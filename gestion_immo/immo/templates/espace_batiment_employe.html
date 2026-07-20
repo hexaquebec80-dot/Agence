@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>
+        {{ batiment.nom|default:"Bâtiment" }} — Espace employé
+    </title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        :root{
+            --primary:#0057ff;
+            --primary-dark:#003dad;
+            --navy:#071a3d;
+            --background:#f4f7fc;
+            --white:#ffffff;
+            --border:#e2e8f0;
+            --muted:#64748b;
+            --success:#16a34a;
+            --danger:#dc2626;
+            --warning:#f59e0b;
+            --purple:#7c3aed;
+            --shadow:0 18px 45px rgba(15,23,42,.08);
+        }
+
+        *{
+            box-sizing:border-box;
+        }
+
+        html{
+            scroll-behavior:smooth;
+        }
+
+        body{
+            margin:0;
+            min-height:100vh;
+            color:#0f172a;
+            font-family:"Segoe UI",Arial,sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(0,87,255,.10),
+                    transparent 29%
+                ),
+                radial-gradient(
+                    circle at bottom left,
+                    rgba(124,58,237,.06),
+                    transparent 25%
+                ),
+                var(--background);
+        }
+
+        a{
+            text-decoration:none;
+        }
+
+        .page-wrapper{
+            width:100%;
+            max-width:1480px;
+            margin:0 auto;
+            padding:28px;
+        }
+
+        /* =========================================
+           MESSAGES
+        ========================================= */
+
+        .page-alert{
+            display:flex;
+            align-items:flex-start;
+            gap:11px;
+            padding:15px 17px;
+            margin-bottom:18px;
+            border:1px solid transparent;
+            border-radius:17px;
+            font-weight:750;
+            box-shadow:0 10px 28px rgba(15,23,42,.06);
+        }
+
+        .page-alert-success{
+            color:#166534;
+            background:#ecfdf3;
+            border-color:#bbf7d0;
+        }
+
+        .page-alert-error,
+        .page-alert-danger{
+            color:#991b1b;
+            background:#fef2f2;
+            border-color:#fecaca;
+        }
+
+        .page-alert-warning{
+            color:#92400e;
+            background:#fffbeb;
+            border-color:#fde68a;
+        }
+
+        .page-alert-info{
+            color:#1d4ed8;
+            background:#eff6ff;
+            border-color:#bfdbfe;
+        }
+
+        /* =========================================
+           HERO
+        ========================================= */
+
+        .building-hero{
+            position:relative;
+            overflow:hidden;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:28px;
+            padding:35px;
+            margin-bottom:24px;
+            color:white;
+            border-radius:32px;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(255,255,255,.18),
+                    transparent 30%
+                ),
+                linear-gradient(
+                    135deg,
+                    #06152f,
+                    #071a3d 48%,
+                    #0057ff
+                );
+
+            box-shadow:0 25px 65px rgba(7,26,61,.22);
+        }
+
+        .building-hero::before{
+            content:"";
+            position:absolute;
+            top:-100px;
+            left:-90px;
+            width:250px;
+            height:250px;
+            border-radius:50%;
+            background:rgba(255,255,255,.04);
+        }
+
+        .building-hero::after{
+            content:"";
+            position:absolute;
+            right:-100px;
+            bottom:-135px;
+            width:280px;
+            height:280px;
+            border-radius:50%;
+            background:rgba(255,255,255,.08);
+        }
+
+        .hero-content,
+        .hero-side{
+            position:relative;
+            z-index:2;
+        }
+
+        .hero-content{
+            flex:1;
+        }
+
+        .back-link{
+            display:inline-flex;
+            align-items:center;
+            gap:9px;
+            padding:11px 15px;
+            margin-bottom:22px;
+            color:white;
+            border:1px solid rgba(255,255,255,.20);
+            border-radius:15px;
+            background:rgba(255,255,255,.12);
+            font-weight:900;
+            transition:.23s ease;
+        }
+
+        .back-link:hover{
+            color:white;
+            background:rgba(255,255,255,.22);
+            transform:translateX(-3px);
+        }
+
+        .building-code{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+            padding:8px 13px;
+            margin-bottom:13px;
+            border-radius:999px;
+            background:rgba(255,255,255,.14);
+            font-size:12px;
+            font-weight:900;
+        }
+
+        .building-hero h1{
+            margin:0 0 9px;
+            font-size:clamp(30px,4vw,45px);
+            font-weight:950;
+        }
+
+        .building-address{
+            display:flex;
+            align-items:flex-start;
+            gap:8px;
+            margin:0;
+            color:rgba(255,255,255,.80);
+            line-height:1.7;
+        }
+
+        .employee-card{
+            display:flex;
+            align-items:center;
+            gap:13px;
+            min-width:270px;
+            padding:17px;
+            border:1px solid rgba(255,255,255,.18);
+            border-radius:21px;
+            background:rgba(255,255,255,.12);
+            backdrop-filter:blur(8px);
+        }
+
+        .employee-icon{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            flex-shrink:0;
+            width:52px;
+            height:52px;
+            color:var(--primary);
+            border-radius:17px;
+            background:white;
+            font-size:20px;
+        }
+
+        .employee-card small{
+            display:block;
+            margin-bottom:2px;
+            color:rgba(255,255,255,.70);
+            font-weight:700;
+        }
+
+        .employee-card strong{
+            display:block;
+            color:white;
+            font-weight:900;
+        }
+
+        /* =========================================
+           NOTICE
+        ========================================= */
+
+        .readonly-notice{
+            display:flex;
+            align-items:flex-start;
+            gap:12px;
+            padding:16px 18px;
+            margin-bottom:24px;
+            color:#1e40af;
+            border:1px solid #bfdbfe;
+            border-radius:18px;
+            background:#eff6ff;
+            font-weight:750;
+        }
+
+        /* =========================================
+           STATISTIQUES
+        ========================================= */
+
+        .stat-card{
+            height:100%;
+            padding:23px;
+            text-align:center;
+            border:1px solid var(--border);
+            border-radius:24px;
+            background:white;
+            box-shadow:0 13px 34px rgba(15,23,42,.07);
+            transition:.24s ease;
+        }
+
+        .stat-card:hover{
+            transform:translateY(-5px);
+            box-shadow:0 20px 45px rgba(15,23,42,.12);
+        }
+
+        .stat-icon{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            width:58px;
+            height:58px;
+            margin:0 auto 15px;
+            border-radius:19px;
+            font-size:23px;
+        }
+
+        .icon-blue{
+            color:var(--primary);
+            background:#eaf1ff;
+        }
+
+        .icon-purple{
+            color:var(--purple);
+            background:#f3e8ff;
+        }
+
+        .icon-red{
+            color:#b91c1c;
+            background:#fee2e2;
+        }
+
+        .icon-green{
+            color:#15803d;
+            background:#dcfce7;
+        }
+
+        .stat-card h5{
+            margin:0 0 7px;
+            color:var(--muted);
+            font-size:14px;
+            font-weight:750;
+        }
+
+        .stat-card h3{
+            margin:0;
+            color:var(--navy);
+            font-size:30px;
+            font-weight:950;
+        }
+
+        /* =========================================
+           PROGRESSION
+        ========================================= */
+
+        .occupation-card{
+            padding:24px;
+            margin:25px 0;
+            border:1px solid var(--border);
+            border-radius:24px;
+            background:white;
+            box-shadow:0 13px 34px rgba(15,23,42,.06);
+        }
+
+        .occupation-header{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:15px;
+            margin-bottom:15px;
+        }
+
+        .occupation-header h3{
+            margin:0;
+            color:var(--navy);
+            font-size:19px;
+            font-weight:950;
+        }
+
+        .occupation-percentage{
+            color:var(--primary);
+            font-size:20px;
+            font-weight:950;
+        }
+
+        .occupation-track{
+            width:100%;
+            height:13px;
+            overflow:hidden;
+            border-radius:999px;
+            background:#e8eef7;
+        }
+
+        .occupation-progress{
+            width:0;
+            height:100%;
+            border-radius:999px;
+
+            background:linear-gradient(
+                90deg,
+                #0057ff,
+                #7c3aed
+            );
+
+            transition:width .6s ease;
+        }
+
+        /* =========================================
+           TABLEAUX
+        ========================================= */
+
+        .table-card{
+            padding:24px;
+            margin-bottom:24px;
+            border:1px solid var(--border);
+            border-radius:26px;
+            background:white;
+            box-shadow:var(--shadow);
+        }
+
+        .table-card-header{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:15px;
+            margin-bottom:20px;
+        }
+
+        .table-title h3{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            margin:0 0 4px;
+            color:var(--navy);
+            font-size:21px;
+            font-weight:950;
+        }
+
+        .table-title p{
+            margin:0;
+            color:var(--muted);
+            font-size:13px;
+        }
+
+        .count-badge{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            min-width:46px;
+            height:46px;
+            padding:0 15px;
+            border-radius:15px;
+            font-weight:950;
+        }
+
+        .count-danger{
+            color:#991b1b;
+            background:#fee2e2;
+        }
+
+        .count-success{
+            color:#166534;
+            background:#dcfce7;
+        }
+
+        .table{
+            margin:0;
+        }
+
+        .table thead th{
+            padding:14px;
+            color:#4d638a;
+            border-bottom:1px solid var(--border);
+            background:#f8fbff;
+            text-transform:uppercase;
+            white-space:nowrap;
+            font-size:11px;
+        }
+
+        .table tbody td{
+            padding:15px 14px;
+            color:#334155;
+            vertical-align:middle;
+            border-color:#edf1f7;
+        }
+
+        .table tbody tr:hover{
+            background:#fbfdff;
+        }
+
+        .room-box,
+        .tenant-box{
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+
+        .room-icon,
+        .tenant-icon{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            flex-shrink:0;
+            width:41px;
+            height:41px;
+            border-radius:13px;
+        }
+
+        .room-icon{
+            color:var(--primary);
+            background:#eaf1ff;
+        }
+
+        .tenant-icon{
+            color:var(--success);
+            background:#ecfdf5;
+        }
+
+        .room-name{
+            color:var(--navy);
+            font-weight:900;
+        }
+
+        .money{
+            color:var(--success);
+            font-weight:950;
+            white-space:nowrap;
+        }
+
+        .status-badge{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            padding:7px 11px;
+            border-radius:999px;
+            font-size:12px;
+            font-weight:900;
+            white-space:nowrap;
+        }
+
+        .status-occupied{
+            color:#991b1b;
+            background:#fee2e2;
+        }
+
+        .status-active,
+        .status-available,
+        .status-paid{
+            color:#166534;
+            background:#dcfce7;
+        }
+
+        .status-unpaid,
+        .status-partial{
+            color:#92400e;
+            background:#fef3c7;
+        }
+
+        .status-empty{
+            color:#475569;
+            background:#e2e8f0;
+        }
+
+        .empty-message{
+            padding:40px 25px;
+            color:var(--muted);
+            text-align:center;
+            border:1px dashed #cbd5e1;
+            border-radius:19px;
+            background:#f8fbff;
+        }
+
+        .empty-message i{
+            color:#94a3b8;
+        }
+
+        /* =========================================
+           INFORMATIONS
+        ========================================= */
+
+        .information-card{
+            padding:25px;
+            margin-bottom:24px;
+            border:1px solid var(--border);
+            border-radius:26px;
+            background:white;
+            box-shadow:var(--shadow);
+        }
+
+        .section-title{
+            display:flex;
+            align-items:center;
+            gap:13px;
+            margin-bottom:23px;
+        }
+
+        .section-icon{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            width:51px;
+            height:51px;
+            color:white;
+            border-radius:17px;
+
+            background:linear-gradient(
+                135deg,
+                #0057ff,
+                #4f8cff
+            );
+        }
+
+        .section-title h3{
+            margin:0;
+            color:var(--navy);
+            font-size:21px;
+            font-weight:950;
+        }
+
+        .section-title p{
+            margin:3px 0 0;
+            color:var(--muted);
+            font-size:13px;
+        }
+
+        .info-grid{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:18px;
+        }
+
+        .info-card{
+            display:flex;
+            align-items:flex-start;
+            gap:13px;
+            padding:20px;
+            border:1px solid #e4ecf8;
+            border-radius:20px;
+            background:#f8fbff;
+            transition:.22s ease;
+        }
+
+        .info-card:hover{
+            transform:translateY(-3px);
+            box-shadow:0 12px 28px rgba(15,23,42,.07);
+        }
+
+        .info-icon{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            flex-shrink:0;
+            width:45px;
+            height:45px;
+            color:var(--primary);
+            border-radius:14px;
+            background:#eaf1ff;
+        }
+
+        .info-label{
+            margin-bottom:5px;
+            color:#6b7a99;
+            font-size:13px;
+            font-weight:700;
+        }
+
+        .info-value{
+            margin:0;
+            color:var(--navy);
+            font-size:17px;
+            font-weight:900;
+        }
+
+        .description-box{
+            padding:20px;
+            margin-top:20px;
+            border:1px dashed #c9d8f0;
+            border-radius:20px;
+            background:#f8fbff;
+        }
+
+        /* =========================================
+           PROPRIÉTAIRE
+        ========================================= */
+
+        .owner-card{
+            padding:27px;
+            color:white;
+            border-radius:27px;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(255,255,255,.16),
+                    transparent 30%
+                ),
+                linear-gradient(
+                    135deg,
+                    #071a3d,
+                    #0057ff
+                );
+
+            box-shadow:0 23px 52px rgba(7,26,61,.22);
+        }
+
+        .owner-head{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:20px;
+            margin-bottom:23px;
+        }
+
+        .owner-profile{
+            display:flex;
+            align-items:center;
+            gap:14px;
+        }
+
+        .owner-avatar{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            flex-shrink:0;
+            width:72px;
+            height:72px;
+            color:var(--primary);
+            border-radius:23px;
+            background:white;
+            font-size:27px;
+            font-weight:950;
+        }
+
+        .owner-profile h3{
+            margin:0 0 4px;
+            font-size:22px;
+            font-weight:950;
+        }
+
+        .owner-profile p{
+            margin:0;
+            color:rgba(255,255,255,.70);
+        }
+
+        .owner-code{
+            display:inline-flex;
+            padding:9px 16px;
+            color:var(--primary);
+            border-radius:999px;
+            background:white;
+            font-weight:900;
+        }
+
+        .owner-info{
+            height:100%;
+            padding:17px;
+            border:1px solid rgba(255,255,255,.11);
+            border-radius:18px;
+            background:rgba(255,255,255,.10);
+        }
+
+        .owner-info small{
+            display:block;
+            margin-bottom:6px;
+            color:rgba(255,255,255,.65);
+        }
+
+        .owner-info strong{
+            display:block;
+            word-break:break-word;
+        }
+
+        /* =========================================
+           RESPONSIVE
+        ========================================= */
+
+        @media(max-width:900px){
+            .page-wrapper{
+                padding:18px;
+            }
+
+            .building-hero{
+                align-items:flex-start;
+                flex-direction:column;
+            }
+
+            .hero-side,
+            .employee-card{
+                width:100%;
+            }
+        }
+
+        @media(max-width:700px){
+            .page-wrapper{
+                padding:10px;
+            }
+
+            .building-hero{
+                padding:23px 19px;
+                border-radius:22px;
+            }
+
+            .info-grid{
+                grid-template-columns:1fr;
+            }
+
+            .wide-info{
+                grid-column:auto !important;
+            }
+
+            .table-card-header,
+            .occupation-header,
+            .owner-head{
+                align-items:flex-start;
+                flex-direction:column;
+            }
+
+            .back-link{
+                width:100%;
+                justify-content:center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page-wrapper">
+
+    {% if messages %}
+        {% for message in messages %}
+
+            <div class="page-alert page-alert-{{ message.tags|default:'info' }}">
+
+                {% if message.tags == "success" %}
+                    <i class="fa-solid fa-circle-check mt-1"></i>
+
+                {% elif message.tags == "error" or message.tags == "danger" %}
+                    <i class="fa-solid fa-circle-exclamation mt-1"></i>
+
+                {% elif message.tags == "warning" %}
+                    <i class="fa-solid fa-triangle-exclamation mt-1"></i>
+
+                {% else %}
+                    <i class="fa-solid fa-circle-info mt-1"></i>
+                {% endif %}
+
+                <span>{{ message }}</span>
+
+            </div>
+
+        {% endfor %}
+    {% endif %}
+
+    <!-- HERO -->
+
+    <section class="building-hero">
+
+        <div class="hero-content">
+
+            <a
+                href="{% url 'espace_batiments_employe' %}"
+                class="back-link"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+                Retour aux bâtiments
+            </a>
+
+            <div>
+
+                <span class="building-code">
+
+                    <i class="fa-solid fa-hashtag"></i>
+
+                    {{ batiment.code_batiment|default:"Sans code" }}
+
+                </span>
+
+            </div>
+
+            <h1>
+                {{ batiment.nom|default:"Bâtiment" }}
+            </h1>
+
+            <p class="building-address">
+
+                <i class="fa-solid fa-location-dot mt-1"></i>
+
+                <span>
+
+                    {{ batiment.adresse|default:"Adresse non renseignée" }}
+
+                    {% if batiment.ville %}
+                        — {{ batiment.ville }}
+                    {% endif %}
+
+                </span>
+
+            </p>
+
+        </div>
+
+        <div class="hero-side">
+
+            <div class="employee-card">
+
+                <div class="employee-icon">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+
+                <div>
+
+                    <small>Employé connecté</small>
+
+                    <strong>
+                        {{ employe.prenom|default:"Employé" }}
+                        {{ employe.nom|default:"" }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <div class="readonly-notice">
+
+        <i class="fa-solid fa-circle-info mt-1"></i>
+
+        <div>
+            Cette page est en lecture seule. L’employé peut consulter
+            les informations du bâtiment, les logements occupés,
+            les logements disponibles et les locations actives.
+        </div>
+
+    </div>
+
+    <!-- STATISTIQUES -->
+
+    <section class="row g-4 mb-4">
+
+        <div class="col-sm-6 col-xl-3">
+
+            <article class="stat-card">
+
+                <div class="stat-icon icon-blue">
+                    <i class="fa-solid fa-building"></i>
+                </div>
+
+                <h5>Code bâtiment</h5>
+
+                <h3>
+                    {{ batiment.code_batiment|default:"-" }}
+                </h3>
+
+            </article>
+
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+
+            <article class="stat-card">
+
+                <div class="stat-icon icon-purple">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+
+                <h5>Total logements/chambres</h5>
+
+                <h3>
+                    {{ total_chambres_batiment|default:"0" }}
+                </h3>
+
+            </article>
+
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+
+            <article class="stat-card">
+
+                <div class="stat-icon icon-red">
+                    <i class="fa-solid fa-key"></i>
+                </div>
+
+                <h5>Logements occupés</h5>
+
+                <h3>
+                    {{ logements_occupes_batiment|default:"0" }}
+                </h3>
+
+            </article>
+
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+
+            <article class="stat-card">
+
+                <div class="stat-icon icon-green">
+                    <i class="fa-solid fa-door-open"></i>
+                </div>
+
+                <h5>Logements disponibles</h5>
+
+                <h3>
+                    {{ logements_libres_batiment|default:"0" }}
+                </h3>
+
+            </article>
+
+        </div>
+
+    </section>
+
+    <!-- TAUX D’OCCUPATION -->
+
+    <section class="occupation-card">
+
+        <div class="occupation-header">
+
+            <h3>
+                <i class="fa-solid fa-chart-simple text-primary me-2"></i>
+                Niveau d’occupation
+            </h3>
+
+            <div class="occupation-percentage">
+                {{ taux_occupation|default:"0" }} %
+            </div>
+
+        </div>
+
+        <div class="occupation-track">
+
+            <div
+                class="occupation-progress"
+                id="occupationProgress"
+                data-percentage="{{ taux_occupation|default:'0' }}"
+            ></div>
+
+        </div>
+
+    </section>
+
+    <!-- LOGEMENTS OCCUPÉS -->
+
+    <section class="table-card">
+
+        <div class="table-card-header">
+
+            <div class="table-title">
+
+                <h3>
+                    <i class="fa-solid fa-key text-danger"></i>
+                    Logements / chambres occupés
+                </h3>
+
+                <p>
+                    Locataires et informations des baux actifs.
+                </p>
+
+            </div>
+
+            <span class="count-badge count-danger">
+                {{ logements_occupes_batiment|default:"0" }}
+            </span>
+
+        </div>
+
+        {% if chambres_occupees %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+
+                        <tr>
+                            <th>Logement / Chambre</th>
+                            <th>Locataire</th>
+                            <th>Téléphone</th>
+                            <th>Loyer</th>
+                            <th>Caution</th>
+                            <th>Date début</th>
+                            <th>Statut</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for item in chambres_occupees %}
+
+                            <tr>
+
+                                <td>
+
+                                    <div class="room-box">
+
+                                        <div class="room-icon">
+                                            <i class="fa-solid fa-door-closed"></i>
+                                        </div>
+
+                                        <div>
+
+                                            <div class="room-name">
+
+                                                {{ item.chambre.nom|default:"Logement / Chambre" }}
+
+                                            </div>
+
+                                            <small class="text-muted">
+
+                                                N° {{ item.chambre.numero|default:"-" }}
+
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+                                <td>
+
+                                    <div class="tenant-box">
+
+                                        <div class="tenant-icon">
+                                            <i class="fa-solid fa-user"></i>
+                                        </div>
+
+                                        <div>
+
+                                            <strong>
+
+                                                {{ item.locataire.nom|default:"" }}
+                                                {{ item.locataire.prenom|default:"" }}
+
+                                            </strong>
+
+                                            <div class="small text-muted">
+                                                Locataire occupant
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+                                <td>
+                                    {{ item.locataire.telephone|default:"Non renseigné" }}
+                                </td>
+
+                                <td>
+
+                                    <span class="money">
+
+                                        {{ item.bail.loyer|default:"0"|floatformat:0 }}
+                                        {{ agence.devise|default:"FCFA" }}
+
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    {% if item.bail.caution_payee %}
+
+                                        <span class="status-badge status-paid">
+
+                                            <i class="fa-solid fa-circle-check"></i>
+                                            Payée
+
+                                        </span>
+
+                                        <div class="small text-muted mt-1">
+
+                                            {{ item.bail.caution|default:"0"|floatformat:0 }}
+                                            {{ agence.devise|default:"FCFA" }}
+
+                                        </div>
+
+                                    {% else %}
+
+                                        <span class="status-badge status-unpaid">
+
+                                            <i class="fa-solid fa-clock"></i>
+                                            Non payée
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+
+                                    {% if item.bail.date_debut %}
+
+                                        <i class="fa-regular fa-calendar text-primary me-1"></i>
+
+                                        {{ item.bail.date_debut|date:"d/m/Y" }}
+
+                                    {% else %}
+
+                                        -
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+
+                                    <span class="status-badge status-active">
+
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        Bail actif
+
+                                    </span>
+
+                                    <span class="status-badge status-occupied mt-1">
+
+                                        <i class="fa-solid fa-key"></i>
+                                        Occupé
+
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-message">
+
+                <i class="fa-solid fa-circle-info fa-2x mb-3 d-block"></i>
+
+                Aucun logement ou chambre occupé pour ce bâtiment.
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+    <!-- LOGEMENTS DISPONIBLES -->
+
+    <section class="table-card">
+
+        <div class="table-card-header">
+
+            <div class="table-title">
+
+                <h3>
+                    <i class="fa-solid fa-door-open text-success"></i>
+                    Logements / chambres disponibles
+                </h3>
+
+                <p>
+                    Logements libres sans location active.
+                </p>
+
+            </div>
+
+            <span class="count-badge count-success">
+                {{ logements_libres_batiment|default:"0" }}
+            </span>
+
+        </div>
+
+        {% if chambres_libres %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+
+                        <tr>
+                            <th>Logement / Chambre</th>
+                            <th>Numéro</th>
+                            <th>Locataire</th>
+                            <th>Statut</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for chambre in chambres_libres %}
+
+                            <tr>
+
+                                <td>
+
+                                    <div class="room-box">
+
+                                        <div class="room-icon">
+                                            <i class="fa-solid fa-door-open"></i>
+                                        </div>
+
+                                        <strong class="room-name">
+
+                                            {{ chambre.nom|default:"Logement / Chambre" }}
+
+                                        </strong>
+
+                                    </div>
+
+                                </td>
+
+                                <td>
+                                    N° {{ chambre.numero|default:"-" }}
+                                </td>
+
+                                <td>
+
+                                    <span class="text-muted">
+                                        Aucun locataire
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    <span class="status-badge status-available">
+
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        Disponible
+
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-message">
+
+                <i class="fa-solid fa-door-closed fa-2x mb-3 d-block"></i>
+
+                Aucun logement ou chambre disponible.
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+    <!-- INFORMATIONS DU BÂTIMENT -->
+
+    <section class="information-card">
+
+        <div class="section-title">
+
+            <div class="section-icon">
+                <i class="fa-solid fa-building"></i>
+            </div>
+
+            <div>
+
+                <h3>Informations du bâtiment</h3>
+
+                <p>
+                    Détails administratifs et localisation.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="info-grid">
+
+            <div class="info-card">
+
+                <div class="info-icon">
+                    <i class="fa-solid fa-signature"></i>
+                </div>
+
+                <div>
+
+                    <div class="info-label">
+                        Nom du bâtiment
+                    </div>
+
+                    <p class="info-value">
+                        {{ batiment.nom|default:"-" }}
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="info-card">
+
+                <div class="info-icon">
+                    <i class="fa-solid fa-barcode"></i>
+                </div>
+
+                <div>
+
+                    <div class="info-label">
+                        Code bâtiment
+                    </div>
+
+                    <p class="info-value">
+                        {{ batiment.code_batiment|default:"-" }}
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="info-card">
+
+                <div class="info-icon">
+                    <i class="fa-solid fa-city"></i>
+                </div>
+
+                <div>
+
+                    <div class="info-label">
+                        Ville
+                    </div>
+
+                    <p class="info-value">
+                        {{ batiment.ville|default:"-" }}
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="info-card">
+
+                <div class="info-icon">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+
+                <div>
+
+                    <div class="info-label">
+                        Statut d’occupation
+                    </div>
+
+                    <p class="info-value">
+
+                        {% if total_chambres_batiment == 0 %}
+
+                            <span class="status-badge status-empty">
+                                Aucun logement
+                            </span>
+
+                        {% elif occupation_complete %}
+
+                            <span class="status-badge status-occupied">
+                                Tout occupé
+                            </span>
+
+                        {% elif occupation_partielle %}
+
+                            <span class="status-badge status-partial">
+                                Partiellement occupé
+                            </span>
+
+                        {% else %}
+
+                            <span class="status-badge status-available">
+                                Libre
+                            </span>
+
+                        {% endif %}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div
+                class="info-card wide-info"
+                style="grid-column:1 / -1;"
+            >
+
+                <div class="info-icon">
+                    <i class="fa-solid fa-location-dot"></i>
+                </div>
+
+                <div>
+
+                    <div class="info-label">
+                        Adresse complète
+                    </div>
+
+                    <p class="info-value">
+                        {{ batiment.adresse|default:"-" }}
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="description-box">
+
+            <div class="info-label">
+
+                <i class="fa-solid fa-align-left text-primary me-1"></i>
+
+                Description
+
+            </div>
+
+            <p class="mb-0">
+
+                {{ batiment.description|default:"Aucune description disponible." }}
+
+            </p>
+
+        </div>
+
+    </section>
+
+    <!-- PROPRIÉTAIRE -->
+
+    <section class="owner-card">
+
+        {% if batiment.proprietaire %}
+
+            <div class="owner-head">
+
+                <div class="owner-profile">
+
+                    <div class="owner-avatar">
+
+                        {{ batiment.proprietaire.nom|slice:":1" }}
+                        {{ batiment.proprietaire.prenom|slice:":1" }}
+
+                    </div>
+
+                    <div>
+
+                        <h3>
+
+                            {{ batiment.proprietaire.nom|default:"" }}
+                            {{ batiment.proprietaire.prenom|default:"" }}
+
+                        </h3>
+
+                        <p>Propriétaire du bâtiment</p>
+
+                    </div>
+
+                </div>
+
+                <span class="owner-code">
+
+                    {{ batiment.proprietaire.code_client|default:"Propriétaire" }}
+
+                </span>
+
+            </div>
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+
+                    <div class="owner-info">
+
+                        <small>Téléphone</small>
+
+                        <strong>
+
+                            <i class="fa-solid fa-phone me-2"></i>
+
+                            {{ batiment.proprietaire.telephone|default:"Non renseigné" }}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="owner-info">
+
+                        <small>Email</small>
+
+                        <strong>
+
+                            <i class="fa-solid fa-envelope me-2"></i>
+
+                            {{ batiment.proprietaire.email|default:"Non renseigné" }}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="owner-info">
+
+                        <small>Adresse</small>
+
+                        <strong>
+
+                            <i class="fa-solid fa-map-location-dot me-2"></i>
+
+                            {{ batiment.proprietaire.adresse|default:"Non renseigné" }}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center">
+
+                <i class="fa-solid fa-user-slash fa-2x mb-3"></i>
+
+                <h4 class="fw-bold">
+                    Aucun propriétaire associé
+                </h4>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const progressBar =
+        document.getElementById("occupationProgress");
+
+    if (!progressBar) {
+        return;
+    }
+
+    const rawPercentage =
+        String(
+            progressBar.dataset.percentage || "0"
+        ).replace(",", ".");
+
+    let percentage =
+        Number.parseFloat(rawPercentage);
+
+    if (!Number.isFinite(percentage)) {
+        percentage = 0;
+    }
+
+    percentage = Math.max(
+        0,
+        Math.min(percentage, 100)
+    );
+
+    requestAnimationFrame(function () {
+        progressBar.style.width = percentage + "%";
+    });
+
+});
+</script>
+
+</body>
+</html>

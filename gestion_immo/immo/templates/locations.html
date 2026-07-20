@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Locations</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+<style>
+body{
+    background:#f4f7fc;
+    font-family:Arial,sans-serif;
+    padding:25px;
+}
+
+.page-header{
+    background:linear-gradient(135deg,#071a3d,#0057ff);
+    color:white;
+    border-radius:28px;
+    padding:30px;
+    margin-bottom:25px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+}
+
+.page-header h1{
+    font-weight:900;
+    margin:0;
+}
+
+.btn-dashboard{
+    background:white;
+    color:#071a3d;
+    padding:13px 20px;
+    border-radius:14px;
+    text-decoration:none;
+    font-weight:900;
+}
+
+.btn-dashboard:hover{
+    color:#0057ff;
+}
+
+.location-card{
+    background:white;
+    border-radius:24px;
+    padding:24px;
+    margin-bottom:22px;
+    box-shadow:0 14px 35px rgba(15,23,42,.08);
+    border:1px solid #e5ecf6;
+}
+
+.card-title{
+    font-weight:900;
+    color:#071a3d;
+    margin-bottom:18px;
+}
+
+.info-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+}
+
+.info-box{
+    background:#f8fbff;
+    border:1px solid #e5ecf6;
+    border-radius:16px;
+    padding:15px;
+}
+
+.info-box small{
+    color:#64748b;
+    font-weight:800;
+}
+
+.info-box h4{
+    margin-top:7px;
+    font-size:16px;
+    color:#071a3d;
+    font-weight:900;
+}
+
+.caution-box{
+    margin-top:22px;
+    background:#fff7ed;
+    border:1px solid #fed7aa;
+    border-radius:18px;
+    padding:20px;
+}
+
+.caution-title{
+    color:#c2410c;
+    font-weight:900;
+    margin-bottom:15px;
+}
+
+.status-active,
+.status-end,
+.status-paid,
+.status-unpaid{
+    padding:8px 13px;
+    border-radius:999px;
+    font-weight:900;
+    display:inline-block;
+}
+
+.status-active,
+.status-paid{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.status-end,
+.status-unpaid{
+    background:#fee2e2;
+    color:#b91c1c;
+}
+
+.empty{
+    text-align:center;
+    background:white;
+    border-radius:24px;
+    padding:60px;
+    color:#64748b;
+}
+
+@media(max-width:900px){
+    .info-grid{
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+@media(max-width:600px){
+    body{
+        padding:15px;
+    }
+
+    .page-header{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .info-grid{
+        grid-template-columns:1fr;
+    }
+
+    .btn-dashboard{
+        width:100%;
+        text-align:center;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="page-header">
+    <div>
+        <h1>
+            <i class="fa-solid fa-key"></i>
+            Liste des locations
+        </h1>
+        <p class="mb-0">Suivi complet des contrats, loyers et cautions</p>
+    </div>
+
+    <a href="{% url 'dashboard' %}" class="btn-dashboard">
+        <i class="fa-solid fa-gauge-high"></i>
+        Tableau de bord
+    </a>
+</div>
+
+{% for location in locations %}
+
+<div class="location-card">
+
+    <h3 class="card-title">
+        <i class="fa-solid fa-house-user text-primary"></i>
+        {{ location.locataire.nom }} — {{ location.batiment.nom }}
+    </h3>
+
+    <div class="info-grid">
+
+        <div class="info-box">
+            <small>Locataire</small>
+            <h4>
+                {{ location.locataire.prenom|default:"" }}
+                {{ location.locataire.nom }}
+            </h4>
+        </div>
+
+        <div class="info-box">
+            <small>Téléphone</small>
+            <h4>{{ location.locataire.telephone|default:"Non défini" }}</h4>
+        </div>
+
+        <div class="info-box">
+            <small>Email</small>
+            <h4>{{ location.locataire.email|default:"Non défini" }}</h4>
+        </div>
+
+        <div class="info-box">
+            <small>Bâtiment</small>
+            <h4>{{ location.batiment.nom }}</h4>
+        </div>
+
+        <div class="info-box">
+            <small>Adresse bâtiment</small>
+            <h4>{{ location.batiment.adresse|default:"Non définie" }}</h4>
+        </div>
+
+        <div class="info-box">
+            <small>N° appartement</small>
+            <h4>{{ location.numero_appartement|default:"Non défini" }}</h4>
+        </div>
+
+        <div class="info-box">
+            <small>Date début</small>
+            <h4>{{ location.date_debut|date:"d/m/Y" }}</h4>
+        </div>
+
+        <div class="info-box">
+            <small>Loyer mensuel</small>
+            <h4>{{ location.loyer }} FCFA</h4>
+        </div>
+
+        <div class="info-box">
+            <small>Statut location</small>
+            <h4>
+                {% if location.active %}
+                    <span class="status-active">Active</span>
+                {% else %}
+                    <span class="status-end">Terminée</span>
+                {% endif %}
+            </h4>
+        </div>
+
+    </div>
+
+    <div class="caution-box">
+
+        <div class="caution-title">
+            <i class="fa-solid fa-shield-halved"></i>
+            Partie caution de location
+        </div>
+
+        <div class="info-grid">
+
+            <div class="info-box">
+                <small>Montant caution</small>
+                <h4>{{ location.caution|default:"0" }} FCFA</h4>
+            </div>
+
+            <div class="info-box">
+                <small>Caution payée</small>
+                <h4>
+                    {% if location.caution_payee %}
+                        <span class="status-paid">Oui</span>
+                    {% else %}
+                        <span class="status-unpaid">Non</span>
+                    {% endif %}
+                </h4>
+            </div>
+
+            <div class="info-box">
+                <small>Date caution</small>
+                <h4>
+                    {% if location.date_caution %}
+                        {{ location.date_caution|date:"d/m/Y" }}
+                    {% else %}
+                        Non définie
+                    {% endif %}
+                </h4>
+            </div>
+
+            <div class="info-box">
+                <small>Observation caution</small>
+                <h4>{{ location.observation_caution|default:"Aucune" }}</h4>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% empty %}
+
+<div class="empty">
+    <i class="fa-solid fa-folder-open fa-3x mb-3"></i>
+    <h3>Aucune location enregistrée</h3>
+    <p>Ajoutez une location pour commencer le suivi.</p>
+</div>
+
+{% endfor %}
+
+</body>
+</html>

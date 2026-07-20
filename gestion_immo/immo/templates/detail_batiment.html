@@ -1,0 +1,476 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.info-card{background:#f8fbff;border:1px solid #e4ecf8;border-radius:20px;padding:20px;transition:.25s}
+.info-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(15,23,42,.08)}
+.info-icon{width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,#0057ff,#4f8cff);color:white;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.info-label{font-size:13px;color:#6b7a99;font-weight:700;margin-bottom:5px}
+.info-value{font-size:18px;color:#071a3d;font-weight:800;margin:0}
+.owner-card{background:linear-gradient(135deg,#071a3d,#0057ff);color:white;border-radius:24px;padding:26px;margin-bottom:25px}
+.owner-avatar{width:70px;height:70px;border-radius:22px;background:white;color:#0057ff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900}
+.description-box{background:#f8fbff;border:1px dashed #c9d8f0;border-radius:20px;padding:20px}
+.table-card{background:white;border-radius:22px;padding:22px;box-shadow:0 12px 30px rgba(15,23,42,.08)}
+@media(max-width:768px){.info-grid{grid-template-columns:1fr}}
+</style>
+
+<div class="container-fluid">
+
+    <div class="card-modern mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div style="width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,#0057ff,#4f8cff);color:white;display:flex;align-items:center;justify-content:center;font-size:35px;">
+                    <i class="fa-solid fa-building"></i>
+                </div>
+
+                <div>
+                    <h2 class="fw-bold mb-1">{{ batiment.nom }}</h2>
+                    <p class="text-muted mb-0">Détails complets du bâtiment</p>
+                </div>
+            </div>
+
+            <a href="{% url 'batiments' %}" class="btn btn-outline-secondary rounded-4">
+                <i class="fa-solid fa-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-3">
+            <div class="card-modern text-center">
+                <i class="fa-solid fa-building text-primary fa-2x mb-3"></i>
+                <h5>Code</h5>
+                <h4 class="fw-bold">{{ batiment.code_batiment }}</h4>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card-modern text-center">
+                <i class="fa-solid fa-house text-success fa-2x mb-3"></i>
+                <h5>Total logements/chambres</h5>
+                <h4 class="fw-bold">{{ total_chambres_batiment }}</h4>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <a href="#blocOccupes" data-bs-toggle="collapse" class="text-decoration-none text-dark">
+                <div class="card-modern text-center">
+                    <i class="fa-solid fa-key text-danger fa-2x mb-3"></i>
+                    <h5>Occupés</h5>
+                    <h4 class="fw-bold">{{ logements_occupes_batiment }}</h4>
+                    <small class="text-muted">Voir les locataires</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a href="#blocDisponibles" data-bs-toggle="collapse" class="text-decoration-none text-dark">
+                <div class="card-modern text-center">
+                    <i class="fa-solid fa-door-open text-primary fa-2x mb-3"></i>
+                    <h5>Disponibles</h5>
+                    <h4 class="fw-bold">{{ logements_libres_batiment }}</h4>
+                    <small class="text-muted">Voir les libres</small>
+                </div>
+            </a>
+        </div>
+
+    </div>
+
+    <div class="mb-4">
+        <a href="{% url 'ajouter_chambre' batiment.id %}" class="btn btn-primary rounded-4">
+            <i class="fa-solid fa-plus"></i> Ajouter logement / chambre
+        </a>
+    </div>
+
+
+
+  <div class="collapse mb-4 show" id="blocOccupes">
+    <div class="table-card">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold mb-0">
+                <i class="fa-solid fa-key text-danger"></i>
+                Logements / chambres occupés
+            </h4>
+
+            <span class="badge bg-danger rounded-pill px-3 py-2">
+                {{ logements_occupes_batiment|default:"0" }} occupé(s)
+            </span>
+        </div>
+
+        {% if chambres_occupees %}
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+
+                <thead>
+                    <tr>
+                        <th>Logement / Chambre</th>
+                        <th>Locataire</th>
+                        <th>Loyer</th>
+                        <th>Caution</th>
+                        <th>Date début</th>
+                        <th>Statut</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for item in chambres_occupees %}
+
+                    <tr>
+
+                        <!-- LOGEMENT / CHAMBRE -->
+                        <td>
+                            <strong>
+                                {{ item.chambre.nom|default:"Logement / Chambre" }}
+                            </strong>
+
+                            <br>
+
+                            <small class="text-muted">
+                                N° {{ item.chambre.numero }}
+                            </small>
+                        </td>
+
+
+                        <!-- LOCATAIRE -->
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+
+                                <div style="
+                                    width:38px;
+                                    height:38px;
+                                    border-radius:12px;
+                                    background:#ecfdf5;
+                                    color:#16a34a;
+                                    display:flex;
+                                    align-items:center;
+                                    justify-content:center;
+                                ">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+
+                                <div>
+                                    <strong>
+                                        {{ item.locataire.nom }}
+                                        {{ item.locataire.prenom }}
+                                    </strong>
+
+                                    <br>
+
+                                    <small class="text-muted">
+                                        Locataire occupant
+                                    </small>
+                                </div>
+
+                            </div>
+                        </td>
+
+
+                        <!-- LOYER -->
+                        <td>
+                            <strong class="text-success">
+                                {{ item.bail.loyer|default:"0" }} $
+                            </strong>
+                        </td>
+
+
+                        <!-- CAUTION -->
+                        <td>
+                            <strong>
+                                {{ item.bail.caution|default:"0" }} $
+                            </strong>
+                        </td>
+
+
+                        <!-- DATE -->
+                        <td>
+                            <i class="fa-regular fa-calendar text-primary"></i>
+
+                            {{ item.bail.date_debut|date:"d/m/Y" }}
+                        </td>
+
+
+                        <!-- STATUT -->
+                        <td>
+                            <span class="badge bg-success rounded-pill">
+                                <i class="fa-solid fa-circle-check"></i>
+                                Bail actif
+                            </span>
+
+                            <span class="badge bg-danger rounded-pill">
+                                <i class="fa-solid fa-key"></i>
+                                Occupé
+                            </span>
+                        </td>
+
+
+                        <!-- ACTIONS -->
+                        <td class="text-center">
+
+                            <div class="d-flex justify-content-center gap-2">
+
+                                <!-- MODIFIER -->
+                                <a href="{% url 'modifier_chamb' item.chambre.id %}"
+                                   class="btn btn-sm btn-outline-warning rounded-3"
+                                   title="Modifier le logement / chambre">
+
+                                    <i class="fa-solid fa-pen-to-square"></i>
+
+                                </a>
+
+
+                                <a href="{% url 'supprimer_chamb' item.chambre.id %}"
+   class="btn btn-sm btn-outline-danger rounded-3"
+   onclick="return confirm('Voulez-vous vraiment supprimer ce logement/chambre et son bail ?');">
+    <i class="fa-solid fa-trash-can"></i>
+</a>
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+        </div>
+
+        {% else %}
+
+        <div class="alert alert-info rounded-4 mb-0">
+            <i class="fa-solid fa-circle-info"></i>
+            Aucun logement ou chambre occupé pour ce bâtiment.
+        </div>
+
+        {% endif %}
+
+    </div>
+</div>
+
+
+
+
+<div class="collapse mb-4 show" id="blocDisponibles">
+    <div class="table-card">
+        <h4 class="fw-bold mb-3">
+            <i class="fa-solid fa-door-open text-primary"></i>
+            Logements / chambres disponibles
+        </h4>
+
+        {% if chambres_libres %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Logement / Chambre</th>
+                        <th>Numéro</th>
+                        <th>Locataire</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for chambre in chambres_libres %}
+                    <tr>
+                        <td>
+                            <strong>{{ chambre.nom|default:"Logement / Chambre" }}</strong>
+                        </td>
+
+                        <td>N° {{ chambre.numero }}</td>
+
+                        <td>
+                            <span class="text-muted">
+                                Aucun locataire
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="badge bg-success">Disponible</span>
+                        </td>
+
+                        <td>
+                            <div class="d-flex gap-2 flex-wrap">
+
+                                <a href="{% url 'modifier_chambre' chambre.id %}"
+                                   class="btn btn-sm btn-outline-warning rounded-3">
+                                    <i class="fa-solid fa-pen"></i>
+                                    Modifier
+                                </a>
+
+                                <a href="{% url 'supprimer_chambre' chambre.id %}"
+                                   class="btn btn-sm btn-outline-danger rounded-3"
+                                   onclick="return confirm('Voulez-vous vraiment supprimer ce logement/chambre ?');">
+                                    <i class="fa-solid fa-trash"></i>
+                                    Supprimer
+                                </a>
+
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-danger rounded-4 mb-0">
+            <i class="fa-solid fa-circle-xmark"></i>
+            Aucun logement ou chambre disponible.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+
+    <div class="card-modern mb-4">
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="info-icon">
+                <i class="fa-solid fa-building"></i>
+            </div>
+
+            <div>
+                <h4 class="fw-bold mb-1">Informations du bâtiment</h4>
+                <p class="text-muted mb-0">Détails administratifs et localisation</p>
+            </div>
+        </div>
+
+        <div class="info-grid">
+
+            <div class="info-card">
+                <div class="d-flex gap-3">
+                    <div class="info-icon"><i class="fa-solid fa-signature"></i></div>
+                    <div>
+                        <div class="info-label">Nom du bâtiment</div>
+                        <p class="info-value">{{ batiment.nom }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="d-flex gap-3">
+                    <div class="info-icon"><i class="fa-solid fa-barcode"></i></div>
+                    <div>
+                        <div class="info-label">Code bâtiment</div>
+                        <p class="info-value">{{ batiment.code_batiment }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="d-flex gap-3">
+                    <div class="info-icon"><i class="fa-solid fa-city"></i></div>
+                    <div>
+                        <div class="info-label">Ville</div>
+                        <p class="info-value">{{ batiment.ville|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="d-flex gap-3">
+                    <div class="info-icon"><i class="fa-solid fa-circle-check"></i></div>
+                    <div>
+                        <div class="info-label">Statut d’occupation</div>
+                        <p class="info-value">
+                            {% if total_chambres_batiment == 0 %}
+                                <span class="badge bg-secondary">Aucun logement</span>
+                            {% elif occupation_complete %}
+                                <span class="badge bg-danger">Tout occupé</span>
+                            {% elif occupation_partielle %}
+                                <span class="badge bg-warning text-dark">Partiellement occupé</span>
+                            {% else %}
+                                <span class="badge bg-success">Libre</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card" style="grid-column:1 / -1;">
+                <div class="d-flex gap-3">
+                    <div class="info-icon"><i class="fa-solid fa-location-dot"></i></div>
+                    <div>
+                        <div class="info-label">Adresse complète</div>
+                        <p class="info-value">{{ batiment.adresse|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="description-box mt-4">
+            <div class="info-label">
+                <i class="fa-solid fa-align-left text-primary"></i>
+                Description
+            </div>
+            <p class="mb-0">{{ batiment.description|default:"Aucune description disponible." }}</p>
+        </div>
+    </div>
+
+    <div class="owner-card">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <div class="owner-avatar">
+                    {{ batiment.proprietaire.nom|slice:":1" }}{{ batiment.proprietaire.prenom|slice:":1" }}
+                </div>
+
+                <div>
+                    <h4 class="fw-bold mb-1">
+                        {{ batiment.proprietaire.nom }} {{ batiment.proprietaire.prenom }}
+                    </h4>
+                    <p class="mb-0 opacity-75">Propriétaire du bâtiment</p>
+                </div>
+            </div>
+
+            <span class="badge bg-light text-primary rounded-pill px-4 py-2">
+                {{ batiment.proprietaire.code_client }}
+            </span>
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+                <div class="bg-white bg-opacity-10 rounded-4 p-3">
+                    <small class="opacity-75">Téléphone</small>
+                    <h6 class="fw-bold mt-1 mb-0">
+                        <i class="fa-solid fa-phone me-2"></i>
+                        {{ batiment.proprietaire.telephone|default:"Non renseigné" }}
+                    </h6>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="bg-white bg-opacity-10 rounded-4 p-3">
+                    <small class="opacity-75">Email</small>
+                    <h6 class="fw-bold mt-1 mb-0">
+                        <i class="fa-solid fa-envelope me-2"></i>
+                        {{ batiment.proprietaire.email|default:"Non renseigné" }}
+                    </h6>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="bg-white bg-opacity-10 rounded-4 p-3">
+                    <small class="opacity-75">Adresse</small>
+                    <h6 class="fw-bold mt-1 mb-0">
+                        <i class="fa-solid fa-map-location-dot me-2"></i>
+                        {{ batiment.proprietaire.adresse|default:"Non renseigné" }}
+                    </h6>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

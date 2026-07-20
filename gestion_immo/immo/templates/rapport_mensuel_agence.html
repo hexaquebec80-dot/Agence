@@ -1,0 +1,1256 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Rapport mensuel agence</title>
+
+<style>
+@page{
+    size:A4 landscape;
+    margin:7mm;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding:0;
+    font-family:Arial, sans-serif;
+    color:#0f172a;
+    background:#fff;
+    font-size:9px;
+}
+
+.report{
+    width:100%;
+    background:white;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header{
+    background:linear-gradient(135deg,#071a3d,#0057ff);
+    color:white;
+    padding:12px 16px;
+    border-radius:10px;
+    display:flex;
+    justify-content:space-between;
+    gap:15px;
+    margin-bottom:8px;
+}
+
+.agency-block{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+}
+
+.logo-box{
+    width:55px;
+    height:55px;
+    background:white;
+    border-radius:10px;
+    padding:5px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.logo-box img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+}
+
+.logo-fallback{
+    color:#071a3d;
+    font-size:22px;
+    font-weight:900;
+}
+
+.agency-info h2{
+    margin:0 0 4px;
+    font-size:16px;
+}
+
+.agency-info p{
+    margin:2px 0;
+    font-size:9px;
+    line-height:1.25;
+}
+
+.header-right{
+    text-align:right;
+    min-width:250px;
+}
+
+.document-badge{
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:20px;
+    background:rgba(255,255,255,.18);
+    font-size:8px;
+    font-weight:900;
+}
+
+.header-right h1{
+    margin:5px 0;
+    font-size:17px;
+    line-height:1.1;
+    text-transform:uppercase;
+}
+
+.header-right p{
+    margin:2px 0;
+    font-size:9px;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+.no-print{
+    margin-bottom:10px;
+}
+
+.toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:end;
+    gap:10px;
+    padding:10px;
+    border:1px solid #dbe3ef;
+    border-radius:10px;
+    background:#f8fafc;
+}
+
+.filter-form{
+    display:flex;
+    gap:8px;
+    align-items:end;
+}
+
+.filter-group{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.filter-group label{
+    font-size:8px;
+    font-weight:900;
+    color:#64748b;
+    text-transform:uppercase;
+}
+
+.filter-group input{
+    height:34px;
+    width:220px;
+    border:1px solid #cbd5e1;
+    border-radius:8px;
+    padding:0 10px;
+}
+
+.btn{
+    height:34px;
+    border:0;
+    border-radius:8px;
+    padding:0 12px;
+    font-size:10px;
+    font-weight:900;
+    cursor:pointer;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.btn-filter{
+    background:#071a3d;
+    color:white;
+}
+
+.btn-reset{
+    background:#e2e8f0;
+    color:#071a3d;
+}
+
+.btn-print{
+    background:#0057ff;
+    color:white;
+}
+
+/* =========================
+   META
+========================= */
+
+.report-meta{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:6px;
+    margin-bottom:8px;
+}
+
+.meta-card{
+    border:1px solid #dbe3ef;
+    background:#f8fafc;
+    border-radius:8px;
+    padding:7px;
+}
+
+.meta-card small{
+    display:block;
+    font-size:7px;
+    font-weight:900;
+    color:#64748b;
+    text-transform:uppercase;
+    margin-bottom:3px;
+}
+
+.meta-card strong{
+    font-size:9px;
+    color:#071a3d;
+}
+
+/* =========================
+   STATISTIQUES
+========================= */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:7px;
+    margin-bottom:9px;
+}
+
+.stat{
+    border:1px solid #dbe3ef;
+    border-left:5px solid #071a3d;
+    border-radius:9px;
+    padding:8px 10px;
+    background:white;
+}
+
+.stat.total{
+    border-left-color:#15803d;
+}
+
+.stat.agence{
+    border-left-color:#0057ff;
+}
+
+.stat.proprietaires{
+    border-left-color:#b7791f;
+}
+
+.stat.depense-agence{
+    border-left-color:#dc2626;
+}
+
+.stat.depense-proprietaire{
+    border-left-color:#9333ea;
+}
+
+.stat.net-agence{
+    border-left-color:#0891b2;
+}
+
+.stat.net-proprietaire{
+    border-left-color:#16a34a;
+}
+
+.stat small{
+    display:block;
+    font-size:7px;
+    font-weight:900;
+    color:#64748b;
+    text-transform:uppercase;
+    margin-bottom:4px;
+}
+
+.stat h2{
+    margin:0;
+    font-size:14px;
+    color:#071a3d;
+}
+
+.stat.total h2{
+    color:#15803d;
+}
+
+.stat.agence h2{
+    color:#0057ff;
+}
+
+.stat.proprietaires h2{
+    color:#b7791f;
+}
+
+.stat.depense-agence h2{
+    color:#dc2626;
+}
+
+.stat.depense-proprietaire h2{
+    color:#9333ea;
+}
+
+.stat.net-agence h2{
+    color:#0891b2;
+}
+
+.stat.net-proprietaire h2{
+    color:#16a34a;
+}
+
+/* =========================
+   TABLEAUX
+========================= */
+
+.table-section{
+    margin-top:10px;
+}
+
+.table-head{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:5px;
+}
+
+.table-head h3{
+    margin:0;
+    font-size:11px;
+    color:#071a3d;
+}
+
+.table-head span{
+    font-size:8px;
+    color:#64748b;
+    font-weight:800;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:fixed;
+}
+
+th{
+    background:#071a3d;
+    color:white;
+    padding:5px 4px;
+    font-size:7px;
+    border:1px solid #163665;
+    line-height:1.2;
+}
+
+td{
+    padding:4px;
+    font-size:7px;
+    border:1px solid #dbe3ef;
+    line-height:1.2;
+    word-break:break-word;
+    vertical-align:middle;
+}
+
+tbody tr:nth-child(even){
+    background:#f8fafc;
+}
+
+.text-right{
+    text-align:right;
+}
+
+.text-center{
+    text-align:center;
+}
+
+.amount{
+    font-weight:900;
+    white-space:nowrap;
+}
+
+.owner-name{
+    font-weight:900;
+    color:#071a3d;
+}
+
+.badge{
+    display:inline-block;
+    padding:3px 5px;
+    border-radius:12px;
+    font-size:6px;
+    font-weight:900;
+}
+
+.badge-paid{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.total-row td{
+    background:#eaf1ff;
+    color:#071a3d;
+    font-weight:900;
+    border-top:2px solid #0057ff;
+}
+
+.expense-row td{
+    background:#fff7f7;
+}
+
+.net-row td{
+    background:#ecfdf5;
+    color:#166534;
+    font-weight:900;
+}
+
+/* =========================
+   NOTE
+========================= */
+
+.note{
+    margin-top:7px;
+    padding:7px 9px;
+    border-left:3px solid #0057ff;
+    background:#f8fafc;
+    border-radius:7px;
+    font-size:7px;
+    line-height:1.35;
+    color:#475569;
+}
+
+/* =========================
+   SIGNATURE
+========================= */
+
+.signature-section{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:60px;
+    margin-top:14px;
+    padding:0 25px;
+}
+
+.signature-box{
+    text-align:center;
+}
+
+.signature-space{
+    height:22px;
+}
+
+.signature-line{
+    border-top:1px solid #64748b;
+    padding-top:4px;
+    font-size:8px;
+    font-weight:900;
+    color:#071a3d;
+}
+
+.signature-line small{
+    display:block;
+    margin-top:2px;
+    color:#64748b;
+    font-size:7px;
+    font-weight:400;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+.document-footer{
+    margin-top:8px;
+    padding-top:5px;
+    border-top:1px solid #e2e8f0;
+    display:flex;
+    justify-content:space-between;
+    gap:15px;
+    font-size:7px;
+    color:#64748b;
+}
+
+/* =========================
+   IMPRESSION PDF
+========================= */
+
+@media print{
+
+    body{
+        background:white;
+        -webkit-print-color-adjust:exact !important;
+        print-color-adjust:exact !important;
+    }
+
+    .no-print{
+        display:none !important;
+    }
+
+    .report{
+        width:100%;
+    }
+
+    .header,
+    .report-meta,
+    .stats,
+    .note,
+    .signature-section{
+        break-inside:avoid;
+        page-break-inside:avoid;
+    }
+
+    thead{
+        display:table-header-group;
+    }
+
+    tr{
+        break-inside:avoid;
+        page-break-inside:avoid;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="report">
+
+    <!-- =========================
+         HEADER
+    ========================== -->
+
+    <div class="header">
+
+        <div class="agency-block">
+
+            <div class="logo-box">
+
+                {% if agence.logo %}
+
+                    <img
+                        src="{{ agence.logo.url }}"
+                        alt="Logo {{ agence.nom }}"
+                    >
+
+                {% else %}
+
+                    <div class="logo-fallback">
+                        {{ agence.nom|slice:":1"|upper }}
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+            <div class="agency-info">
+
+                <h2>
+                    {{ agence.nom|default:"Agence immobilière" }}
+                </h2>
+
+                <p>
+                    <strong>Adresse :</strong>
+                    {{ agence.adresse|default:"-" }}
+                </p>
+
+                <p>
+                    {% if agence.ville %}
+                        {{ agence.ville }}
+                    {% endif %}
+
+                    {% if agence.pays %}
+
+                        {% if agence.ville %}
+                            —
+                        {% endif %}
+
+                        {{ agence.pays }}
+
+                    {% endif %}
+                </p>
+
+                {% if agence.telephone %}
+
+                    <p>
+                        <strong>Téléphone :</strong>
+                        {{ agence.telephone }}
+                    </p>
+
+                {% endif %}
+
+                {% if agence.email %}
+
+                    <p>
+                        <strong>Email :</strong>
+                        {{ agence.email }}
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <div class="header-right">
+
+            <div class="document-badge">
+                RAPPORT FINANCIER GLOBAL
+            </div>
+
+            <h1>
+                Rapport mensuel<br>
+                de l’agence
+            </h1>
+
+            <p>
+                <strong>Période :</strong>
+
+                {% if mois %}
+                    {{ mois }}
+                {% else %}
+                    Tous les mois
+                {% endif %}
+            </p>
+
+            <p>
+                <strong>Généré le :</strong>
+                {% now "d/m/Y" %}
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         FILTRE
+    ========================== -->
+
+    <div class="toolbar no-print">
+
+        <form method="get" class="filter-form">
+
+            <div class="filter-group">
+
+                <label for="mois">
+                    Filtrer par mois
+                </label>
+
+                <input
+                    type="month"
+                    name="mois"
+                    id="mois"
+                    value="{{ mois|default:'' }}"
+                >
+
+            </div>
+
+            <button
+                type="submit"
+                class="btn btn-filter"
+            >
+                Filtrer
+            </button>
+
+            {% if mois %}
+
+                <a
+                    href="{% url 'rapport_mensuel_agence' %}"
+                    class="btn btn-reset"
+                >
+                    Réinitialiser
+                </a>
+
+            {% endif %}
+
+        </form>
+
+        <button
+            type="button"
+            onclick="window.print()"
+            class="btn btn-print"
+        >
+            Imprimer / Télécharger PDF
+        </button>
+
+    </div>
+
+
+    <!-- =========================
+         META
+    ========================== -->
+
+    <div class="report-meta">
+
+        <div class="meta-card">
+            <small>Agence</small>
+
+            <strong>
+                {{ agence.nom|default:"-" }}
+            </strong>
+        </div>
+
+        <div class="meta-card">
+            <small>Propriétaires</small>
+
+            <strong>
+                {{ proprietaires|length }}
+            </strong>
+        </div>
+
+        <div class="meta-card">
+            <small>Paiements encaissés</small>
+
+            <strong>
+                {{ paiements|length }}
+            </strong>
+        </div>
+
+        <div class="meta-card">
+            <small>Période</small>
+
+            <strong>
+                {% if mois %}
+                    {{ mois }}
+                {% else %}
+                    Tous les mois
+                {% endif %}
+            </strong>
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         STATISTIQUES
+    ========================== -->
+
+    <div class="stats">
+
+        <div class="stat total">
+            <small>Total loyers encaissés</small>
+
+            <h2>
+                {{ total_loyers|floatformat:0 }} FCFA
+            </h2>
+        </div>
+
+        <div class="stat agence">
+            <small>Commission agence 10 %</small>
+
+            <h2>
+                {{ commission_agence|floatformat:0 }} FCFA
+            </h2>
+        </div>
+
+        <div class="stat proprietaires">
+            <small>Parts propriétaires 90 %</small>
+
+            <h2>
+                {{ total_proprietaires|floatformat:0 }} FCFA
+            </h2>
+        </div>
+
+        <div class="stat depense-agence">
+            <small>Dépenses agence</small>
+
+            <h2>
+                {{ depenses_agence|floatformat:0 }} FCFA
+            </h2>
+        </div>
+
+        <div class="stat depense-proprietaire">
+            <small>Dépenses propriétaires</small>
+
+            <h2>
+                {{ depenses_proprietaires|floatformat:0 }} FCFA
+            </h2>
+        </div>
+
+        <div class="stat net-agence">
+            <small>Net agence</small>
+
+            <h2>
+                {{ net_agence|floatformat:0 }} FCFA
+            </h2>
+        </div>
+
+        <div class="stat net-proprietaire">
+            <small>Net propriétaires</small>
+
+            <h2>
+                {{ net_total_proprietaires|floatformat:0 }} FCFA
+            </h2>
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         TABLE PAIEMENTS
+    ========================== -->
+
+    <div class="table-section">
+
+        <div class="table-head">
+
+            <h3>
+                Détail global des paiements encaissés
+            </h3>
+
+            <span>
+                {{ paiements|length }} paiement(s)
+            </span>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th style="width:7%;">Date</th>
+                    <th style="width:8%;">Mois</th>
+                    <th style="width:13%;">Propriétaire</th>
+                    <th style="width:12%;">Bâtiment</th>
+                    <th style="width:10%;">Logement</th>
+                    <th style="width:14%;">Locataire</th>
+                    <th style="width:10%;">Montant payé</th>
+                    <th style="width:10%;">Agence 10 %</th>
+                    <th style="width:10%;">Propriétaire 90 %</th>
+                    <th style="width:6%;">Statut</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for paiement in paiements %}
+
+                    <tr>
+
+                        <td>
+                            {{ paiement.date_paiement|date:"d/m/Y" }}
+                        </td>
+
+                        <td>
+                            {{ paiement.mois }}
+                        </td>
+
+                        <td class="owner-name">
+
+                            {{ paiement.location.batiment.proprietaire.nom }}
+                            {{ paiement.location.batiment.proprietaire.prenom }}
+
+                        </td>
+
+                        <td>
+                            {{ paiement.location.batiment.nom }}
+                        </td>
+
+                        <td>
+                            {{ paiement.location.numero_appartement|default:"-" }}
+                        </td>
+
+                        <td>
+
+                            <strong>
+                                {{ paiement.location.locataire.nom }}
+                                {{ paiement.location.locataire.prenom }}
+                            </strong>
+
+                        </td>
+
+                        <td class="text-right amount">
+                            {{ paiement.montant|floatformat:0 }} FCFA
+                        </td>
+
+                        <td class="text-right amount">
+                            {{ paiement.part_agence|floatformat:0 }} FCFA
+                        </td>
+
+                        <td class="text-right amount">
+                            {{ paiement.part_proprietaire|floatformat:0 }} FCFA
+                        </td>
+
+                        <td class="text-center">
+
+                            <span class="badge badge-paid">
+                                {{ paiement.get_statut_display }}
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="10"
+                            class="text-center"
+                            style="padding:18px;"
+                        >
+                            Aucun paiement encaissé trouvé pour cette période.
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+
+                <tr class="total-row">
+
+                    <td colspan="6">
+                        TOTAL GÉNÉRAL
+                    </td>
+
+                    <td class="text-right">
+                        {{ total_loyers|floatformat:0 }} FCFA
+                    </td>
+
+                    <td class="text-right">
+                        {{ commission_agence|floatformat:0 }} FCFA
+                    </td>
+
+                    <td class="text-right">
+                        {{ total_proprietaires|floatformat:0 }} FCFA
+                    </td>
+
+                    <td></td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- =========================
+         DÉPENSES AGENCE
+    ========================== -->
+
+    <div class="table-section">
+
+        <div class="table-head">
+
+            <h3>
+                Dépenses de l’agence
+            </h3>
+
+            <span>
+                {{ liste_depenses_agence|length }}
+                dépense(s)
+            </span>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th style="width:10%;">Date</th>
+                    <th style="width:18%;">Catégorie</th>
+                    <th style="width:24%;">Titre</th>
+                    <th>Description</th>
+                    <th style="width:15%;">Montant</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for depense in liste_depenses_agence %}
+
+                    <tr class="expense-row">
+
+                        <td>
+                            {{ depense.date_depense|date:"d/m/Y" }}
+                        </td>
+
+                        <td>
+                            {{ depense.get_categorie_display }}
+                        </td>
+
+                        <td>
+                            <strong>
+                                {{ depense.titre }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {{ depense.description|default:"-" }}
+                        </td>
+
+                        <td class="text-right amount">
+                            {{ depense.montant|floatformat:0 }} FCFA
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="5"
+                            class="text-center"
+                            style="padding:14px;"
+                        >
+                            Aucune dépense d’agence pour cette période.
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+
+                <tr class="total-row">
+
+                    <td colspan="4">
+                        TOTAL DÉPENSES AGENCE
+                    </td>
+
+                    <td class="text-right">
+                        {{ depenses_agence|floatformat:0 }} FCFA
+                    </td>
+
+                </tr>
+
+                <tr class="net-row">
+
+                    <td colspan="4">
+                        NET AGENCE APRÈS DÉPENSES
+                    </td>
+
+                    <td class="text-right">
+                        {{ net_agence|floatformat:0 }} FCFA
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- =========================
+         DÉPENSES PROPRIÉTAIRES
+    ========================== -->
+
+    <div class="table-section">
+
+        <div class="table-head">
+
+            <h3>
+                Dépenses des propriétaires
+            </h3>
+
+            <span>
+                {{ liste_depenses_proprietaires|length }}
+                dépense(s)
+            </span>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th style="width:10%;">Date</th>
+                    <th style="width:18%;">Propriétaire</th>
+                    <th style="width:15%;">Catégorie</th>
+                    <th style="width:22%;">Titre</th>
+                    <th>Description</th>
+                    <th style="width:15%;">Montant</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for depense in liste_depenses_proprietaires %}
+
+                    <tr class="expense-row">
+
+                        <td>
+                            {{ depense.date_depense|date:"d/m/Y" }}
+                        </td>
+
+                        <td class="owner-name">
+
+                            {{ depense.proprietaire.nom }}
+                            {{ depense.proprietaire.prenom }}
+
+                        </td>
+
+                        <td>
+                            {{ depense.get_categorie_display }}
+                        </td>
+
+                        <td>
+                            <strong>
+                                {{ depense.titre }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {{ depense.description|default:"-" }}
+                        </td>
+
+                        <td class="text-right amount">
+                            {{ depense.montant|floatformat:0 }} FCFA
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="6"
+                            class="text-center"
+                            style="padding:14px;"
+                        >
+                            Aucune dépense propriétaire pour cette période.
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+
+                <tr class="total-row">
+
+                    <td colspan="5">
+                        TOTAL DÉPENSES PROPRIÉTAIRES
+                    </td>
+
+                    <td class="text-right">
+                        {{ depenses_proprietaires|floatformat:0 }} FCFA
+                    </td>
+
+                </tr>
+
+                <tr class="net-row">
+
+                    <td colspan="5">
+                        NET TOTAL PROPRIÉTAIRES
+                    </td>
+
+                    <td class="text-right">
+                        {{ net_total_proprietaires|floatformat:0 }} FCFA
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- =========================
+         NOTE
+    ========================== -->
+
+    <div class="note">
+
+        <strong>Note financière :</strong>
+
+        Ce rapport présente uniquement les paiements avec le statut
+        <strong>Payé</strong>.
+
+        La commission brute de gestion de l’agence est de
+        <strong>10 %</strong>.
+
+        Le <strong>net agence</strong> correspond à la commission
+        de 10 % moins les dépenses de l’agence.
+
+        Le <strong>net total propriétaires</strong> correspond
+        aux parts propriétaires de 90 % moins leurs dépenses.
+
+    </div>
+
+
+    <!-- =========================
+         SIGNATURES
+    ========================== -->
+
+    <div class="signature-section">
+
+        <div class="signature-box">
+
+            <div class="signature-space"></div>
+
+            <div class="signature-line">
+
+                Direction / Responsable agence
+
+                <small>
+                    {{ agence.nom }}
+                </small>
+
+            </div>
+
+        </div>
+
+        <div class="signature-box">
+
+            <div class="signature-space"></div>
+
+            <div class="signature-line">
+
+                Cachet officiel de l’agence
+
+                <small>
+                    Validation du rapport financier
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <div class="document-footer">
+
+        <div>
+
+            {{ agence.nom|default:"Agence immobilière" }}
+
+            {% if agence.adresse %}
+                — {{ agence.adresse }}
+            {% endif %}
+
+        </div>
+
+        <div>
+            Rapport généré le {% now "d/m/Y" %}
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

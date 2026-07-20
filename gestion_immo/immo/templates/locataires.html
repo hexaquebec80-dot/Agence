@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+body{background:#f4f7fb}
+.page-wrapper{padding:30px 0}
+.page-header{
+    background:linear-gradient(135deg,#0f172a,#1e40af);
+    color:white;border-radius:24px;padding:28px;margin-bottom:25px;
+    box-shadow:0 20px 40px rgba(15,23,42,.18)
+}
+.btn-add{
+    background:white;color:#1e40af;border-radius:14px;padding:12px 18px;
+    font-weight:700;text-decoration:none;box-shadow:0 10px 25px rgba(0,0,0,.15)
+}
+.stats-card,.table-card{
+    background:white;border-radius:20px;border:1px solid #e5e7eb;
+    box-shadow:0 12px 30px rgba(15,23,42,.07)
+}
+.stats-card{padding:18px}
+.table-card{overflow:hidden}
+.table-top{
+    padding:22px 24px;border-bottom:1px solid #e5e7eb;
+    display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap
+}
+.search-form{display:flex;gap:10px;flex-wrap:wrap}
+.search-box{
+    width:320px;max-width:100%;border:1px solid #dbe3ef;border-radius:14px;
+    padding:11px 15px;background:#f8fafc
+}
+.btn-search{
+    border:none;background:#2563eb;color:white;border-radius:14px;
+    padding:11px 18px;font-weight:700
+}
+.btn-clear{
+    background:#f1f5f9;color:#334155;border-radius:14px;
+    padding:11px 18px;font-weight:700;text-decoration:none
+}
+.modern-table{margin:0}
+.modern-table th{
+    background:#f8fafc;color:#475569;font-size:12px;text-transform:uppercase;
+    border:none;padding:15px 18px;white-space:nowrap
+}
+.modern-table td{
+    padding:16px 18px;border-color:#eef2f7;color:#334155;vertical-align:middle
+}
+.avatar{
+    width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#0f172a);
+    color:white;display:inline-flex;justify-content:center;align-items:center;
+    font-weight:800;margin-right:12px;object-fit:cover
+}
+.name-box{display:flex;align-items:center}
+.badge-active,.badge-paid{
+    background:#dcfce7;color:#166534;padding:7px 12px;border-radius:999px;font-weight:700
+}
+.badge-inactive,.badge-unpaid{
+    background:#fee2e2;color:#991b1b;padding:7px 12px;border-radius:999px;font-weight:700
+}
+.actions{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+}
+.action-btn{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    transition:all .25s ease;
+    font-size:18px;
+}
+.action-btn i{font-size:18px}
+.view{background:#eff6ff;color:#2563eb}
+.view:hover{background:#2563eb;color:#fff;transform:translateY(-3px)}
+.edit{background:#fef3c7;color:#d97706}
+.edit:hover{background:#d97706;color:#fff;transform:translateY(-3px)}
+.delete{background:#fee2e2;color:#dc2626}
+.delete:hover{background:#dc2626;color:#fff;transform:translateY(-3px)}
+.empty-box{text-align:center;padding:70px 20px}
+@media(max-width:768px){
+    .btn-add,.search-form,.search-box,.btn-search,.btn-clear{width:100%;text-align:center}
+}
+</style>
+
+<div class="container-fluid page-wrapper px-4">
+
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h2 class="fw-bold mb-1">Locataires</h2>
+                <p class="mb-0 opacity-75">Gestion des locataires enregistrés</p>
+            </div>
+
+            <a href="{% url 'ajouter_locataire' %}" class="btn-add">
+                + Ajouter un locataire
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <small class="text-muted">Total locataires</small>
+                <h4 class="fw-bold mb-0">{{ locataires|length }}</h4>
+            </div>
+        </div>
+
+       <div class="col-md-3">
+    <div class="stats-card">
+        <small class="text-muted">
+            Total cautions payées
+        </small>
+
+        <h4 class="fw-bold mb-0">
+            {{ total_cautions_payees|default:"0" }} FCFA
+        </h4>
+    </div>
+</div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <small class="text-muted">Gestion</small>
+                <h4 class="fw-bold mb-0">Hexa Immo</h4>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stats-card">
+                <small class="text-muted">Actions</small>
+                <h4 class="fw-bold mb-0">Voir / Modifier / Supprimer</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-card">
+
+        <div class="table-top">
+            <div>
+                <h5 class="fw-bold mb-1">Liste des locataires</h5>
+                <small class="text-muted">Informations, caution et actions</small>
+            </div>
+
+            <form method="GET" class="search-form">
+                <input type="text"
+                       name="q"
+                       value="{{ q }}"
+                       class="search-box"
+                       placeholder="Rechercher nom, téléphone, email...">
+
+                <button type="submit" class="btn-search">Rechercher</button>
+
+                {% if q %}
+                <a href="{% url 'locataires' %}" class="btn-clear">Effacer</a>
+                {% endif %}
+            </form>
+        </div>
+
+        {% if locataires %}
+        <div class="table-responsive">
+            <table class="table modern-table">
+                <thead>
+                    <tr>
+                        <th>Locataire</th>
+                        <th>Téléphone</th>
+                        <th>Email</th>
+                        <th>Profession</th>
+                        <th>Ville</th>
+                        <th>Caution</th>
+                        <th>Caution payée</th>
+                        <th>Date caution</th>
+                        <th>Date début</th>
+                        <th>Statut</th>
+                        <th>Date ajout</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for locataire in locataires %}
+                    <tr>
+                        <td>
+                            <div class="name-box">
+                                {% if locataire.photo %}
+                                    <img src="{{ locataire.photo.url }}" class="avatar" alt="Photo">
+                                {% else %}
+                                    <span class="avatar">{{ locataire.nom|first|upper }}</span>
+                                {% endif %}
+
+                                <strong>{{ locataire.prenom|default:"" }} {{ locataire.nom }}</strong>
+                            </div>
+                        </td>
+
+                        <td>{{ locataire.telephone|default:"-" }}</td>
+                        <td>{{ locataire.email|default:"-" }}</td>
+                        <td>{{ locataire.profession|default:"-" }}</td>
+                        <td>{{ locataire.ville|default:"-" }}</td>
+
+                        <td>
+                            <strong>{{ locataire.caution|default:"0" }}</strong>
+                        </td>
+
+                        <td>
+                            {% if locataire.caution_payee %}
+                                <span class="badge-paid">Payée</span>
+                            {% else %}
+                                <span class="badge-unpaid">Non payée</span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ locataire.date_caution|date:"d/m/Y"|default:"-" }}</td>
+                        <td>{{ locataire.date_debut|date:"d/m/Y"|default:"-" }}</td>
+
+                        <td>
+                            {% if locataire.actif %}
+                                <span class="badge-active">Actif</span>
+                            {% else %}
+                                <span class="badge-inactive">Inactif</span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ locataire.date_creation|date:"d/m/Y"|default:"-" }}</td>
+
+                        <td>
+                            <div class="actions">
+                                <a href="{% url 'detail_locataire' locataire.id %}" class="action-btn view" title="Voir les détails">
+                                    <i class="bi bi-eye-fill"></i>
+                                </a>
+
+                                <a href="{% url 'modifier_locataire' locataire.id %}"
+   class="action-btn edit"
+   title="Modifier">
+    <i class="bi bi-pencil-square"></i>
+</a>
+                                <a href="{% url 'supprimer_locataire' locataire.id %}" class="action-btn delete" title="Supprimer"
+                                   onclick="return confirm('Voulez-vous vraiment supprimer ce locataire ?');">
+                                    <i class="bi bi-trash-fill"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% else %}
+        <div class="empty-box">
+            <h5 class="fw-bold">Aucun locataire enregistré</h5>
+            <p class="text-muted">Ajoute ton premier locataire pour commencer.</p>
+            <a href="{% url 'ajouter_locataire' %}" class="btn btn-primary rounded-pill px-4">
+                Ajouter un locataire
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

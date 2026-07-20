@@ -1,0 +1,1710 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <meta
+        name="theme-color"
+        content="#071a3d"
+    >
+
+    <title>
+        Reçu {{ paiement.numero_recu|default:paiement.id }}
+    </title>
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    >
+
+    <style>
+
+        /* =========================================================
+           VARIABLES
+        ========================================================= */
+
+        :root{
+            --primary:#0057ff;
+            --primary-dark:#071a3d;
+            --primary-soft:#eef4ff;
+
+            --success:#15803d;
+            --success-soft:#dcfce7;
+
+            --warning:#b45309;
+            --warning-soft:#fff7ed;
+
+            --danger:#dc2626;
+            --danger-soft:#fef2f2;
+
+            --text:#0f172a;
+            --muted:#64748b;
+
+            --border:#dbe3ef;
+            --line:#e2e8f0;
+
+            --card:#f8fbff;
+            --background:#eef3f9;
+            --white:#ffffff;
+        }
+
+
+        /* =========================================================
+           BASE
+        ========================================================= */
+
+        *{
+            box-sizing:border-box;
+        }
+
+        html{
+            scroll-behavior:smooth;
+        }
+
+        body{
+            margin:0;
+            padding:24px;
+
+            color:var(--text);
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(0,87,255,.07),
+                    transparent 25%
+                ),
+                radial-gradient(
+                    circle at bottom left,
+                    rgba(7,26,61,.05),
+                    transparent 25%
+                ),
+                var(--background);
+
+            font-family:
+                Arial,
+                sans-serif;
+        }
+
+        button{
+            font:inherit;
+        }
+
+        .page-wrapper{
+            width:100%;
+            max-width:980px;
+            margin:0 auto;
+        }
+
+
+        /* =========================================================
+           FACTURE
+        ========================================================= */
+
+        .invoice{
+            width:100%;
+
+            overflow:hidden;
+
+            border:1px solid var(--border);
+            border-radius:26px;
+
+            background:var(--white);
+
+            box-shadow:
+                0 20px 55px rgba(15,23,42,.10);
+        }
+
+
+        /* =========================================================
+           EN-TÊTE
+        ========================================================= */
+
+        .invoice-header{
+            position:relative;
+
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:24px;
+
+            padding:30px 34px;
+
+            border-bottom:4px solid var(--primary-dark);
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffffff,
+                    #f7faff
+                );
+        }
+
+        .invoice-header::after{
+            content:"";
+
+            position:absolute;
+            right:-80px;
+            top:-100px;
+
+            width:240px;
+            height:240px;
+
+            border-radius:50%;
+
+            background:
+                rgba(0,87,255,.05);
+
+            pointer-events:none;
+        }
+
+        .company{
+            position:relative;
+            z-index:2;
+
+            display:flex;
+            align-items:flex-start;
+            gap:16px;
+        }
+
+        .company-logo-box{
+            flex:0 0 84px;
+
+            width:84px;
+            height:84px;
+
+            display:grid;
+            place-items:center;
+
+            overflow:hidden;
+
+            border:1px solid #dbeafe;
+            border-radius:21px;
+
+            background:white;
+
+            box-shadow:
+                0 8px 22px rgba(15,23,42,.06);
+        }
+
+        .company-logo{
+            width:72px;
+            height:72px;
+            object-fit:contain;
+        }
+
+        .company h2{
+            margin:0 0 8px;
+
+            color:var(--primary-dark);
+
+            font-size:24px;
+            line-height:1.2;
+            font-weight:900;
+        }
+
+        .company p{
+            margin:0;
+
+            color:var(--muted);
+
+            font-size:13px;
+            line-height:1.65;
+        }
+
+        .invoice-heading{
+            position:relative;
+            z-index:2;
+
+            text-align:right;
+        }
+
+        .invoice-type{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+
+            margin-bottom:11px;
+            padding:8px 13px;
+
+            color:var(--primary);
+
+            border:1px solid #dbeafe;
+            border-radius:999px;
+
+            background:var(--primary-soft);
+
+            font-size:11px;
+            font-weight:900;
+            letter-spacing:.07em;
+            text-transform:uppercase;
+        }
+
+        .invoice-heading h1{
+            margin:0;
+
+            color:var(--primary-dark);
+
+            font-size:31px;
+            font-weight:950;
+            letter-spacing:.02em;
+        }
+
+        .invoice-heading p{
+            margin:9px 0 0;
+
+            color:var(--muted);
+
+            font-size:13px;
+            line-height:1.75;
+        }
+
+        .invoice-heading strong{
+            color:var(--primary-dark);
+        }
+
+
+        /* =========================================================
+           CONTENU
+        ========================================================= */
+
+        .invoice-content{
+            padding:28px 34px 32px;
+        }
+
+        .invoice-topbar{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:15px;
+
+            margin-bottom:22px;
+
+            flex-wrap:wrap;
+        }
+
+        .status{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+
+            padding:9px 16px;
+
+            color:var(--success);
+
+            border:1px solid #bbf7d0;
+            border-radius:999px;
+
+            background:var(--success-soft);
+
+            font-size:13px;
+            font-weight:900;
+        }
+
+        .receipt-reference{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+
+            padding:9px 15px;
+
+            color:var(--primary-dark);
+
+            border:1px solid #dbeafe;
+            border-radius:999px;
+
+            background:#f8fbff;
+
+            font-size:12px;
+            font-weight:850;
+        }
+
+
+        /* =========================================================
+           TITRES DE SECTION
+        ========================================================= */
+
+        .invoice-section{
+            margin-top:24px;
+        }
+
+        .section-title{
+            display:flex;
+            align-items:center;
+            gap:10px;
+
+            margin:0 0 13px;
+
+            color:var(--muted);
+
+            font-size:12px;
+            font-weight:900;
+            letter-spacing:.08em;
+            text-transform:uppercase;
+        }
+
+        .section-title-icon{
+            width:30px;
+            height:30px;
+
+            display:grid;
+            place-items:center;
+
+            color:var(--primary);
+
+            border-radius:10px;
+
+            background:var(--primary-soft);
+        }
+
+
+        /* =========================================================
+           INFORMATIONS DU LOCATAIRE
+        ========================================================= */
+
+        .information-grid{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:14px;
+        }
+
+        .information-card{
+            min-width:0;
+
+            padding:16px;
+
+            border:1px solid var(--line);
+            border-radius:17px;
+
+            background:var(--card);
+        }
+
+        .information-card small{
+            display:block;
+
+            margin-bottom:7px;
+
+            color:var(--muted);
+
+            font-size:11px;
+            font-weight:850;
+            letter-spacing:.04em;
+            text-transform:uppercase;
+        }
+
+        .information-card strong{
+            display:block;
+
+            overflow-wrap:anywhere;
+
+            color:var(--primary-dark);
+
+            font-size:15px;
+            line-height:1.5;
+            font-weight:900;
+        }
+
+
+        /* =========================================================
+           TABLEAU
+        ========================================================= */
+
+        .table-container{
+            overflow:hidden;
+
+            border:1px solid var(--line);
+            border-radius:17px;
+
+            background:white;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        thead th{
+            padding:14px 13px;
+
+            color:white;
+            background:var(--primary-dark);
+
+            text-align:left;
+
+            font-size:11px;
+            font-weight:900;
+            letter-spacing:.05em;
+            text-transform:uppercase;
+        }
+
+        tbody td{
+            padding:14px 13px;
+
+            color:#334155;
+
+            border-top:1px solid #edf2f7;
+
+            font-size:13px;
+            font-weight:750;
+        }
+
+        tbody tr:nth-child(even){
+            background:#fcfdff;
+        }
+
+        .total-row td{
+            background:#f8fbff;
+        }
+
+        .total-label{
+            color:var(--primary-dark);
+
+            text-align:right;
+
+            font-weight:900;
+        }
+
+        .total-amount{
+            color:var(--success);
+
+            font-size:19px;
+            font-weight:950;
+        }
+
+
+        /* =========================================================
+           RÉSUMÉ PAIEMENT
+        ========================================================= */
+
+        .payment-summary{
+            display:grid;
+            grid-template-columns:repeat(3,minmax(0,1fr));
+            gap:12px;
+
+            margin-top:16px;
+        }
+
+        .payment-summary-card{
+            padding:15px;
+
+            border:1px solid var(--line);
+            border-radius:16px;
+
+            background:white;
+        }
+
+        .payment-summary-card small{
+            display:block;
+
+            color:var(--muted);
+
+            font-size:11px;
+            font-weight:850;
+            letter-spacing:.04em;
+            text-transform:uppercase;
+        }
+
+        .payment-summary-card strong{
+            display:block;
+
+            margin-top:8px;
+
+            color:var(--primary-dark);
+
+            font-size:14px;
+            line-height:1.4;
+            font-weight:900;
+        }
+
+
+        /* =========================================================
+           COMMISSION
+        ========================================================= */
+
+        .highlight-grid{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:14px;
+
+            margin-top:16px;
+        }
+
+        .highlight-box{
+            padding:17px 18px;
+
+            border:1px solid #dbeafe;
+            border-radius:18px;
+
+            background:#f8fbff;
+        }
+
+        .highlight-box.owner{
+            border-color:#bbf7d0;
+            background:#f0fdf4;
+        }
+
+        .highlight-box small{
+            display:block;
+
+            margin-bottom:7px;
+
+            color:var(--muted);
+
+            font-size:11px;
+            font-weight:850;
+            letter-spacing:.04em;
+            text-transform:uppercase;
+        }
+
+        .highlight-box strong{
+            color:var(--primary-dark);
+
+            font-size:19px;
+            font-weight:950;
+        }
+
+        .highlight-box.owner strong{
+            color:var(--success);
+        }
+
+
+        /* =========================================================
+           NOTE
+        ========================================================= */
+
+        .invoice-note{
+            margin-top:20px;
+            padding:16px 18px;
+
+            color:#475569;
+
+            border-left:5px solid var(--primary-dark);
+            border-radius:0 15px 15px 0;
+
+            background:#f8fbff;
+
+            font-size:13px;
+            line-height:1.65;
+        }
+
+        .invoice-note strong{
+            color:var(--primary-dark);
+        }
+
+
+        /* =========================================================
+           SIGNATURES
+        ========================================================= */
+
+        .signatures-section{
+            margin-top:27px;
+            padding:20px;
+
+            border:1px solid var(--line);
+            border-radius:22px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #ffffff,
+                    #fbfdff
+                );
+        }
+
+        .signatures-heading{
+            display:flex;
+            align-items:center;
+            gap:10px;
+
+            margin:0 0 17px;
+
+            color:var(--primary-dark);
+
+            font-size:16px;
+            font-weight:900;
+        }
+
+        .signatures-heading i{
+            color:var(--primary);
+        }
+
+        .signatures-grid{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:18px;
+        }
+
+        .signature-card{
+            overflow:hidden;
+
+            border:1px solid var(--line);
+            border-radius:18px;
+
+            background:white;
+        }
+
+        .signature-card-header{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:10px;
+
+            padding:14px 16px;
+
+            border-bottom:1px solid #edf2f7;
+
+            background:#f8fbff;
+        }
+
+        .signature-card-header h4{
+            margin:0;
+
+            color:var(--primary-dark);
+
+            font-size:14px;
+            font-weight:900;
+        }
+
+        .signature-badge{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+
+            padding:6px 10px;
+
+            border-radius:999px;
+
+            font-size:10px;
+            font-weight:900;
+            white-space:nowrap;
+        }
+
+        .signature-badge.signed{
+            color:#047857;
+
+            border:1px solid #a7f3d0;
+
+            background:#ecfdf5;
+        }
+
+        .signature-badge.unsigned{
+            color:var(--warning);
+
+            border:1px solid #fed7aa;
+
+            background:var(--warning-soft);
+        }
+
+        .signature-image-container{
+            min-height:190px;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            padding:18px;
+
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 34px,
+                    rgba(148,163,184,.13) 35px
+                ),
+                #ffffff;
+        }
+
+        .signature-image{
+            display:block;
+
+            max-width:100%;
+            max-height:145px;
+
+            object-fit:contain;
+        }
+
+        .signature-empty{
+            color:#94a3b8;
+
+            text-align:center;
+        }
+
+        .signature-empty i{
+            display:block;
+
+            margin-bottom:10px;
+
+            font-size:29px;
+        }
+
+        .signature-empty span{
+            font-size:12px;
+            font-weight:800;
+        }
+
+        .signature-card-footer{
+            padding:12px 16px;
+
+            color:#475569;
+
+            border-top:1px solid #edf2f7;
+
+            background:#fbfdff;
+
+            text-align:center;
+
+            font-size:12px;
+            font-weight:850;
+        }
+
+
+        /* =========================================================
+           PIED DE PAGE
+        ========================================================= */
+
+        .invoice-footer{
+            margin-top:23px;
+            padding-top:15px;
+
+            color:var(--muted);
+
+            border-top:1px solid var(--line);
+
+            text-align:center;
+
+            font-size:11px;
+            line-height:1.6;
+        }
+
+
+        /* =========================================================
+           ACTIONS
+        ========================================================= */
+
+        .actions{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:12px;
+
+            margin:25px 0 5px;
+        }
+
+        .btn-action{
+            min-height:50px;
+
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:9px;
+
+            padding:12px 22px;
+
+            border:none;
+            border-radius:14px;
+
+            font-size:13px;
+            font-weight:900;
+            text-decoration:none;
+
+            cursor:pointer;
+
+            transition:
+                transform .2s ease,
+                box-shadow .2s ease;
+        }
+
+        .btn-back{
+            color:var(--primary-dark);
+            background:white;
+
+            border:1px solid var(--line);
+        }
+
+        .btn-print{
+            color:white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary-dark),
+                    var(--primary)
+                );
+
+            box-shadow:
+                0 12px 28px rgba(0,87,255,.20);
+        }
+
+        .btn-action:hover{
+            transform:translateY(-2px);
+        }
+
+
+        /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+        @media(max-width:760px){
+
+            body{
+                padding:10px;
+            }
+
+            .invoice-header{
+                padding:22px 18px;
+
+                flex-direction:column;
+            }
+
+            .company{
+                flex-direction:column;
+            }
+
+            .invoice-heading{
+                text-align:left;
+            }
+
+            .invoice-content{
+                padding:20px 18px;
+            }
+
+            .information-grid,
+            .payment-summary,
+            .highlight-grid,
+            .signatures-grid{
+                grid-template-columns:1fr;
+            }
+
+            .actions{
+                flex-direction:column;
+            }
+
+            .btn-action{
+                width:100%;
+            }
+
+        }
+
+
+        /* =========================================================
+           IMPRESSION
+        ========================================================= */
+
+        @media print{
+
+            @page{
+                size:A4;
+                margin:0;
+            }
+
+            html,
+            body{
+                width:210mm;
+                min-height:297mm;
+
+                margin:0 !important;
+                padding:0 !important;
+
+                background:white !important;
+            }
+
+            .no-print{
+                display:none !important;
+            }
+
+            body *{
+                visibility:hidden;
+            }
+
+            .invoice,
+            .invoice *{
+                visibility:visible;
+            }
+
+            .page-wrapper{
+                max-width:none !important;
+                margin:0 !important;
+            }
+
+            .invoice{
+                position:absolute;
+                top:0;
+                left:0;
+
+                width:210mm !important;
+                min-height:297mm !important;
+
+                max-width:none !important;
+
+                margin:0 !important;
+
+                border:none !important;
+                border-radius:0 !important;
+
+                box-shadow:none !important;
+            }
+
+            .invoice-header{
+                padding:11mm 13mm 7mm !important;
+            }
+
+            .invoice-content{
+                padding:7mm 13mm 9mm !important;
+            }
+
+            .invoice-section{
+                margin-top:16px !important;
+            }
+
+            .information-card,
+            .payment-summary-card,
+            .highlight-box,
+            .signature-card{
+                break-inside:avoid;
+            }
+
+            .signature-image-container{
+                min-height:115px !important;
+            }
+
+            .signatures-section{
+                margin-top:18px !important;
+                padding:14px !important;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="page-wrapper">
+
+
+    <article class="invoice">
+
+
+        <!-- =====================================================
+             EN-TÊTE
+        ====================================================== -->
+
+        <header class="invoice-header">
+
+
+            <div class="company">
+
+
+                <div class="company-logo-box">
+
+                    {% if agence.logo %}
+
+                        <img
+                            src="{{ agence.logo.url }}"
+                            class="company-logo"
+                            alt="Logo de {{ agence.nom }}"
+                        >
+
+                    {% else %}
+
+                        <img
+                            src="{% static 'images/logo.png' %}"
+                            class="company-logo"
+                            alt="Logo de l’entreprise"
+                        >
+
+                    {% endif %}
+
+                </div>
+
+
+                <div>
+
+                    <h2>
+                        {{ agence.nom|default:"Gestion Immobilière" }}
+                    </h2>
+
+                    <p>
+
+                        {{ agence.adresse|default:"Adresse non renseignée" }}
+
+                        <br>
+
+                        Téléphone :
+                        {{ agence.telephone|default:"Non renseigné" }}
+
+                        <br>
+
+                        Courriel :
+                        {{ agence.email|default:"Non renseigné" }}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="invoice-heading">
+
+                <span class="invoice-type">
+
+                    <i class="fa-solid fa-file-invoice"></i>
+
+                    Reçu officiel
+
+                </span>
+
+                <h1>
+                    FACTURE
+                </h1>
+
+                <p>
+
+                    <strong>Numéro :</strong>
+
+                    {{ paiement.numero_recu|default:paiement.id }}
+
+                    <br>
+
+                    <strong>Date :</strong>
+
+                    {{ paiement.date_paiement|date:"d/m/Y"|default:"Non renseignée" }}
+
+                    <br>
+
+                    <strong>Mois :</strong>
+
+                    {{ paiement.mois|default:"Non renseigné" }}
+
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <!-- =====================================================
+             CONTENU
+        ====================================================== -->
+
+        <div class="invoice-content">
+
+
+            <div class="invoice-topbar">
+
+
+                <span class="status">
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                    {{ paiement.get_statut_display|default:"Paiement enregistré" }}
+
+                </span>
+
+
+                <span class="receipt-reference">
+
+                    <i class="fa-solid fa-receipt"></i>
+
+                    Reçu
+                    {{ paiement.numero_recu|default:paiement.id }}
+
+                </span>
+
+            </div>
+
+
+            <!-- =================================================
+                 INFORMATIONS DU LOCATAIRE
+            ================================================== -->
+
+            <section class="invoice-section">
+
+
+                <h2 class="section-title">
+
+                    <span class="section-title-icon">
+
+                        <i class="fa-solid fa-user"></i>
+
+                    </span>
+
+                    Informations du locataire
+
+                </h2>
+
+
+                <div class="information-grid">
+
+
+                    <div class="information-card">
+
+                        <small>
+                            Locataire
+                        </small>
+
+                        <strong>
+
+                            {{ paiement.location.locataire.prenom|default:"" }}
+
+                            {{ paiement.location.locataire.nom|default:"Non renseigné" }}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            Téléphone
+                        </small>
+
+                        <strong>
+
+                            {{ paiement.location.locataire.telephone|default:"Non renseigné" }}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            Bâtiment
+                        </small>
+
+                        <strong>
+
+                            {{ paiement.location.batiment.nom|default:"Non renseigné" }}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            Logement / chambre
+                        </small>
+
+                        <strong>
+
+                            {% if paiement.numero_appartement %}
+
+                                {{ paiement.numero_appartement }}
+
+                            {% elif paiement.location.numero_appartement %}
+
+                                {{ paiement.location.numero_appartement }}
+
+                            {% else %}
+
+                                Non renseigné
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 DÉTAILS DU PAIEMENT
+            ================================================== -->
+
+            <section class="invoice-section">
+
+
+                <h2 class="section-title">
+
+                    <span class="section-title-icon">
+
+                        <i class="fa-solid fa-coins"></i>
+
+                    </span>
+
+                    Détails du paiement
+
+                </h2>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Description
+                                </th>
+
+                                <th>
+                                    Mois
+                                </th>
+
+                                <th>
+                                    Mode
+                                </th>
+
+                                <th>
+                                    Montant
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            <tr>
+
+                                <td>
+                                    Paiement du loyer
+                                </td>
+
+                                <td>
+                                    {{ paiement.mois|default:"Non renseigné" }}
+                                </td>
+
+                                <td>
+
+                                    {% if paiement.get_mode_paiement_display %}
+
+                                        {{ paiement.get_mode_paiement_display }}
+
+                                    {% else %}
+
+                                        {{ paiement.mode_paiement|default:"Non renseigné" }}
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+                                    {{ paiement.montant }} FCFA
+                                </td>
+
+                            </tr>
+
+
+                            <tr class="total-row">
+
+                                <td
+                                    colspan="3"
+                                    class="total-label"
+                                >
+
+                                    Total payé
+
+                                </td>
+
+                                <td class="total-amount">
+
+                                    {{ paiement.montant }} FCFA
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <div class="payment-summary">
+
+
+                    <div class="payment-summary-card">
+
+                        <small>
+                            Date du paiement
+                        </small>
+
+                        <strong>
+
+                            {{ paiement.date_paiement|date:"d/m/Y"|default:"Non renseignée" }}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="payment-summary-card">
+
+                        <small>
+                            Mode de paiement
+                        </small>
+
+                        <strong>
+
+                            {% if paiement.get_mode_paiement_display %}
+
+                                {{ paiement.get_mode_paiement_display }}
+
+                            {% else %}
+
+                                {{ paiement.mode_paiement|default:"Non renseigné" }}
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="payment-summary-card">
+
+                        <small>
+                            Statut
+                        </small>
+
+                        <strong>
+
+                            {{ paiement.get_statut_display|default:"Paiement enregistré" }}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =============================================
+                     COMMISSION CORRIGÉE
+                ============================================== -->
+
+                <div class="highlight-grid">
+
+
+                    <div class="highlight-box">
+
+                        <small>
+                            Commission agence — 10 %
+                        </small>
+
+                        <strong>
+
+                            {{ commission_agence|default:"0.00" }} FCFA
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="highlight-box owner">
+
+                        <small>
+                            Part propriétaire — 90 %
+                        </small>
+
+                        <strong>
+
+                            {{ montant_proprietaire|default:"0.00" }} FCFA
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 NOTE
+            ================================================== -->
+
+            <div class="invoice-note">
+
+                Cette facture confirme la réception du paiement du loyer
+                pour le mois indiqué. Elle peut être conservée comme preuve
+                officielle de paiement.
+
+                {% if paiement.commentaire %}
+
+                    <br><br>
+
+                    <strong>
+                        Commentaire :
+                    </strong>
+
+                    {{ paiement.commentaire }}
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =================================================
+                 SIGNATURES
+            ================================================== -->
+
+            <section class="signatures-section">
+
+
+                <h2 class="signatures-heading">
+
+                    <i class="fa-solid fa-file-signature"></i>
+
+                    Signatures de validation
+
+                </h2>
+
+
+                <div class="signatures-grid">
+
+
+                    <!-- SIGNATURE EMPLOYÉ -->
+
+                    <div class="signature-card">
+
+
+                        <div class="signature-card-header">
+
+                            <h4>
+                                Signature employé
+                            </h4>
+
+
+                            {% if paiement.signature_employe %}
+
+                                <span class="signature-badge signed">
+
+                                    <i class="fa-solid fa-circle-check"></i>
+
+                                    Déjà signée
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="signature-badge unsigned">
+
+                                    <i class="fa-solid fa-pen"></i>
+
+                                    Non signée
+
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="signature-image-container">
+
+
+                            {% if paiement.signature_employe %}
+
+                                <img
+                                    src="{{ paiement.signature_employe.url }}"
+                                    class="signature-image"
+                                    alt="Signature de l’employé"
+                                >
+
+                            {% else %}
+
+                                <div class="signature-empty">
+
+                                    <i class="fa-solid fa-signature"></i>
+
+                                    <span>
+                                        Signature non disponible
+                                    </span>
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="signature-card-footer">
+
+                            {% if paiement.employe %}
+
+                                {{ paiement.employe.prenom }}
+                                {{ paiement.employe.nom }}
+
+                            {% elif paiement.agent %}
+
+                                {{ paiement.agent.prenom }}
+                                {{ paiement.agent.nom }}
+
+                            {% else %}
+
+                                Employé responsable
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SIGNATURE LOCATAIRE -->
+
+                    <div class="signature-card">
+
+
+                        <div class="signature-card-header">
+
+                            <h4>
+                                Signature locataire
+                            </h4>
+
+
+                            {% if paiement.signature_locataire %}
+
+                                <span class="signature-badge signed">
+
+                                    <i class="fa-solid fa-circle-check"></i>
+
+                                    Déjà signée
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="signature-badge unsigned">
+
+                                    <i class="fa-solid fa-pen"></i>
+
+                                    Non signée
+
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="signature-image-container">
+
+
+                            {% if paiement.signature_locataire %}
+
+                                <img
+                                    src="{{ paiement.signature_locataire.url }}"
+                                    class="signature-image"
+                                    alt="Signature du locataire"
+                                >
+
+                            {% else %}
+
+                                <div class="signature-empty">
+
+                                    <i class="fa-solid fa-signature"></i>
+
+                                    <span>
+                                        Signature non disponible
+                                    </span>
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="signature-card-footer">
+
+                            {{ paiement.location.locataire.prenom|default:"" }}
+
+                            {{ paiement.location.locataire.nom|default:"Locataire" }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 PIED
+            ================================================== -->
+
+            <footer class="invoice-footer">
+
+                Document généré automatiquement par
+
+                {{ agence.nom|default:"le système de gestion immobilière" }}.
+
+                <br>
+
+                Ce document peut être imprimé et conservé comme
+                justificatif officiel de paiement.
+
+            </footer>
+
+        </div>
+
+    </article>
+
+
+    <!-- =====================================================
+         BOUTONS
+    ====================================================== -->
+
+    <div class="actions no-print">
+
+
+        <button
+            type="button"
+            onclick="history.back()"
+            class="btn-action btn-back"
+        >
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+            Retour
+
+        </button>
+
+
+        <button
+            type="button"
+            onclick="window.print()"
+            class="btn-action btn-print"
+        >
+
+            <i class="fa-solid fa-file-pdf"></i>
+
+            Télécharger la facture PDF
+
+        </button>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

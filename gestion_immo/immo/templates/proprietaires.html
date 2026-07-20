@@ -1,0 +1,2632 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    /* =========================================================
+       GESTION DES PROPRIÉTAIRES — INTERFACE APPLICATION
+    ========================================================= */
+
+    :root{
+        --app-primary:#2563eb;
+        --app-primary-dark:#1746b5;
+        --app-secondary:#7c3aed;
+        --app-navy:#071a3d;
+        --app-text:#172033;
+        --app-muted:#71809f;
+        --app-border:#e3eaf5;
+        --app-background:#f5f7fc;
+        --app-card:#ffffff;
+        --app-success:#16a34a;
+        --app-danger:#dc2626;
+        --app-warning:#ea580c;
+        --app-radius-xl:30px;
+        --app-radius-lg:24px;
+        --app-radius-md:17px;
+        --app-shadow:0 18px 55px rgba(15,23,42,.08);
+    }
+
+    *{
+        box-sizing:border-box;
+    }
+
+    .owners-app{
+        width:100%;
+        min-height:100vh;
+        padding:18px 0 50px;
+        color:var(--app-text);
+    }
+
+    .owners-container{
+        width:100%;
+        max-width:1500px;
+        margin:0 auto;
+    }
+
+    /* =========================================================
+       EN-TÊTE PRINCIPAL
+    ========================================================= */
+
+    .owners-hero{
+        position:relative;
+        overflow:hidden;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:25px;
+        margin-bottom:22px;
+        padding:30px;
+        border-radius:var(--app-radius-xl);
+        color:white;
+        background:
+            radial-gradient(
+                circle at 90% 10%,
+                rgba(255,255,255,.20),
+                transparent 23%
+            ),
+            radial-gradient(
+                circle at 65% 120%,
+                rgba(124,58,237,.65),
+                transparent 35%
+            ),
+            linear-gradient(
+                135deg,
+                #06152f 0%,
+                #0b388f 50%,
+                #2563eb 100%
+            );
+        box-shadow:0 28px 70px rgba(37,99,235,.23);
+    }
+
+    .owners-hero::before{
+        content:"";
+        position:absolute;
+        top:-140px;
+        right:-80px;
+        width:280px;
+        height:280px;
+        border:1px solid rgba(255,255,255,.18);
+        border-radius:50%;
+    }
+
+    .owners-hero::after{
+        content:"";
+        position:absolute;
+        right:200px;
+        bottom:-120px;
+        width:190px;
+        height:190px;
+        border:35px solid rgba(255,255,255,.055);
+        border-radius:50%;
+    }
+
+    .owners-hero-content,
+    .owners-hero-actions{
+        position:relative;
+        z-index:2;
+    }
+
+    .owners-hero-content{
+        display:flex;
+        align-items:center;
+        gap:19px;
+        min-width:0;
+    }
+
+    .owners-page-icon{
+        flex:0 0 76px;
+        width:76px;
+        height:76px;
+        display:grid;
+        place-items:center;
+        border:1px solid rgba(255,255,255,.25);
+        border-radius:23px;
+        color:white;
+        background:rgba(255,255,255,.15);
+        backdrop-filter:blur(12px);
+        box-shadow:
+            0 18px 35px rgba(0,0,0,.18),
+            inset 0 0 0 1px rgba(255,255,255,.08);
+        font-size:29px;
+    }
+
+    .owners-page-badge{
+        display:inline-flex;
+        align-items:center;
+        gap:7px;
+        margin-bottom:9px;
+        padding:7px 11px;
+        border:1px solid rgba(255,255,255,.18);
+        border-radius:999px;
+        background:rgba(255,255,255,.10);
+        font-size:11px;
+        font-weight:850;
+        letter-spacing:.55px;
+        text-transform:uppercase;
+    }
+
+    .owners-page-title{
+        margin:0 0 7px;
+        color:white;
+        font-size:clamp(27px,4vw,39px);
+        font-weight:950;
+        line-height:1.08;
+        letter-spacing:-1.1px;
+    }
+
+    .owners-page-description{
+        max-width:680px;
+        margin:0;
+        color:rgba(255,255,255,.76);
+        font-size:14px;
+        line-height:1.65;
+    }
+
+    .owners-hero-actions{
+        display:flex;
+        align-items:center;
+        flex-wrap:wrap;
+        gap:10px;
+    }
+
+    .owners-main-button{
+        min-height:50px;
+        padding:0 20px;
+        border:0;
+        border-radius:16px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:9px;
+        color:var(--app-primary);
+        background:white;
+        text-decoration:none;
+        font-size:14px;
+        font-weight:900;
+        box-shadow:0 15px 35px rgba(0,0,0,.16);
+        transition:
+            transform .22s ease,
+            box-shadow .22s ease,
+            background .22s ease;
+    }
+
+    .owners-main-button:hover{
+        color:var(--app-primary-dark);
+        background:#f8fbff;
+        transform:translateY(-3px);
+        box-shadow:0 20px 40px rgba(0,0,0,.20);
+    }
+
+    .owners-main-button i{
+        width:28px;
+        height:28px;
+        display:grid;
+        place-items:center;
+        border-radius:9px;
+        color:white;
+        background:var(--app-primary);
+    }
+
+    /* =========================================================
+       STATISTIQUES
+    ========================================================= */
+
+    .owners-stats{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:15px;
+        margin-bottom:22px;
+    }
+
+    .owners-stat-card{
+        position:relative;
+        overflow:hidden;
+        display:flex;
+        align-items:center;
+        gap:15px;
+        min-height:112px;
+        padding:19px;
+        border:1px solid var(--app-border);
+        border-radius:22px;
+        background:white;
+        box-shadow:0 12px 35px rgba(15,23,42,.055);
+        transition:
+            transform .25s ease,
+            border-color .25s ease,
+            box-shadow .25s ease;
+    }
+
+    .owners-stat-card::after{
+        content:"";
+        position:absolute;
+        right:-22px;
+        bottom:-35px;
+        width:90px;
+        height:90px;
+        border-radius:50%;
+        background:currentColor;
+        opacity:.035;
+    }
+
+    .owners-stat-card:hover{
+        transform:translateY(-5px);
+        border-color:rgba(37,99,235,.25);
+        box-shadow:0 19px 42px rgba(37,99,235,.10);
+    }
+
+    .owners-stat-icon{
+        flex:0 0 57px;
+        width:57px;
+        height:57px;
+        display:grid;
+        place-items:center;
+        border-radius:18px;
+        font-size:22px;
+    }
+
+    .owners-stat-icon.blue{
+        color:#2563eb;
+        background:#eaf2ff;
+    }
+
+    .owners-stat-icon.green{
+        color:#15803d;
+        background:#e8f9ed;
+    }
+
+    .owners-stat-icon.orange{
+        color:#ea580c;
+        background:#fff1e7;
+    }
+
+    .owners-stat-icon.purple{
+        color:#7c3aed;
+        background:#f2eaff;
+    }
+
+    .owners-stat-label{
+        margin-bottom:4px;
+        color:var(--app-muted);
+        font-size:12px;
+        font-weight:800;
+    }
+
+    .owners-stat-value{
+        margin:0;
+        color:var(--app-navy);
+        font-size:28px;
+        font-weight:950;
+        line-height:1.1;
+    }
+
+    /* =========================================================
+       MESSAGES DJANGO
+    ========================================================= */
+
+    .owners-message{
+        position:relative;
+        display:flex;
+        align-items:flex-start;
+        gap:13px;
+        margin-bottom:18px;
+        padding:16px 52px 16px 17px;
+        border:1px solid var(--app-border);
+        border-radius:17px;
+        background:white;
+        box-shadow:0 10px 30px rgba(15,23,42,.06);
+        animation:ownersMessageIn .4s ease both;
+    }
+
+    .owners-message.success{
+        color:#166534;
+        border-color:#bbf7d0;
+        background:#f0fdf4;
+    }
+
+    .owners-message.error,
+    .owners-message.danger{
+        color:#991b1b;
+        border-color:#fecaca;
+        background:#fef2f2;
+    }
+
+    .owners-message.warning{
+        color:#9a3412;
+        border-color:#fed7aa;
+        background:#fff7ed;
+    }
+
+    .owners-message.info{
+        color:#1e40af;
+        border-color:#bfdbfe;
+        background:#eff6ff;
+    }
+
+    .owners-message-icon{
+        flex:0 0 38px;
+        width:38px;
+        height:38px;
+        display:grid;
+        place-items:center;
+        border-radius:12px;
+        background:rgba(255,255,255,.75);
+    }
+
+    .owners-message-text{
+        padding-top:7px;
+        font-size:14px;
+        font-weight:750;
+        line-height:1.5;
+    }
+
+    .owners-message-close{
+        position:absolute;
+        top:50%;
+        right:14px;
+        width:32px;
+        height:32px;
+        border:0;
+        border-radius:10px;
+        display:grid;
+        place-items:center;
+        color:currentColor;
+        background:transparent;
+        cursor:pointer;
+        transform:translateY(-50%);
+    }
+
+    .owners-message-close:hover{
+        background:rgba(255,255,255,.75);
+    }
+
+    @keyframes ownersMessageIn{
+        from{
+            opacity:0;
+            transform:translateY(-10px);
+        }
+
+        to{
+            opacity:1;
+            transform:translateY(0);
+        }
+    }
+
+    /* =========================================================
+       BARRE DE RECHERCHE ET FILTRES
+    ========================================================= */
+
+    .owners-toolbar{
+        margin-bottom:20px;
+        padding:19px;
+        border:1px solid var(--app-border);
+        border-radius:22px;
+        background:white;
+        box-shadow:0 12px 35px rgba(15,23,42,.055);
+    }
+
+    .owners-search-row{
+        display:grid;
+        grid-template-columns:minmax(0,1fr) auto;
+        gap:12px;
+        margin-bottom:15px;
+    }
+
+    .owners-search-group{
+        position:relative;
+    }
+
+    .owners-search-icon{
+        position:absolute;
+        top:50%;
+        left:17px;
+        z-index:2;
+        color:#8492ad;
+        font-size:15px;
+        pointer-events:none;
+        transform:translateY(-50%);
+    }
+
+    .owners-search-input{
+        width:100%;
+        height:54px;
+        padding:0 53px 0 47px;
+        border:1px solid #dbe5f3;
+        border-radius:16px;
+        outline:none;
+        color:var(--app-text);
+        background:#f9fbff;
+        font-size:14px;
+        font-weight:650;
+        transition:
+            border-color .2s ease,
+            background .2s ease,
+            box-shadow .2s ease;
+    }
+
+    .owners-search-input::placeholder{
+        color:#96a3bb;
+        font-weight:550;
+    }
+
+    .owners-search-input:focus{
+        border-color:var(--app-primary);
+        background:white;
+        box-shadow:0 0 0 4px rgba(37,99,235,.10);
+    }
+
+    .owners-clear-search{
+        position:absolute;
+        top:50%;
+        right:10px;
+        width:35px;
+        height:35px;
+        border:0;
+        border-radius:11px;
+        display:none;
+        place-items:center;
+        color:#7d8ba7;
+        background:#eef3fb;
+        cursor:pointer;
+        transform:translateY(-50%);
+        transition:.2s ease;
+    }
+
+    .owners-clear-search.visible{
+        display:grid;
+    }
+
+    .owners-clear-search:hover{
+        color:var(--app-danger);
+        background:#fee2e2;
+    }
+
+    .owners-submit-search{
+        min-width:145px;
+        height:54px;
+        padding:0 20px;
+        border:0;
+        border-radius:16px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:9px;
+        color:white;
+        background:
+            linear-gradient(
+                135deg,
+                var(--app-primary),
+                var(--app-primary-dark)
+            );
+        font-size:14px;
+        font-weight:850;
+        cursor:pointer;
+        box-shadow:0 12px 25px rgba(37,99,235,.22);
+        transition:.22s ease;
+    }
+
+    .owners-submit-search:hover{
+        transform:translateY(-2px);
+        box-shadow:0 17px 32px rgba(37,99,235,.28);
+    }
+
+    .owners-filter-row{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        flex-wrap:wrap;
+        gap:13px;
+    }
+
+    .owners-filter-buttons{
+        display:flex;
+        align-items:center;
+        flex-wrap:wrap;
+        gap:8px;
+    }
+
+    .owners-filter-button{
+        min-height:40px;
+        padding:0 14px;
+        border:1px solid var(--app-border);
+        border-radius:13px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:7px;
+        color:#5d6d8b;
+        background:white;
+        font-size:12px;
+        font-weight:850;
+        cursor:pointer;
+        transition:.2s ease;
+    }
+
+    .owners-filter-button:hover{
+        color:var(--app-primary);
+        border-color:rgba(37,99,235,.35);
+        background:#f5f9ff;
+    }
+
+    .owners-filter-button.active{
+        color:white;
+        border-color:var(--app-primary);
+        background:var(--app-primary);
+        box-shadow:0 8px 20px rgba(37,99,235,.20);
+    }
+
+    .owners-results-info{
+        display:flex;
+        align-items:center;
+        gap:8px;
+        color:var(--app-muted);
+        font-size:12px;
+        font-weight:750;
+    }
+
+    .owners-results-info strong{
+        color:var(--app-navy);
+        font-size:14px;
+    }
+
+    /* =========================================================
+       TABLEAU
+    ========================================================= */
+
+    .owners-table-card{
+        overflow:hidden;
+        border:1px solid var(--app-border);
+        border-radius:24px;
+        background:white;
+        box-shadow:var(--app-shadow);
+    }
+
+    .owners-table-header{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:15px;
+        padding:20px 22px;
+        border-bottom:1px solid var(--app-border);
+        background:white;
+    }
+
+    .owners-table-title-wrap{
+        display:flex;
+        align-items:center;
+        gap:13px;
+    }
+
+    .owners-table-title-icon{
+        flex:0 0 45px;
+        width:45px;
+        height:45px;
+        display:grid;
+        place-items:center;
+        border-radius:14px;
+        color:var(--app-primary);
+        background:#eaf2ff;
+    }
+
+    .owners-table-title{
+        margin:0 0 3px;
+        color:var(--app-navy);
+        font-size:17px;
+        font-weight:950;
+    }
+
+    .owners-table-subtitle{
+        margin:0;
+        color:var(--app-muted);
+        font-size:12px;
+    }
+
+    .owners-table-scroll{
+        width:100%;
+        overflow-x:auto;
+    }
+
+    .owners-table{
+        width:100%;
+        min-width:1180px;
+        margin:0;
+        border-collapse:collapse;
+    }
+
+    .owners-table thead th{
+        padding:16px 17px;
+        border-bottom:1px solid var(--app-border);
+        color:#667693;
+        background:#f8faff;
+        font-size:11px;
+        font-weight:900;
+        letter-spacing:.5px;
+        text-align:left;
+        text-transform:uppercase;
+        white-space:nowrap;
+    }
+
+    .owners-table tbody tr{
+        transition:
+            background .2s ease,
+            transform .2s ease;
+    }
+
+    .owners-table tbody tr:hover{
+        background:#f8fbff;
+    }
+
+    .owners-table tbody td{
+        padding:17px;
+        border-bottom:1px solid #edf1f8;
+        color:#33405a;
+        font-size:13px;
+        vertical-align:middle;
+    }
+
+    .owners-table tbody tr:last-child td{
+        border-bottom:0;
+    }
+
+    .owners-code{
+        display:inline-flex;
+        align-items:center;
+        gap:7px;
+        padding:9px 12px;
+        border-radius:11px;
+        color:var(--app-primary);
+        background:#eaf2ff;
+        font-size:12px;
+        font-weight:900;
+        white-space:nowrap;
+    }
+
+    .owners-person{
+        display:flex;
+        align-items:center;
+        gap:12px;
+        min-width:190px;
+    }
+
+    .owners-avatar{
+        flex:0 0 45px;
+        width:45px;
+        height:45px;
+        display:grid;
+        place-items:center;
+        border:1px solid #dce7f7;
+        border-radius:14px;
+        color:var(--app-primary);
+        background:
+            linear-gradient(
+                145deg,
+                #e7f0ff,
+                #ffffff
+            );
+        font-size:14px;
+        font-weight:950;
+        text-transform:uppercase;
+        box-shadow:0 8px 20px rgba(37,99,235,.08);
+    }
+
+    .owners-person-name{
+        margin:0 0 3px;
+        color:var(--app-navy);
+        font-size:14px;
+        font-weight:900;
+    }
+
+    .owners-person-role{
+        color:var(--app-muted);
+        font-size:11px;
+        font-weight:650;
+    }
+
+    .owners-contact-value{
+        display:flex;
+        align-items:flex-start;
+        gap:9px;
+        max-width:230px;
+    }
+
+    .owners-contact-value > i{
+        width:28px;
+        height:28px;
+        flex:0 0 28px;
+        display:grid;
+        place-items:center;
+        border-radius:9px;
+        color:var(--app-primary);
+        background:#edf4ff;
+        font-size:11px;
+    }
+
+    .owners-contact-text{
+        padding-top:5px;
+        overflow:hidden;
+        line-height:1.45;
+        overflow-wrap:anywhere;
+    }
+
+    .owners-contact-link{
+        color:#33405a;
+        text-decoration:none;
+    }
+
+    .owners-contact-link:hover{
+        color:var(--app-primary);
+    }
+
+    .owners-address{
+        display:-webkit-box;
+        max-width:235px;
+        overflow:hidden;
+        line-height:1.5;
+        -webkit-line-clamp:2;
+        -webkit-box-orient:vertical;
+    }
+
+    .owners-status{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:9px 12px;
+        border-radius:999px;
+        font-size:11px;
+        font-weight:900;
+        white-space:nowrap;
+    }
+
+    .owners-status::before{
+        content:"";
+        width:8px;
+        height:8px;
+        border-radius:50%;
+        background:currentColor;
+    }
+
+    .owners-status.resident{
+        color:#15803d;
+        background:#dcfce7;
+    }
+
+    .owners-status.non-resident{
+        color:#dc2626;
+        background:#fee2e2;
+    }
+
+    .owners-actions{
+        display:flex;
+        align-items:center;
+        gap:7px;
+        white-space:nowrap;
+    }
+
+    .owners-action-button{
+        width:39px;
+        height:39px;
+        border:1px solid var(--app-border);
+        border-radius:12px;
+        display:inline-grid;
+        place-items:center;
+        text-decoration:none;
+        background:white;
+        cursor:pointer;
+        transition:
+            transform .2s ease,
+            border-color .2s ease,
+            background .2s ease,
+            box-shadow .2s ease;
+    }
+
+    .owners-action-button:hover{
+        transform:translateY(-3px);
+    }
+
+    .owners-action-button.view{
+        color:#2563eb;
+    }
+
+    .owners-action-button.view:hover{
+        border-color:#bfdbfe;
+        background:#eff6ff;
+        box-shadow:0 10px 22px rgba(37,99,235,.13);
+    }
+
+    .owners-action-button.edit{
+        color:#d97706;
+    }
+
+    .owners-action-button.edit:hover{
+        border-color:#fed7aa;
+        background:#fff7ed;
+        box-shadow:0 10px 22px rgba(217,119,6,.13);
+    }
+
+    .owners-action-button.delete{
+        color:#dc2626;
+    }
+
+    .owners-action-button.delete:hover{
+        border-color:#fecaca;
+        background:#fef2f2;
+        box-shadow:0 10px 22px rgba(220,38,38,.13);
+    }
+
+    /* =========================================================
+       CARTES MOBILE
+    ========================================================= */
+
+    .owners-mobile-list{
+        display:none;
+        padding:15px;
+        gap:13px;
+        background:#f7f9fd;
+    }
+
+    .owners-mobile-card{
+        padding:17px;
+        border:1px solid var(--app-border);
+        border-radius:19px;
+        background:white;
+        box-shadow:0 9px 25px rgba(15,23,42,.055);
+    }
+
+    .owners-mobile-card-header{
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+        gap:13px;
+        padding-bottom:14px;
+        margin-bottom:14px;
+        border-bottom:1px solid var(--app-border);
+    }
+
+    .owners-mobile-code{
+        margin-top:9px;
+    }
+
+    .owners-mobile-info{
+        display:grid;
+        gap:11px;
+        margin-bottom:15px;
+    }
+
+    .owners-mobile-info-row{
+        display:flex;
+        align-items:flex-start;
+        gap:10px;
+    }
+
+    .owners-mobile-info-icon{
+        flex:0 0 34px;
+        width:34px;
+        height:34px;
+        display:grid;
+        place-items:center;
+        border-radius:11px;
+        color:var(--app-primary);
+        background:#edf4ff;
+        font-size:12px;
+    }
+
+    .owners-mobile-info-label{
+        margin-bottom:2px;
+        color:var(--app-muted);
+        font-size:10px;
+        font-weight:850;
+        letter-spacing:.35px;
+        text-transform:uppercase;
+    }
+
+    .owners-mobile-info-value{
+        color:#33405a;
+        font-size:12px;
+        font-weight:750;
+        line-height:1.45;
+        overflow-wrap:anywhere;
+    }
+
+    .owners-mobile-actions{
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
+        gap:8px;
+    }
+
+    .owners-mobile-action{
+        min-height:43px;
+        border:1px solid var(--app-border);
+        border-radius:12px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:7px;
+        text-decoration:none;
+        background:white;
+        font-size:11px;
+        font-weight:850;
+        cursor:pointer;
+    }
+
+    .owners-mobile-action.view{
+        color:#2563eb;
+        background:#eff6ff;
+        border-color:#dbeafe;
+    }
+
+    .owners-mobile-action.edit{
+        color:#d97706;
+        background:#fff7ed;
+        border-color:#ffedd5;
+    }
+
+    .owners-mobile-action.delete{
+        color:#dc2626;
+        background:#fef2f2;
+        border-color:#fee2e2;
+    }
+
+    /* =========================================================
+       ÉTAT VIDE
+    ========================================================= */
+
+    .owners-empty-state{
+        padding:65px 25px;
+        text-align:center;
+    }
+
+    .owners-empty-icon{
+        width:82px;
+        height:82px;
+        margin:0 auto 18px;
+        display:grid;
+        place-items:center;
+        border-radius:25px;
+        color:var(--app-primary);
+        background:#eaf2ff;
+        font-size:30px;
+    }
+
+    .owners-empty-title{
+        margin:0 0 8px;
+        color:var(--app-navy);
+        font-size:20px;
+        font-weight:950;
+    }
+
+    .owners-empty-text{
+        max-width:460px;
+        margin:0 auto 20px;
+        color:var(--app-muted);
+        font-size:13px;
+        line-height:1.65;
+    }
+
+    .owners-empty-button{
+        min-height:45px;
+        padding:0 17px;
+        border-radius:13px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        color:white;
+        background:var(--app-primary);
+        text-decoration:none;
+        font-size:13px;
+        font-weight:850;
+    }
+
+    .owners-live-empty{
+        display:none;
+    }
+
+    /* =========================================================
+       MODALE SUPPRESSION
+    ========================================================= */
+
+    .owners-modal-overlay{
+        position:fixed;
+        inset:0;
+        z-index:99990;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+        background:rgba(5,15,35,.62);
+        backdrop-filter:blur(8px);
+        opacity:0;
+        visibility:hidden;
+        transition:
+            opacity .25s ease,
+            visibility .25s ease;
+    }
+
+    .owners-modal-overlay.open{
+        opacity:1;
+        visibility:visible;
+    }
+
+    .owners-modal{
+        width:100%;
+        max-width:450px;
+        padding:26px;
+        border:1px solid rgba(255,255,255,.55);
+        border-radius:25px;
+        background:white;
+        box-shadow:0 30px 90px rgba(0,0,0,.30);
+        transform:scale(.93) translateY(20px);
+        transition:transform .25s ease;
+    }
+
+    .owners-modal-overlay.open .owners-modal{
+        transform:scale(1) translateY(0);
+    }
+
+    .owners-modal-icon{
+        width:68px;
+        height:68px;
+        margin-bottom:18px;
+        display:grid;
+        place-items:center;
+        border-radius:21px;
+        color:#dc2626;
+        background:#fee2e2;
+        font-size:25px;
+    }
+
+    .owners-modal-title{
+        margin:0 0 9px;
+        color:var(--app-navy);
+        font-size:23px;
+        font-weight:950;
+    }
+
+    .owners-modal-text{
+        margin:0 0 10px;
+        color:var(--app-muted);
+        font-size:13px;
+        line-height:1.65;
+    }
+
+    .owners-modal-name{
+        margin:15px 0 22px;
+        padding:13px 15px;
+        border:1px solid #fecaca;
+        border-radius:14px;
+        color:#991b1b;
+        background:#fef2f2;
+        font-size:14px;
+        font-weight:900;
+    }
+
+    .owners-modal-actions{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+    }
+
+    .owners-modal-button{
+        min-height:48px;
+        border:0;
+        border-radius:14px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        text-decoration:none;
+        font-size:13px;
+        font-weight:900;
+        cursor:pointer;
+        transition:.2s ease;
+    }
+
+    .owners-modal-button.cancel{
+        color:#52617d;
+        background:#eef2f8;
+    }
+
+    .owners-modal-button.cancel:hover{
+        background:#e3e9f2;
+    }
+
+    .owners-modal-button.confirm{
+        color:white;
+        background:#dc2626;
+        box-shadow:0 12px 25px rgba(220,38,38,.22);
+    }
+
+    .owners-modal-button.confirm:hover{
+        color:white;
+        background:#b91c1c;
+        transform:translateY(-2px);
+    }
+
+    /* =========================================================
+       TOAST
+    ========================================================= */
+
+    .owners-toast{
+        position:fixed;
+        left:50%;
+        bottom:25px;
+        z-index:99999;
+        display:flex;
+        align-items:center;
+        gap:10px;
+        max-width:calc(100% - 30px);
+        padding:14px 18px;
+        border-radius:15px;
+        color:white;
+        background:#071a3d;
+        box-shadow:0 20px 50px rgba(0,0,0,.22);
+        font-size:13px;
+        font-weight:800;
+        opacity:0;
+        visibility:hidden;
+        transform:translate(-50%,25px);
+        transition:.3s ease;
+    }
+
+    .owners-toast.show{
+        opacity:1;
+        visibility:visible;
+        transform:translate(-50%,0);
+    }
+
+    .owners-toast i{
+        color:#86efac;
+    }
+
+    /* =========================================================
+       ANIMATIONS
+    ========================================================= */
+
+    .owners-reveal{
+        opacity:0;
+        transform:translateY(18px);
+        transition:
+            opacity .55s ease,
+            transform .55s ease;
+    }
+
+    .owners-reveal.visible{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media(max-width:1150px){
+        .owners-stats{
+            grid-template-columns:repeat(2,minmax(0,1fr));
+        }
+    }
+
+    @media(max-width:850px){
+        .owners-hero{
+            align-items:flex-start;
+            flex-direction:column;
+        }
+
+        .owners-hero-actions{
+            width:100%;
+        }
+
+        .owners-main-button{
+            width:100%;
+        }
+
+        .owners-table-scroll{
+            display:none;
+        }
+
+        .owners-mobile-list{
+            display:grid;
+        }
+    }
+
+    @media(max-width:650px){
+        .owners-app{
+            padding-top:8px;
+        }
+
+        .owners-hero{
+            padding:23px 19px;
+            border-radius:23px;
+        }
+
+        .owners-hero-content{
+            align-items:flex-start;
+            flex-direction:column;
+        }
+
+        .owners-page-icon{
+            width:65px;
+            height:65px;
+            flex-basis:65px;
+            border-radius:20px;
+            font-size:25px;
+        }
+
+        .owners-page-title{
+            font-size:28px;
+        }
+
+        .owners-stats{
+            grid-template-columns:1fr;
+        }
+
+        .owners-search-row{
+            grid-template-columns:1fr;
+        }
+
+        .owners-submit-search{
+            width:100%;
+        }
+
+        .owners-filter-row{
+            align-items:flex-start;
+            flex-direction:column;
+        }
+
+        .owners-filter-buttons{
+            width:100%;
+        }
+
+        .owners-filter-button{
+            flex:1;
+        }
+
+        .owners-table-header{
+            align-items:flex-start;
+            flex-direction:column;
+        }
+    }
+
+    @media(max-width:430px){
+        .owners-mobile-card-header{
+            flex-direction:column;
+        }
+
+        .owners-mobile-actions{
+            grid-template-columns:1fr;
+        }
+
+        .owners-modal-actions{
+            grid-template-columns:1fr;
+        }
+    }
+</style>
+
+
+<div class="owners-app">
+
+    <div class="owners-container">
+
+        <!-- =====================================================
+             EN-TÊTE
+        ====================================================== -->
+        <section class="owners-hero owners-reveal">
+
+            <div class="owners-hero-content">
+
+                <div class="owners-page-icon">
+                    <i class="fa-solid fa-users-gear"></i>
+                </div>
+
+                <div>
+
+                    <div class="owners-page-badge">
+                        <i class="fa-solid fa-building-shield"></i>
+                        Gestion immobilière
+                    </div>
+
+                    <h1 class="owners-page-title">
+                        Gestion des propriétaires
+                    </h1>
+
+                    <p class="owners-page-description">
+                        Consultez les dossiers, recherchez un propriétaire,
+                        vérifiez son statut et gérez ses informations depuis
+                        une interface centralisée.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="owners-hero-actions">
+
+                <a
+                    href="{% url 'ajouter_proprietaire' %}"
+                    class="owners-main-button"
+                >
+                    <i class="fa-solid fa-plus"></i>
+                    Ajouter un propriétaire
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             STATISTIQUES
+        ====================================================== -->
+        <section class="owners-stats">
+
+            <article class="owners-stat-card owners-reveal">
+
+                <div class="owners-stat-icon blue">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+
+                <div>
+                    <div class="owners-stat-label">
+                        Total propriétaires
+                    </div>
+
+                    <p
+                        class="owners-stat-value owners-counter"
+                        data-count="{{ total_proprietaires|default:'0' }}"
+                    >
+                        0
+                    </p>
+                </div>
+
+            </article>
+
+
+            <article class="owners-stat-card owners-reveal">
+
+                <div class="owners-stat-icon green">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <div>
+                    <div class="owners-stat-label">
+                        Propriétaires résidents
+                    </div>
+
+                    <p
+                        class="owners-stat-value owners-counter"
+                        data-count="{{ total_residents|default:'0' }}"
+                    >
+                        0
+                    </p>
+                </div>
+
+            </article>
+
+
+            <article class="owners-stat-card owners-reveal">
+
+                <div class="owners-stat-icon orange">
+                    <i class="fa-solid fa-user-xmark"></i>
+                </div>
+
+                <div>
+                    <div class="owners-stat-label">
+                        Non-résidents
+                    </div>
+
+                    <p
+                        class="owners-stat-value owners-counter"
+                        data-count="{{ total_non_residents|default:'0' }}"
+                    >
+                        0
+                    </p>
+                </div>
+
+            </article>
+
+
+            <article class="owners-stat-card owners-reveal">
+
+                <div class="owners-stat-icon purple">
+                    <i class="fa-solid fa-filter-circle-check"></i>
+                </div>
+
+                <div>
+                    <div class="owners-stat-label">
+                        Résultats affichés
+                    </div>
+
+                    <p
+                        class="owners-stat-value"
+                        id="ownersVisibleCount"
+                    >
+                        {{ proprietaires|length }}
+                    </p>
+                </div>
+
+            </article>
+
+        </section>
+
+
+        <!-- =====================================================
+             MESSAGES DJANGO
+        ====================================================== -->
+        {% if messages %}
+
+            <section id="ownersMessages">
+
+                {% for message in messages %}
+
+                    <div class="owners-message {{ message.tags }}">
+
+                        <div class="owners-message-icon">
+
+                            {% if message.tags == "success" %}
+                                <i class="fa-solid fa-circle-check"></i>
+
+                            {% elif message.tags == "error" or message.tags == "danger" %}
+                                <i class="fa-solid fa-circle-exclamation"></i>
+
+                            {% elif message.tags == "warning" %}
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                            {% else %}
+                                <i class="fa-solid fa-circle-info"></i>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="owners-message-text">
+                            {{ message }}
+                        </div>
+
+                        <button
+                            type="button"
+                            class="owners-message-close"
+                            aria-label="Fermer le message"
+                        >
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+
+                    </div>
+
+                {% endfor %}
+
+            </section>
+
+        {% endif %}
+
+
+        <!-- =====================================================
+             RECHERCHE ET FILTRES
+        ====================================================== -->
+        <section class="owners-toolbar owners-reveal">
+
+            <form method="GET" id="ownersSearchForm">
+
+                <div class="owners-search-row">
+
+                    <div class="owners-search-group">
+
+                        <i class="fa-solid fa-magnifying-glass owners-search-icon"></i>
+
+                        <input
+                            type="text"
+                            name="q"
+                            id="ownersSearchInput"
+                            value="{{ q|default:'' }}"
+                            class="owners-search-input"
+                            placeholder="Nom, prénom, téléphone, courriel, adresse ou code client..."
+                            autocomplete="off"
+                        >
+
+                        <button
+                            type="button"
+                            class="owners-clear-search"
+                            id="ownersClearSearch"
+                            aria-label="Effacer la recherche"
+                            title="Effacer la recherche"
+                        >
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="owners-submit-search"
+                    >
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        Rechercher
+                    </button>
+
+                </div>
+
+            </form>
+
+
+            <div class="owners-filter-row">
+
+                <div class="owners-filter-buttons">
+
+                    <button
+                        type="button"
+                        class="owners-filter-button active"
+                        data-filter="all"
+                    >
+                        <i class="fa-solid fa-users"></i>
+                        Tous
+                    </button>
+
+                    <button
+                        type="button"
+                        class="owners-filter-button"
+                        data-filter="resident"
+                    >
+                        <i class="fa-solid fa-house-circle-check"></i>
+                        Résidents
+                    </button>
+
+                    <button
+                        type="button"
+                        class="owners-filter-button"
+                        data-filter="non-resident"
+                    >
+                        <i class="fa-solid fa-house-circle-xmark"></i>
+                        Non-résidents
+                    </button>
+
+                </div>
+
+                <div class="owners-results-info">
+
+                    <i class="fa-solid fa-list-check"></i>
+
+                    <span>
+                        <strong id="ownersResultText">
+                            {{ proprietaires|length }}
+                        </strong>
+                        résultat(s)
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             LISTE
+        ====================================================== -->
+        <section class="owners-table-card owners-reveal">
+
+            <div class="owners-table-header">
+
+                <div class="owners-table-title-wrap">
+
+                    <div class="owners-table-title-icon">
+                        <i class="fa-solid fa-address-book"></i>
+                    </div>
+
+                    <div>
+                        <h2 class="owners-table-title">
+                            Répertoire des propriétaires
+                        </h2>
+
+                        <p class="owners-table-subtitle">
+                            Liste complète des propriétaires enregistrés
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {% if proprietaires %}
+
+                <!-- =============================================
+                     VERSION ORDINATEUR
+                ============================================== -->
+                <div class="owners-table-scroll">
+
+                    <table class="owners-table">
+
+                        <thead>
+                            <tr>
+                                <th>Code client</th>
+                                <th>Propriétaire</th>
+                                <th>Téléphone</th>
+                                <th>Courriel</th>
+                                <th>Adresse</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="ownersTableBody">
+
+                            {% for p in proprietaires %}
+
+                                <tr
+                                    class="owners-data-item"
+                                    data-owner-id="{{ p.id }}"
+                                    data-status="{% if p.resident %}resident{% else %}non-resident{% endif %}"
+                                    data-search="{{ p.code_client|default:'' }} {{ p.nom|default:'' }} {{ p.prenom|default:'' }} {{ p.telephone|default:'' }} {{ p.email|default:'' }} {{ p.adresse|default:'' }}"
+                                >
+
+                                    <td>
+                                        <span class="owners-code">
+                                            <i class="fa-solid fa-barcode"></i>
+                                            {{ p.code_client|default:"Sans code" }}
+                                        </span>
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="owners-person">
+
+                                            <div class="owners-avatar">
+                                                {{ p.prenom|slice:":1" }}{{ p.nom|slice:":1" }}
+                                            </div>
+
+                                            <div>
+                                                <p class="owners-person-name">
+                                                    {{ p.prenom|default:"" }}
+                                                    {{ p.nom|default:"" }}
+                                                </p>
+
+                                                <span class="owners-person-role">
+                                                    Propriétaire immobilier
+                                                </span>
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="owners-contact-value">
+
+                                            <i class="fa-solid fa-phone"></i>
+
+                                            <div class="owners-contact-text">
+
+                                                {% if p.telephone %}
+
+                                                    <a
+                                                        href="tel:{{ p.telephone }}"
+                                                        class="owners-contact-link"
+                                                    >
+                                                        {{ p.telephone }}
+                                                    </a>
+
+                                                {% else %}
+
+                                                    <span class="text-muted">
+                                                        Non renseigné
+                                                    </span>
+
+                                                {% endif %}
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="owners-contact-value">
+
+                                            <i class="fa-solid fa-envelope"></i>
+
+                                            <div class="owners-contact-text">
+
+                                                {% if p.email %}
+
+                                                    <a
+                                                        href="mailto:{{ p.email }}"
+                                                        class="owners-contact-link"
+                                                    >
+                                                        {{ p.email }}
+                                                    </a>
+
+                                                {% else %}
+
+                                                    <span class="text-muted">
+                                                        Non renseigné
+                                                    </span>
+
+                                                {% endif %}
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="owners-contact-value">
+
+                                            <i class="fa-solid fa-location-dot"></i>
+
+                                            <div class="owners-contact-text owners-address">
+                                                {{ p.adresse|default:"Adresse non renseignée" }}
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if p.resident %}
+
+                                            <span class="owners-status resident">
+                                                Résident
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="owners-status non-resident">
+                                                Non-résident
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="owners-actions">
+
+                                            <a
+                                                href="{% url 'detail_proprietaire' p.id %}"
+                                                class="owners-action-button view"
+                                                title="Consulter la fiche"
+                                                aria-label="Consulter la fiche"
+                                            >
+                                                <i class="fa-solid fa-eye"></i>
+                                            </a>
+
+                                            <a
+                                                href="{% url 'modifier_proprietaire' p.id %}"
+                                                class="owners-action-button edit"
+                                                title="Modifier le propriétaire"
+                                                aria-label="Modifier le propriétaire"
+                                            >
+                                                <i class="fa-solid fa-pen"></i>
+                                            </a>
+
+                                            <button
+                                                type="button"
+                                                class="owners-action-button delete owners-delete-trigger"
+                                                data-delete-url="{% url 'supprimer_proprietaire' p.id %}"
+                                                data-owner-name="{{ p.prenom|default:'' }} {{ p.nom|default:'' }}"
+                                                title="Supprimer le propriétaire"
+                                                aria-label="Supprimer le propriétaire"
+                                            >
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- =============================================
+                     VERSION MOBILE
+                ============================================== -->
+                <div class="owners-mobile-list" id="ownersMobileList">
+
+                    {% for p in proprietaires %}
+
+                        <article
+                            class="owners-mobile-card owners-mobile-data-item"
+                            data-owner-id="{{ p.id }}"
+                            data-status="{% if p.resident %}resident{% else %}non-resident{% endif %}"
+                            data-search="{{ p.code_client|default:'' }} {{ p.nom|default:'' }} {{ p.prenom|default:'' }} {{ p.telephone|default:'' }} {{ p.email|default:'' }} {{ p.adresse|default:'' }}"
+                        >
+
+                            <div class="owners-mobile-card-header">
+
+                                <div class="owners-person">
+
+                                    <div class="owners-avatar">
+                                        {{ p.prenom|slice:":1" }}{{ p.nom|slice:":1" }}
+                                    </div>
+
+                                    <div>
+                                        <p class="owners-person-name">
+                                            {{ p.prenom|default:"" }}
+                                            {{ p.nom|default:"" }}
+                                        </p>
+
+                                        <span class="owners-person-role">
+                                            Propriétaire immobilier
+                                        </span>
+
+                                        <div class="owners-mobile-code">
+                                            <span class="owners-code">
+                                                <i class="fa-solid fa-barcode"></i>
+                                                {{ p.code_client|default:"Sans code" }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                                {% if p.resident %}
+
+                                    <span class="owners-status resident">
+                                        Résident
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="owners-status non-resident">
+                                        Non-résident
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="owners-mobile-info">
+
+                                <div class="owners-mobile-info-row">
+
+                                    <div class="owners-mobile-info-icon">
+                                        <i class="fa-solid fa-phone"></i>
+                                    </div>
+
+                                    <div>
+                                        <div class="owners-mobile-info-label">
+                                            Téléphone
+                                        </div>
+
+                                        <div class="owners-mobile-info-value">
+                                            {% if p.telephone %}
+                                                <a
+                                                    href="tel:{{ p.telephone }}"
+                                                    class="owners-contact-link"
+                                                >
+                                                    {{ p.telephone }}
+                                                </a>
+                                            {% else %}
+                                                Non renseigné
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="owners-mobile-info-row">
+
+                                    <div class="owners-mobile-info-icon">
+                                        <i class="fa-solid fa-envelope"></i>
+                                    </div>
+
+                                    <div>
+                                        <div class="owners-mobile-info-label">
+                                            Courriel
+                                        </div>
+
+                                        <div class="owners-mobile-info-value">
+                                            {% if p.email %}
+                                                <a
+                                                    href="mailto:{{ p.email }}"
+                                                    class="owners-contact-link"
+                                                >
+                                                    {{ p.email }}
+                                                </a>
+                                            {% else %}
+                                                Non renseigné
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="owners-mobile-info-row">
+
+                                    <div class="owners-mobile-info-icon">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                    </div>
+
+                                    <div>
+                                        <div class="owners-mobile-info-label">
+                                            Adresse
+                                        </div>
+
+                                        <div class="owners-mobile-info-value">
+                                            {{ p.adresse|default:"Adresse non renseignée" }}
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="owners-mobile-actions">
+
+                                <a
+                                    href="{% url 'detail_proprietaire' p.id %}"
+                                    class="owners-mobile-action view"
+                                >
+                                    <i class="fa-solid fa-eye"></i>
+                                    Consulter
+                                </a>
+
+                                <a
+                                    href="{% url 'modifier_proprietaire' p.id %}"
+                                    class="owners-mobile-action edit"
+                                >
+                                    <i class="fa-solid fa-pen"></i>
+                                    Modifier
+                                </a>
+
+                                <button
+                                    type="button"
+                                    class="owners-mobile-action delete owners-delete-trigger"
+                                    data-delete-url="{% url 'supprimer_proprietaire' p.id %}"
+                                    data-owner-name="{{ p.prenom|default:'' }} {{ p.nom|default:'' }}"
+                                >
+                                    <i class="fa-solid fa-trash-can"></i>
+                                    Supprimer
+                                </button>
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- AUCUN RÉSULTAT APRÈS FILTRAGE JAVASCRIPT -->
+                <div class="owners-empty-state owners-live-empty" id="ownersLiveEmpty">
+
+                    <div class="owners-empty-icon">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+
+                    <h3 class="owners-empty-title">
+                        Aucun résultat correspondant
+                    </h3>
+
+                    <p class="owners-empty-text">
+                        Aucun propriétaire ne correspond à votre recherche ou
+                        au filtre sélectionné. Essayez un autre nom, code ou statut.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="owners-empty-button"
+                        id="ownersResetFilters"
+                    >
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Réinitialiser les filtres
+                    </button>
+
+                </div>
+
+            {% else %}
+
+                <!-- AUCUN PROPRIÉTAIRE ENREGISTRÉ -->
+                <div class="owners-empty-state">
+
+                    <div class="owners-empty-icon">
+                        <i class="fa-solid fa-users-slash"></i>
+                    </div>
+
+                    <h3 class="owners-empty-title">
+                        Aucun propriétaire trouvé
+                    </h3>
+
+                    <p class="owners-empty-text">
+                        Aucun propriétaire n’est actuellement enregistré ou
+                        aucun résultat ne correspond à votre recherche.
+                    </p>
+
+                    <a
+                        href="{% url 'ajouter_proprietaire' %}"
+                        class="owners-empty-button"
+                    >
+                        <i class="fa-solid fa-plus"></i>
+                        Ajouter un propriétaire
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     MODALE DE CONFIRMATION DE SUPPRESSION
+========================================================= -->
+<div
+    class="owners-modal-overlay"
+    id="ownersDeleteModal"
+    aria-hidden="true"
+>
+
+    <div
+        class="owners-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="ownersDeleteTitle"
+    >
+
+        <div class="owners-modal-icon">
+            <i class="fa-solid fa-trash-can"></i>
+        </div>
+
+        <h2
+            class="owners-modal-title"
+            id="ownersDeleteTitle"
+        >
+            Supprimer ce propriétaire ?
+        </h2>
+
+        <p class="owners-modal-text">
+            Cette action peut supprimer définitivement le dossier du
+            propriétaire. Vérifiez qu’aucun bâtiment ou contrat actif
+            ne dépend de ce dossier.
+        </p>
+
+        <div
+            class="owners-modal-name"
+            id="ownersDeleteName"
+        >
+            Propriétaire
+        </div>
+
+        <div class="owners-modal-actions">
+
+            <button
+                type="button"
+                class="owners-modal-button cancel"
+                id="ownersCancelDelete"
+            >
+                <i class="fa-solid fa-xmark"></i>
+                Annuler
+            </button>
+
+            <a
+                href="#"
+                class="owners-modal-button confirm"
+                id="ownersConfirmDelete"
+            >
+                <i class="fa-solid fa-trash-can"></i>
+                Oui, supprimer
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     TOAST
+========================================================= -->
+<div class="owners-toast" id="ownersToast">
+
+    <i class="fa-solid fa-circle-check"></i>
+
+    <span id="ownersToastMessage">
+        Action effectuée.
+    </span>
+
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* =========================================================
+       OUTILS
+    ========================================================= */
+
+    function normalizeText(value) {
+        return String(value || "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .trim();
+    }
+
+
+    /* =========================================================
+       ANIMATIONS D’APPARITION
+    ========================================================= */
+
+    const revealElements = document.querySelectorAll(".owners-reveal");
+
+    if ("IntersectionObserver" in window) {
+
+        const revealObserver = new IntersectionObserver(
+            function (entries, observer) {
+
+                entries.forEach(function (entry) {
+
+                    if (!entry.isIntersecting) {
+                        return;
+                    }
+
+                    const elementIndex =
+                        Array.from(revealElements).indexOf(entry.target);
+
+                    entry.target.style.transitionDelay =
+                        Math.min((elementIndex % 5) * 70, 280) + "ms";
+
+                    entry.target.classList.add("visible");
+
+                    observer.unobserve(entry.target);
+
+                });
+
+            },
+            {
+                threshold:0.08
+            }
+        );
+
+        revealElements.forEach(function (element) {
+            revealObserver.observe(element);
+        });
+
+    } else {
+
+        revealElements.forEach(function (element) {
+            element.classList.add("visible");
+        });
+
+    }
+
+
+    /* =========================================================
+       ANIMATION DES COMPTEURS
+    ========================================================= */
+
+    const counters = document.querySelectorAll(".owners-counter");
+
+    counters.forEach(function (counter) {
+
+        const target =
+            parseInt(counter.getAttribute("data-count"), 10) || 0;
+
+        const duration = 850;
+        const startTime = performance.now();
+
+        function animateCounter(currentTime) {
+
+            const elapsed = currentTime - startTime;
+
+            const progress =
+                Math.min(elapsed / duration, 1);
+
+            const easedProgress =
+                1 - Math.pow(1 - progress, 3);
+
+            counter.textContent =
+                Math.round(target * easedProgress);
+
+            if (progress < 1) {
+                requestAnimationFrame(animateCounter);
+            } else {
+                counter.textContent = target;
+            }
+
+        }
+
+        requestAnimationFrame(animateCounter);
+
+    });
+
+
+    /* =========================================================
+       RECHERCHE DYNAMIQUE ET FILTRES
+    ========================================================= */
+
+    const searchInput =
+        document.getElementById("ownersSearchInput");
+
+    const clearSearchButton =
+        document.getElementById("ownersClearSearch");
+
+    const filterButtons =
+        document.querySelectorAll(".owners-filter-button");
+
+    const desktopItems =
+        document.querySelectorAll(".owners-data-item");
+
+    const mobileItems =
+        document.querySelectorAll(".owners-mobile-data-item");
+
+    const visibleCount =
+        document.getElementById("ownersVisibleCount");
+
+    const resultText =
+        document.getElementById("ownersResultText");
+
+    const liveEmpty =
+        document.getElementById("ownersLiveEmpty");
+
+    const resetFiltersButton =
+        document.getElementById("ownersResetFilters");
+
+    let currentFilter = "all";
+
+
+    function updateClearButton() {
+
+        if (!searchInput || !clearSearchButton) {
+            return;
+        }
+
+        if (searchInput.value.trim()) {
+            clearSearchButton.classList.add("visible");
+        } else {
+            clearSearchButton.classList.remove("visible");
+        }
+
+    }
+
+
+    function ownerMatches(item, query, filter) {
+
+        const itemSearch =
+            normalizeText(item.getAttribute("data-search"));
+
+        const itemStatus =
+            item.getAttribute("data-status");
+
+        const matchesSearch =
+            !query || itemSearch.includes(query);
+
+        const matchesStatus =
+            filter === "all" || itemStatus === filter;
+
+        return matchesSearch && matchesStatus;
+
+    }
+
+
+    function applyOwnersFilters() {
+
+        if (!searchInput) {
+            return;
+        }
+
+        const query =
+            normalizeText(searchInput.value);
+
+        let displayedOwners = 0;
+
+        desktopItems.forEach(function (item) {
+
+            const matches =
+                ownerMatches(item, query, currentFilter);
+
+            item.style.display = matches ? "" : "none";
+
+            if (matches) {
+                displayedOwners += 1;
+            }
+
+        });
+
+
+        mobileItems.forEach(function (item) {
+
+            const matches =
+                ownerMatches(item, query, currentFilter);
+
+            item.style.display = matches ? "" : "none";
+
+        });
+
+
+        if (visibleCount) {
+            visibleCount.textContent = displayedOwners;
+        }
+
+        if (resultText) {
+            resultText.textContent = displayedOwners;
+        }
+
+        if (liveEmpty) {
+
+            if (desktopItems.length > 0 && displayedOwners === 0) {
+                liveEmpty.style.display = "block";
+            } else {
+                liveEmpty.style.display = "none";
+            }
+
+        }
+
+        updateClearButton();
+
+    }
+
+
+    if (searchInput) {
+
+        searchInput.addEventListener(
+            "input",
+            applyOwnersFilters
+        );
+
+        updateClearButton();
+
+    }
+
+
+    if (clearSearchButton) {
+
+        clearSearchButton.addEventListener("click", function () {
+
+            searchInput.value = "";
+            searchInput.focus();
+
+            applyOwnersFilters();
+
+        });
+
+    }
+
+
+    filterButtons.forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            filterButtons.forEach(function (item) {
+                item.classList.remove("active");
+            });
+
+            button.classList.add("active");
+
+            currentFilter =
+                button.getAttribute("data-filter") || "all";
+
+            applyOwnersFilters();
+
+        });
+
+    });
+
+
+    if (resetFiltersButton) {
+
+        resetFiltersButton.addEventListener("click", function () {
+
+            currentFilter = "all";
+
+            filterButtons.forEach(function (button) {
+
+                button.classList.toggle(
+                    "active",
+                    button.getAttribute("data-filter") === "all"
+                );
+
+            });
+
+            if (searchInput) {
+                searchInput.value = "";
+                searchInput.focus();
+            }
+
+            applyOwnersFilters();
+
+        });
+
+    }
+
+
+    applyOwnersFilters();
+
+
+    /* =========================================================
+       MODALE DE SUPPRESSION
+    ========================================================= */
+
+    const deleteModal =
+        document.getElementById("ownersDeleteModal");
+
+    const deleteTriggers =
+        document.querySelectorAll(".owners-delete-trigger");
+
+    const deleteName =
+        document.getElementById("ownersDeleteName");
+
+    const confirmDelete =
+        document.getElementById("ownersConfirmDelete");
+
+    const cancelDelete =
+        document.getElementById("ownersCancelDelete");
+
+
+    function openDeleteModal(ownerName, deleteUrl) {
+
+        if (
+            !deleteModal ||
+            !deleteName ||
+            !confirmDelete
+        ) {
+            return;
+        }
+
+        deleteName.textContent =
+            ownerName || "Propriétaire sélectionné";
+
+        confirmDelete.setAttribute(
+            "href",
+            deleteUrl || "#"
+        );
+
+        deleteModal.classList.add("open");
+
+        deleteModal.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+        document.body.style.overflow = "hidden";
+
+    }
+
+
+    function closeDeleteModal() {
+
+        if (!deleteModal) {
+            return;
+        }
+
+        deleteModal.classList.remove("open");
+
+        deleteModal.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+        document.body.style.overflow = "";
+
+    }
+
+
+    deleteTriggers.forEach(function (trigger) {
+
+        trigger.addEventListener("click", function () {
+
+            openDeleteModal(
+                trigger.getAttribute("data-owner-name"),
+                trigger.getAttribute("data-delete-url")
+            );
+
+        });
+
+    });
+
+
+    if (cancelDelete) {
+
+        cancelDelete.addEventListener(
+            "click",
+            closeDeleteModal
+        );
+
+    }
+
+
+    if (deleteModal) {
+
+        deleteModal.addEventListener("click", function (event) {
+
+            if (event.target === deleteModal) {
+                closeDeleteModal();
+            }
+
+        });
+
+    }
+
+
+    document.addEventListener("keydown", function (event) {
+
+        if (event.key === "Escape") {
+            closeDeleteModal();
+        }
+
+    });
+
+
+    /* =========================================================
+       FERMETURE DES MESSAGES DJANGO
+    ========================================================= */
+
+    const messageCloseButtons =
+        document.querySelectorAll(".owners-message-close");
+
+    messageCloseButtons.forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const message =
+                button.closest(".owners-message");
+
+            if (!message) {
+                return;
+            }
+
+            message.style.opacity = "0";
+            message.style.transform = "translateY(-8px)";
+
+            setTimeout(function () {
+                message.remove();
+            }, 250);
+
+        });
+
+    });
+
+
+    const djangoMessages =
+        document.querySelectorAll(".owners-message");
+
+    djangoMessages.forEach(function (message) {
+
+        setTimeout(function () {
+
+            if (!document.body.contains(message)) {
+                return;
+            }
+
+            message.style.opacity = "0";
+            message.style.transform = "translateY(-8px)";
+
+            setTimeout(function () {
+                message.remove();
+            }, 250);
+
+        }, 7000);
+
+    });
+
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>
+        Attribuer le local {{ local.numero }}
+    </title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        :root{
+            --navy:#071a3d;
+            --blue:#0057ff;
+            --blue-dark:#0043c7;
+            --blue-soft:#eaf1ff;
+            --green:#16a34a;
+            --green-soft:#eaf9ef;
+            --orange:#e78a15;
+            --orange-soft:#fff4e5;
+            --red:#dc2626;
+            --red-soft:#fff0f0;
+            --gray:#64748b;
+            --border:#e2e8f0;
+            --background:#f3f6fb;
+            --white:#ffffff;
+            --text:#0f172a;
+        }
+
+        *{
+            box-sizing:border-box;
+        }
+
+        body{
+            min-height:100vh;
+            margin:0;
+            padding:28px 16px;
+
+            color:var(--text);
+
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(0,87,255,.09),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at bottom right,
+                    rgba(22,163,74,.07),
+                    transparent 25%
+                ),
+                var(--background);
+
+            font-family:
+                "Segoe UI",
+                Arial,
+                sans-serif;
+        }
+
+        a{
+            text-decoration:none;
+        }
+
+        .page{
+            width:100%;
+            max-width:1150px;
+            margin:auto;
+        }
+
+        /* =====================================================
+           NAVIGATION
+        ===================================================== */
+
+        .top-navigation{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:15px;
+            margin-bottom:18px;
+        }
+
+        .btn-back{
+            min-height:46px;
+
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+
+            padding:11px 17px;
+
+            border:1px solid var(--border);
+            border-radius:14px;
+
+            color:#475569;
+            background:white;
+
+            box-shadow:
+                0 10px 25px rgba(15,23,42,.06);
+
+            font-size:11px;
+            font-weight:900;
+        }
+
+        .btn-back:hover{
+            color:var(--navy);
+        }
+
+        .local-reference{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+
+            padding:9px 13px;
+
+            border-radius:999px;
+
+            color:var(--blue);
+            background:var(--blue-soft);
+
+            font-size:10px;
+            font-weight:900;
+        }
+
+        /* =====================================================
+           EN-TÊTE
+        ===================================================== */
+
+        .hero{
+            position:relative;
+            isolation:isolate;
+            overflow:hidden;
+
+            display:grid;
+            grid-template-columns:minmax(0,1fr) auto;
+            align-items:center;
+            gap:25px;
+
+            margin-bottom:20px;
+            padding:32px;
+
+            border-radius:27px;
+
+            color:white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--navy),
+                    #123d82 55%,
+                    var(--blue)
+                );
+
+            box-shadow:
+                0 22px 55px rgba(7,26,61,.20);
+        }
+
+        .hero::after{
+            content:"";
+
+            position:absolute;
+            z-index:-1;
+
+            width:240px;
+            height:240px;
+
+            right:-100px;
+            top:-120px;
+
+            border:45px solid rgba(255,255,255,.08);
+            border-radius:50%;
+        }
+
+        .hero-main{
+            display:flex;
+            align-items:flex-start;
+            gap:17px;
+        }
+
+        .hero-icon{
+            flex:0 0 63px;
+
+            width:63px;
+            height:63px;
+
+            display:grid;
+            place-items:center;
+
+            border:1px solid rgba(255,255,255,.20);
+            border-radius:20px;
+
+            background:rgba(255,255,255,.12);
+
+            font-size:24px;
+        }
+
+        .hero-label{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+
+            margin-bottom:7px;
+            padding:6px 10px;
+
+            border:1px solid rgba(255,255,255,.15);
+            border-radius:999px;
+
+            color:rgba(255,255,255,.78);
+            background:rgba(255,255,255,.08);
+
+            font-size:8px;
+            font-weight:900;
+            text-transform:uppercase;
+        }
+
+        .hero h1{
+            margin:0 0 8px;
+
+            color:white;
+
+            font-size:29px;
+            font-weight:900;
+        }
+
+        .hero p{
+            margin:0;
+
+            color:rgba(255,255,255,.72);
+
+            font-size:12px;
+            line-height:1.7;
+        }
+
+        .hero-price{
+            min-width:220px;
+            padding:18px;
+
+            border:1px solid rgba(255,255,255,.17);
+            border-radius:19px;
+
+            background:rgba(255,255,255,.09);
+        }
+
+        .hero-price small{
+            display:block;
+            margin-bottom:5px;
+
+            color:rgba(255,255,255,.65);
+
+            font-size:8px;
+            font-weight:900;
+            text-transform:uppercase;
+        }
+
+        .hero-price strong{
+            display:block;
+
+            color:white;
+
+            font-size:20px;
+            font-weight:900;
+        }
+
+        .hero-price span{
+            display:block;
+            margin-top:9px;
+
+            color:rgba(255,255,255,.70);
+
+            font-size:10px;
+        }
+
+        /* =====================================================
+           MESSAGES ET ERREURS
+        ===================================================== */
+
+        .alert-message{
+            display:flex;
+            align-items:flex-start;
+            gap:10px;
+
+            margin-bottom:15px;
+            padding:14px 16px;
+
+            border-radius:15px;
+
+            font-size:11px;
+            font-weight:700;
+            line-height:1.6;
+        }
+
+        .alert-message.success{
+            color:#116534;
+            border:1px solid #bce8ca;
+            background:#effcf3;
+        }
+
+        .alert-message.error{
+            color:#a51d2d;
+            border:1px solid #ffcbd1;
+            background:#fff1f2;
+        }
+
+        .form-errors{
+            margin-bottom:18px;
+            padding:15px;
+
+            border:1px solid #ffcbd1;
+            border-radius:15px;
+
+            color:#a51d2d;
+            background:#fff1f2;
+
+            font-size:11px;
+            font-weight:700;
+        }
+
+        .form-errors ul,
+        .errorlist{
+            margin:6px 0 0;
+            padding-left:18px;
+
+            color:#b42331;
+
+            font-size:10px;
+            font-weight:700;
+        }
+
+        /* =====================================================
+           FORMULAIRE
+        ===================================================== */
+
+        .form-card{
+            padding:27px;
+
+            border:1px solid var(--border);
+            border-radius:25px;
+
+            background:white;
+
+            box-shadow:
+                0 16px 45px rgba(15,23,42,.08);
+        }
+
+        .form-section{
+            margin-bottom:24px;
+            padding-bottom:24px;
+
+            border-bottom:1px solid #edf1f6;
+        }
+
+        .form-section:last-of-type{
+            margin-bottom:0;
+            border-bottom:0;
+        }
+
+        .section-heading{
+            display:flex;
+            align-items:center;
+            gap:12px;
+
+            margin-bottom:19px;
+        }
+
+        .section-icon{
+            flex:0 0 45px;
+
+            width:45px;
+            height:45px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:14px;
+
+            color:var(--blue);
+            background:var(--blue-soft);
+
+            font-size:17px;
+        }
+
+        .section-heading h2{
+            margin:0;
+
+            color:var(--navy);
+
+            font-size:17px;
+            font-weight:900;
+        }
+
+        .section-heading p{
+            margin:4px 0 0;
+
+            color:var(--gray);
+
+            font-size:10px;
+            line-height:1.5;
+        }
+
+        .fields-grid{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:16px;
+        }
+
+        .field-group{
+            min-width:0;
+        }
+
+        .field-group.full{
+            grid-column:1 / -1;
+        }
+
+        .field-group label{
+            display:flex;
+            align-items:center;
+            gap:7px;
+
+            margin-bottom:7px;
+
+            color:#263653;
+
+            font-size:10px;
+            font-weight:900;
+        }
+
+        .required{
+            color:var(--red);
+        }
+
+        .field-help{
+            display:block;
+            margin-top:6px;
+
+            color:var(--gray);
+
+            font-size:8px;
+            line-height:1.5;
+        }
+
+        .field-group input:not([type="checkbox"]),
+        .field-group select,
+        .field-group textarea{
+            width:100%;
+            min-height:49px;
+
+            padding:11px 13px;
+
+            border:1px solid #d8e0ea;
+            border-radius:13px;
+            outline:none;
+
+            color:var(--text);
+            background:white;
+
+            font-size:11px;
+
+            transition:
+                border-color .2s ease,
+                box-shadow .2s ease;
+        }
+
+        .field-group textarea{
+            min-height:115px;
+            resize:vertical;
+        }
+
+        .field-group input:focus,
+        .field-group select:focus,
+        .field-group textarea:focus{
+            border-color:var(--blue);
+
+            box-shadow:
+                0 0 0 4px rgba(0,87,255,.09);
+        }
+
+        .field-group input[type="file"]{
+            padding:9px;
+            background:#f8fafc;
+        }
+
+        .document-notice{
+            display:flex;
+            align-items:flex-start;
+            gap:10px;
+
+            margin-top:13px;
+            padding:13px;
+
+            border:1px solid #d6e3ff;
+            border-radius:14px;
+
+            color:#315687;
+            background:#f4f8ff;
+
+            font-size:9px;
+            line-height:1.6;
+        }
+
+        /* =====================================================
+           CASES À COCHER
+        ===================================================== */
+
+        .checkbox-grid{
+            display:grid;
+            grid-template-columns:repeat(3,minmax(0,1fr));
+            gap:12px;
+        }
+
+        .checkbox-card{
+            min-height:66px;
+
+            display:flex;
+            align-items:center;
+            gap:10px;
+
+            padding:13px;
+
+            border:1px solid #dfe6ef;
+            border-radius:14px;
+
+            background:#fafcff;
+        }
+
+        .checkbox-card input{
+            flex:0 0 18px;
+
+            width:18px;
+            height:18px;
+
+            accent-color:var(--blue);
+        }
+
+        .checkbox-card label{
+            margin:0;
+
+            color:var(--navy);
+
+            font-size:9px;
+            font-weight:900;
+            line-height:1.5;
+        }
+
+        /* =====================================================
+           ACTIONS
+        ===================================================== */
+
+        .actions{
+            display:flex;
+            align-items:center;
+            justify-content:flex-end;
+            gap:12px;
+
+            margin-top:25px;
+            padding-top:22px;
+
+            border-top:1px solid #edf1f6;
+        }
+
+        .btn-cancel,
+        .btn-save{
+            min-height:51px;
+
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+
+            padding:12px 20px;
+
+            border-radius:14px;
+
+            font-size:11px;
+            font-weight:900;
+        }
+
+        .btn-cancel{
+            border:1px solid var(--border);
+
+            color:#475569;
+            background:white;
+        }
+
+        .btn-save{
+            min-width:220px;
+
+            border:0;
+
+            color:white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    var(--blue-dark)
+                );
+
+            box-shadow:
+                0 12px 26px rgba(0,87,255,.23);
+        }
+
+        .btn-save:hover{
+            color:white;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media(max-width:800px){
+            .hero{
+                grid-template-columns:1fr;
+            }
+
+            .hero-price{
+                width:100%;
+            }
+
+            .checkbox-grid{
+                grid-template-columns:1fr;
+            }
+        }
+
+        @media(max-width:650px){
+            body{
+                padding:15px 10px;
+            }
+
+            .top-navigation{
+                align-items:stretch;
+                flex-direction:column;
+            }
+
+            .btn-back,
+            .local-reference{
+                width:100%;
+                justify-content:center;
+            }
+
+            .hero{
+                padding:24px 19px;
+                border-radius:21px;
+            }
+
+            .hero-main{
+                flex-direction:column;
+            }
+
+            .hero h1{
+                font-size:24px;
+            }
+
+            .form-card{
+                padding:19px;
+                border-radius:20px;
+            }
+
+            .fields-grid{
+                grid-template-columns:1fr;
+            }
+
+            .field-group.full{
+                grid-column:auto;
+            }
+
+            .actions{
+                align-items:stretch;
+                flex-direction:column-reverse;
+            }
+
+            .btn-cancel,
+            .btn-save{
+                width:100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="page">
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <div class="top-navigation">
+
+        <a
+            href="{% url 'detail_centre_commercial' local.centre.id %}"
+            class="btn-back"
+        >
+            <i class="fa-solid fa-arrow-left"></i>
+            Retour au centre commercial
+        </a>
+
+        <span class="local-reference">
+
+            <i class="fa-solid fa-store"></i>
+
+            Local {{ local.numero }}
+
+            {% if local.nom %}
+                · {{ local.nom }}
+            {% endif %}
+
+        </span>
+
+    </div>
+
+
+    <!-- =====================================================
+         PRÉSENTATION
+    ====================================================== -->
+
+    <header class="hero">
+
+        <div class="hero-main">
+
+            <div class="hero-icon">
+                <i class="fa-solid fa-user-plus"></i>
+            </div>
+
+            <div>
+
+                <div class="hero-label">
+
+                    <i class="fa-solid fa-file-signature"></i>
+
+                    Nouveau contrat commercial
+
+                </div>
+
+                <h1>
+                    Attribuer le local à une personne
+                </h1>
+
+                <p>
+
+                    Enregistrez l’identité complète de la personne,
+                    son document officiel, ses coordonnées et les
+                    conditions du contrat commercial.
+
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="hero-price">
+
+            <small>
+                Centre commercial
+            </small>
+
+            <strong>
+                {{ local.centre.nom }}
+            </strong>
+
+            <span>
+
+                Local N° {{ local.numero }}
+                · {{ local.get_type_local_display }}
+
+            </span>
+
+            <span>
+
+                Loyer :
+                {{ local.prix_mensuel|default:0|floatformat:0 }}
+                FCFA/mois
+
+            </span>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         MESSAGES
+    ====================================================== -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="alert-message {{ message.tags }}">
+
+                {% if message.tags == "success" %}
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                {% else %}
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                {% endif %}
+
+                <span>
+                    {{ message }}
+                </span>
+
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         FORMULAIRE
+    ====================================================== -->
+
+    <form
+        method="POST"
+        enctype="multipart/form-data"
+        class="form-card"
+        novalidate
+    >
+
+        {% csrf_token %}
+
+        {% for hidden in occupant_form.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+
+        {% for hidden in contrat_form.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+
+
+        <!-- ERREURS GÉNÉRALES -->
+
+        {% if occupant_form.non_field_errors or contrat_form.non_field_errors %}
+
+            <div class="form-errors">
+
+                <strong>
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    Le formulaire contient des erreurs.
+                </strong>
+
+                {{ occupant_form.non_field_errors }}
+                {{ contrat_form.non_field_errors }}
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- =================================================
+             IDENTITÉ DE LA PERSONNE
+        ================================================== -->
+
+        <section class="form-section">
+
+            <div class="section-heading">
+
+                <div class="section-icon">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div>
+
+                    <h2>
+                        Identité de la personne
+                    </h2>
+
+                    <p>
+                        Informations officielles de la personne occupant le local.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="fields-grid">
+
+                <div class="field-group">
+
+                    <label for="{{ occupant_form.nom.id_for_label }}">
+
+                        <i class="fa-solid fa-user"></i>
+
+                        Nom
+
+                        <span class="required">*</span>
+
+                    </label>
+
+                    {{ occupant_form.nom }}
+                    {{ occupant_form.nom.errors }}
+
+                </div>
+
+
+                <div class="field-group">
+
+                    <label for="{{ occupant_form.prenom.id_for_label }}">
+
+                        <i class="fa-solid fa-user"></i>
+
+                        Prénom
+
+                        <span class="required">*</span>
+
+                    </label>
+
+                    {{ occupant_form.prenom }}
+                    {{ occupant_form.prenom.errors }}
+
+                </div>
+
+
+                <div class="field-group">
+
+                    <label for="{{ occupant_form.date_naissance.id_for_label }}">
+
+                        <i class="fa-solid fa-calendar-days"></i>
+
+                        Date de naissance
+
+                    </label>
+
+                    {{ occupant_form.date_naissance }}
+                    {{ occupant_form.date_naissance.errors }}
+
+                </div>
+
+
+                <div class="field-group">
+
+                    <label for="{{ occupant_form.lieu_naissance.id_for_label }}">
+
+                        <i class="fa-solid fa-location-dot"></i>
+
+                        Lieu de naissance
+
+                    </label>
+
+                    {{ occupant_form.lieu_naissance }}
+                    {{ occupant_form.lieu_naissance.errors }}
+
+                </div>
+
+
+                <div class="field-group">
+
+                    <label for="{{ occupant_form.nationalite.id_for_label }}">
+
+                        <i class="fa-solid fa-earth-africa"></i>
+
+                        Nationalité
+
+                    </label>
+
+                    {{ occupant_form.nationalite }}
+                    {{ occupant_form.nationalite.errors }}
+
+                </div>
+
+
+                <div class="field-group">
+
+                    <label for="{{ occupant_form.profession.id_for_label }}">
+
+                        <i class="fa-solid fa-briefcase"></i>
+
+                        Profession
+
+                    </label>
+
+                    {{ occupant_form.profession }}
+                    {{ occupant_form.profession.errors }}
+
+                </div>
+
+
+                <div class="field-group full">
+
+                    <label for="{{ occupant_form.photo.id_for_label }}">
+
+                        <i class="fa-solid fa-camera"></i>
+
+                        Photo de la personne
+
+                    </label>
+
+                    {{ occupant_form.photo }}
+                    {{ occupant_form.photo.errors }}
+
+                    <span class="field-help">
+                        Formats conseillés : JPG, JPEG ou PNG.
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             COORDONNÉES
+        ================================================== -->
+
+        <section class="form-section">
+
+            <div class="section-heading">
+
+                <div class="section-icon">
+                    <i class="fa-solid fa-address-book"></i>
+                </div>
+
+                <div>
+
+                    <h2>
+                        Coordonnées
+                    </h2>
+
+                    <p>
+                        Téléphone, adresse courriel et adresse de résidence.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="fields-grid">
+
+                <div class="field-group">
+
+                    <label for="{{ occupant_form.telephone.id_for_label }}">
+
+                        <i class="fa-solid fa-phone"></i>
+
+                        Numéro de téléphone
+
+                        <span class="required">*</span>
+
+                    </label>
+
+                    {{ occupant_form.telephone }}
+                    {{ occupant_form.telephone.errors }}
+
+                </div>
+
+
+                <div class="field-group">
+
+                    <label for="{{ occupant_form.email.id_for_label }}">
+
+                        <i class="fa-solid fa-envelope"></i>
+
+                        Adresse courriel
+
+                    </label>
+
+                    {{ occupant_form.email }}
+                    {{ occupant_form.email.errors }}
+
+                </div>
+
+
+                <div class="field-group full">
+
+                    <label for="{{ occupant_form.adresse.id_for_label }}">
+
+                        <i class="fa-solid fa-house"></i>
+
+                        Adresse complète de résidence
+
+                    </label>
+
+                    {{ occupant_form.adresse }}
+                    {{ occupant_form.adresse.errors }}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             DOCUMENT OFFICIEL
+        ================================================== -->
+
+        <section class="form-section">
+
+            <div class="section-heading">
+
+                <div class="section-icon">
+                    <i class="fa-solid fa-passport"></i>
+                </div>
+
+                <div>
+
+                    <h2>
+                        Document officiel d’identité
+                    </h2>
+
+                    <p>
+                        Passeport, carte nationale d’identité, permis ou autre pièce valide.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="fields-grid">
+
+                <div class="field-group">
+
+                    <label for="{{ occupant_form.type_piece.id_for_label }}">
+
+                        <i class="fa-solid fa-id-card"></i>
+
+                        Type de document
+
+                        <span class="required">*</span>
+
+                    </label>
+
+                    {{ occupant_form.type_piece }}
+                    {{ occupant_form.type_piece.errors }}
+
+                </div>
+
+
+                <div class="field-group">
+
+                    <label for="{{ occupant_form.numero_piece.id_for_label }}">
+
+                        <i class="fa-solid fa-hashtag"></i>
+
+                        Numéro du document
+
+                        <span class="required">*</span>
+
+                    </label>
+
+                    {{ occupant_form.numero_piece }}
+                    {{ occupant_form.numero_piece.errors }}
+
+                </div>
+
+
+                <div class="field-group">
+
+                    <label for="{{ occupant_form.date_expiration_piece.id_for_label }}">
+
+                        <i class="fa-solid fa-calendar-xmark"></i>
+
+                        Date d’expiration
+
+                    </label>
+
+                    {{ occupant_form.date_expiration_piece }}
+                    {{ occupant_form.date_expiration_piece.errors }}
+
+                </div>
+
+
+                <div class="field-group">
+
+                    <label for="{{ occupant_form.piece_identite.id_for_label }}">
+
+                        <i class="fa-solid fa-file-arrow-up"></i>
+
+                        Copie du document officiel
+
+                        <span class="required">*</span>
+
+                    </label>
+
+                    {{ occupant_form.piece_identite }}
+                    {{ occupant_form.piece_identite.errors }}
+
+                </div>
+
+            </div>
+
+
+            <div class="document-notice">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+                <span>
+
+                    Téléversez une copie lisible du passeport,
+                    de la carte d’identité ou de la pièce officielle.
+                    Vérifiez le numéro et la date d’expiration avant
+                    d’enregistrer le contrat.
+
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ACTIVITÉ COMMERCIALE
+        ================================================== -->
+
+        <section class="form-section">
+
+            <div class="section-heading">
+
+                <div class="section-icon">
+                    <i class="fa-solid fa-store"></i>
+                </div>
+
+                <div>
+
+                    <h2>
+                        Activité commerciale
+                    </h2>
+
+                    <p>
+                        Entreprise ou activité exercée dans le local.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="fields-grid">
+
+                <div class="field-group">
+
+                    <label for="{{ occupant_form.nom_entreprise.id_for_label }}">
+
+                        <i class="fa-solid fa-building"></i>
+
+                        Nom de l’entreprise
+
+                    </label>
+
+                    {{ occupant_form.nom_entreprise }}
+                    {{ occupant_form.nom_entreprise.errors }}
+
+                </div>
+
+
+                <div class="field-group">
+
+                    <label for="{{ occupant_form.registre_commerce.id_for_label }}">
+
+                        <i class="fa-solid fa-file-lines"></i>
+
+                        Numéro du registre de commerce
+
+                    </label>
+
+                    {{ occupant_form.registre_commerce }}
+                    {{ occupant_form.registre_commerce.errors }}
+
+                </div>
+
+
+                <div class="field-group full">
+
+                    <label for="{{ occupant_form.activite_commerciale.id_for_label }}">
+
+                        <i class="fa-solid fa-shop"></i>
+
+                        Description de l’activité commerciale
+
+                    </label>
+
+                    {{ occupant_form.activite_commerciale }}
+                    {{ occupant_form.activite_commerciale.errors }}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CONTRAT COMMERCIAL
+        ================================================== -->
+
+        <section class="form-section">
+
+            <div class="section-heading">
+
+                <div class="section-icon">
+                    <i class="fa-solid fa-file-signature"></i>
+                </div>
+
+                <div>
+
+                    <h2>
+                        Conditions du contrat
+                    </h2>
+
+                    <p>
+                        Dates, loyer, caution et conditions d’occupation.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="fields-grid">
+
+                <div class="field-group full">
+
+                    <label for="{{ contrat_form.nom_activite.id_for_label }}">
+
+                        <i class="fa-solid fa-store"></i>
+
+                        Nom de l’activité exercée
+
+                        <span class="required">*</span>
+
+                    </label>
+
+                    {{ contrat_form.nom_activite }}
+                    {{ contrat_form.nom_activite.errors }}
+
+                </div>
+
+
+                <div class="field-group">
+
+                    <label for="{{ contrat_form.date_debut.id_for_label }}">
+
+                        <i class="fa-solid fa-calendar-check"></i>
+
+                        Date de début
+
+                        <span class="required">*</span>
+
+                    </label>
+
+                    {{ contrat_form.date_debut }}
+                    {{ contrat_form.date_debut.errors }}
+
+                </div>
+
+
+                <div class="field-group">
+
+                    <label for="{{ contrat_form.date_fin.id_for_label }}">
+
+                        <i class="fa-solid fa-calendar-xmark"></i>
+
+                        Date de fin
+
+                    </label>
+
+                    {{ contrat_form.date_fin }}
+                    {{ contrat_form.date_fin.errors }}
+
+                    <span class="field-help">
+                        Laissez vide pour un contrat sans date de fin définie.
+                    </span>
+
+                </div>
+
+
+                <div class="field-group">
+
+                    <label for="{{ contrat_form.prix_mensuel.id_for_label }}">
+
+                        <i class="fa-solid fa-money-bill-wave"></i>
+
+                        Prix mensuel
+
+                        <span class="required">*</span>
+
+                    </label>
+
+                    {{ contrat_form.prix_mensuel }}
+                    {{ contrat_form.prix_mensuel.errors }}
+
+                </div>
+
+
+                <div class="field-group">
+
+                    <label for="{{ contrat_form.caution.id_for_label }}">
+
+                        <i class="fa-solid fa-wallet"></i>
+
+                        Montant de la caution
+
+                    </label>
+
+                    {{ contrat_form.caution }}
+                    {{ contrat_form.caution.errors }}
+
+                </div>
+
+
+                <div class="field-group full">
+
+                    <label for="{{ contrat_form.conditions.id_for_label }}">
+
+                        <i class="fa-solid fa-list-check"></i>
+
+                        Conditions particulières
+
+                    </label>
+
+                    {{ contrat_form.conditions }}
+                    {{ contrat_form.conditions.errors }}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             VALIDATION ET SIGNATURES
+        ================================================== -->
+
+        <section class="form-section">
+
+            <div class="section-heading">
+
+                <div class="section-icon">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <div>
+
+                    <h2>
+                        Validation du contrat
+                    </h2>
+
+                    <p>
+                        Confirmez le paiement de la caution et les signatures.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="checkbox-grid">
+
+                <div class="checkbox-card">
+
+                    {{ contrat_form.caution_payee }}
+
+                    <label for="{{ contrat_form.caution_payee.id_for_label }}">
+                        Caution payée
+                    </label>
+
+                </div>
+
+
+                <div class="checkbox-card">
+
+                    {{ contrat_form.signe_par_occupant }}
+
+                    <label for="{{ contrat_form.signe_par_occupant.id_for_label }}">
+                        Contrat signé par l’occupant
+                    </label>
+
+                </div>
+
+
+                <div class="checkbox-card">
+
+                    {{ contrat_form.signe_par_gestionnaire }}
+
+                    <label for="{{ contrat_form.signe_par_gestionnaire.id_for_label }}">
+                        Contrat signé par le gestionnaire
+                    </label>
+
+                </div>
+
+            </div>
+
+            {{ contrat_form.caution_payee.errors }}
+            {{ contrat_form.signe_par_occupant.errors }}
+            {{ contrat_form.signe_par_gestionnaire.errors }}
+
+        </section>
+
+
+        <!-- =================================================
+             BOUTONS
+        ================================================== -->
+
+        <div class="actions">
+
+            <a
+                href="{% url 'detail_centre_commercial' local.centre.id %}"
+                class="btn-cancel"
+            >
+                <i class="fa-solid fa-xmark"></i>
+                Annuler
+            </a>
+
+            <button
+                type="submit"
+                class="btn-save"
+            >
+                <i class="fa-solid fa-file-circle-check"></i>
+                Enregistrer et générer le contrat
+            </button>
+
+        </div>
+
+    </form>
+
+</main>
+
+</body>
+</html>

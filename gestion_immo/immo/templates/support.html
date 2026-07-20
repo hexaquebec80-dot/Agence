@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>Centre d’aide | Hexa Immo</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        :root{
+            --navy:#071a3d;
+            --navy-light:#123b7a;
+            --blue:#0057ff;
+            --blue-dark:#0043c7;
+            --blue-soft:#eaf1ff;
+
+            --green:#16a34a;
+            --green-dark:#08783a;
+            --green-soft:#eaf9ef;
+
+            --orange:#e78a15;
+            --orange-soft:#fff4e5;
+
+            --purple:#7c3aed;
+            --purple-soft:#f3edff;
+
+            --red:#dc2626;
+            --red-soft:#fff0f0;
+
+            --gray:#64748b;
+            --border:#e2e8f0;
+            --background:#f3f6fb;
+            --white:#ffffff;
+            --text:#0f172a;
+        }
+
+        *{
+            box-sizing:border-box;
+        }
+
+        html{
+            scroll-behavior:smooth;
+        }
+
+        body{
+            min-height:100vh;
+            margin:0;
+
+            color:var(--text);
+
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(0,87,255,.10),
+                    transparent 27%
+                ),
+                radial-gradient(
+                    circle at bottom right,
+                    rgba(22,163,74,.08),
+                    transparent 25%
+                ),
+                var(--background);
+
+            font-family:
+                "Segoe UI",
+                Arial,
+                sans-serif;
+        }
+
+        a{
+            text-decoration:none;
+        }
+
+        button,
+        input,
+        textarea,
+        select{
+            font-family:inherit;
+        }
+
+        .page{
+            width:100%;
+            max-width:1250px;
+            margin:auto;
+            padding:28px 18px 45px;
+        }
+
+        /* =====================================================
+           NAVIGATION
+        ===================================================== */
+
+        .top-navigation{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:15px;
+
+            margin-bottom:18px;
+        }
+
+        .btn-back{
+            min-height:46px;
+
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:9px;
+
+            padding:11px 17px;
+
+            border:1px solid var(--border);
+            border-radius:14px;
+
+            color:#475569;
+            background:white;
+
+            box-shadow:
+                0 10px 25px rgba(15,23,42,.06);
+
+            font-size:11px;
+            font-weight:900;
+
+            cursor:pointer;
+
+            transition:
+                transform .25s ease,
+                box-shadow .25s ease;
+        }
+
+        .btn-back:hover{
+            color:var(--navy);
+            transform:translateY(-2px);
+
+            box-shadow:
+                0 15px 32px rgba(15,23,42,.10);
+        }
+
+        .security-badge{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+
+            padding:9px 13px;
+
+            border-radius:999px;
+
+            color:var(--green-dark);
+            background:var(--green-soft);
+
+            font-size:9px;
+            font-weight:900;
+            text-transform:uppercase;
+        }
+
+        /* =====================================================
+           EN-TÊTE
+        ===================================================== */
+
+        .support-hero{
+            position:relative;
+            isolation:isolate;
+            overflow:hidden;
+
+            display:grid;
+            grid-template-columns:minmax(0,1fr) auto;
+            align-items:center;
+            gap:30px;
+
+            margin-bottom:22px;
+            padding:38px;
+
+            border-radius:30px;
+
+            color:white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--navy),
+                    #113c80 55%,
+                    var(--blue)
+                );
+
+            box-shadow:
+                0 25px 65px rgba(7,26,61,.22);
+        }
+
+        .support-hero::before{
+            content:"";
+
+            position:absolute;
+            z-index:-1;
+
+            width:330px;
+            height:330px;
+
+            top:-215px;
+            right:-100px;
+
+            border:58px solid rgba(255,255,255,.08);
+            border-radius:50%;
+        }
+
+        .support-hero::after{
+            content:"";
+
+            position:absolute;
+            z-index:-1;
+
+            width:180px;
+            height:180px;
+
+            left:45%;
+            bottom:-125px;
+
+            border-radius:50%;
+            background:rgba(255,255,255,.06);
+        }
+
+        .hero-content{
+            display:flex;
+            align-items:flex-start;
+            gap:18px;
+        }
+
+        .hero-icon{
+            flex:0 0 72px;
+
+            width:72px;
+            height:72px;
+
+            display:grid;
+            place-items:center;
+
+            border:1px solid rgba(255,255,255,.20);
+            border-radius:22px;
+
+            background:rgba(255,255,255,.12);
+
+            font-size:28px;
+        }
+
+        .hero-label{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+
+            margin-bottom:8px;
+            padding:7px 11px;
+
+            border:1px solid rgba(255,255,255,.16);
+            border-radius:999px;
+
+            color:rgba(255,255,255,.82);
+            background:rgba(255,255,255,.08);
+
+            font-size:8px;
+            font-weight:900;
+            text-transform:uppercase;
+        }
+
+        .hero-text h1{
+            margin:0 0 9px;
+
+            color:white;
+
+            font-size:35px;
+            font-weight:900;
+        }
+
+        .hero-text p{
+            max-width:680px;
+            margin:0;
+
+            color:rgba(255,255,255,.73);
+
+            font-size:12px;
+            line-height:1.75;
+        }
+
+        /* =====================================================
+           HELP BOX
+        ===================================================== */
+
+        .help-box{
+            min-width:265px;
+
+            display:flex;
+            align-items:center;
+            gap:14px;
+
+            padding:19px;
+
+            border:1px solid rgba(255,255,255,.17);
+            border-radius:20px;
+
+            color:white;
+            background:rgba(255,255,255,.10);
+
+            backdrop-filter:blur(10px);
+        }
+
+        .help-box > i{
+            flex:0 0 50px;
+
+            width:50px;
+            height:50px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:15px;
+
+            color:white;
+            background:rgba(255,255,255,.14);
+
+            font-size:20px;
+        }
+
+        .help-box strong{
+            color:white;
+
+            font-size:14px;
+            font-weight:900;
+        }
+
+        .help-box small{
+            color:rgba(255,255,255,.70);
+
+            font-size:9px;
+            font-weight:700;
+        }
+
+        /* =====================================================
+           CONTENU PRINCIPAL
+        ===================================================== */
+
+        .content-grid{
+            display:grid;
+            grid-template-columns:minmax(0,1.45fr) minmax(320px,.55fr);
+            gap:20px;
+        }
+
+        .column{
+            display:grid;
+            gap:20px;
+            align-content:start;
+        }
+
+        .panel{
+            padding:24px;
+
+            border:1px solid var(--border);
+            border-radius:23px;
+
+            background:white;
+
+            box-shadow:
+                0 14px 38px rgba(15,23,42,.06);
+        }
+
+        .panel-header{
+            display:flex;
+            align-items:center;
+            gap:12px;
+
+            margin-bottom:20px;
+        }
+
+        .panel-icon{
+            flex:0 0 44px;
+
+            width:44px;
+            height:44px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:14px;
+
+            color:var(--blue);
+            background:var(--blue-soft);
+
+            font-size:17px;
+        }
+
+        .panel-header h2{
+            margin:0;
+
+            color:var(--navy);
+
+            font-size:19px;
+            font-weight:900;
+        }
+
+        .panel-header p{
+            margin:4px 0 0;
+
+            color:var(--gray);
+
+            font-size:10px;
+            line-height:1.5;
+        }
+
+        /* =====================================================
+           MOYENS DE CONTACT
+        ===================================================== */
+
+        .contact-grid{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:14px;
+        }
+
+        .contact-card{
+            min-height:170px;
+
+            display:flex;
+            flex-direction:column;
+
+            padding:19px;
+
+            border:1px solid #e7ecf3;
+            border-radius:18px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #ffffff,
+                    #fafcff
+                );
+
+            transition:
+                transform .25s ease,
+                box-shadow .25s ease,
+                border-color .25s ease;
+        }
+
+        .contact-card:hover{
+            transform:translateY(-3px);
+
+            border-color:#cddcff;
+
+            box-shadow:
+                0 16px 34px rgba(15,23,42,.09);
+        }
+
+        .contact-icon{
+            width:47px;
+            height:47px;
+
+            display:grid;
+            place-items:center;
+
+            margin-bottom:14px;
+
+            border-radius:15px;
+
+            font-size:18px;
+        }
+
+        .contact-icon.blue{
+            color:var(--blue);
+            background:var(--blue-soft);
+        }
+
+        .contact-icon.green{
+            color:var(--green);
+            background:var(--green-soft);
+        }
+
+        .contact-icon.orange{
+            color:var(--orange);
+            background:var(--orange-soft);
+        }
+
+        .contact-icon.purple{
+            color:var(--purple);
+            background:var(--purple-soft);
+        }
+
+        .contact-card h3{
+            margin:0 0 6px;
+
+            color:var(--navy);
+
+            font-size:14px;
+            font-weight:900;
+        }
+
+        .contact-card p{
+            margin:0 0 15px;
+
+            color:var(--gray);
+
+            font-size:10px;
+            line-height:1.65;
+        }
+
+        .contact-link{
+            margin-top:auto;
+
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+
+            color:var(--blue);
+
+            font-size:10px;
+            font-weight:900;
+        }
+
+        .contact-link.green{
+            color:var(--green-dark);
+        }
+
+        /* =====================================================
+           FORMULAIRE
+        ===================================================== */
+
+        .support-form{
+            display:grid;
+            gap:15px;
+        }
+
+        .form-grid{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:15px;
+        }
+
+        .field-group{
+            min-width:0;
+        }
+
+        .field-group.full{
+            grid-column:1 / -1;
+        }
+
+        .field-group label{
+            display:flex;
+            align-items:center;
+            gap:7px;
+
+            margin-bottom:7px;
+
+            color:#263653;
+
+            font-size:10px;
+            font-weight:900;
+        }
+
+        .field-group input,
+        .field-group select,
+        .field-group textarea{
+            width:100%;
+
+            min-height:49px;
+
+            padding:11px 13px;
+
+            border:1px solid #d8e0ea;
+            border-radius:13px;
+            outline:none;
+
+            color:var(--text);
+            background:white;
+
+            font-size:11px;
+
+            transition:
+                border-color .2s ease,
+                box-shadow .2s ease;
+        }
+
+        .field-group textarea{
+            min-height:125px;
+            resize:vertical;
+        }
+
+        .field-group input:focus,
+        .field-group select:focus,
+        .field-group textarea:focus{
+            border-color:var(--blue);
+
+            box-shadow:
+                0 0 0 4px rgba(0,87,255,.09);
+        }
+
+        .btn-send{
+            min-height:51px;
+
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+
+            padding:12px 20px;
+
+            border:0;
+            border-radius:14px;
+
+            color:white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    var(--blue-dark)
+                );
+
+            box-shadow:
+                0 12px 28px rgba(0,87,255,.22);
+
+            font-size:11px;
+            font-weight:900;
+
+            cursor:pointer;
+        }
+
+        /* =====================================================
+           HORAIRES
+        ===================================================== */
+
+        .schedule-list{
+            display:grid;
+            gap:10px;
+        }
+
+        .schedule-row{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+
+            padding:12px 13px;
+
+            border:1px solid #e8edf4;
+            border-radius:14px;
+
+            background:#fafcff;
+
+            font-size:10px;
+        }
+
+        .schedule-row span{
+            color:var(--gray);
+            font-weight:700;
+        }
+
+        .schedule-row strong{
+            color:var(--navy);
+            font-weight:900;
+            text-align:right;
+        }
+
+        .availability{
+            display:flex;
+            align-items:center;
+            gap:9px;
+
+            margin-top:13px;
+            padding:13px;
+
+            border:1px solid #ccebd5;
+            border-radius:14px;
+
+            color:var(--green-dark);
+            background:var(--green-soft);
+
+            font-size:9px;
+            font-weight:800;
+            line-height:1.55;
+        }
+
+        .availability-dot{
+            flex:0 0 9px;
+
+            width:9px;
+            height:9px;
+
+            border-radius:50%;
+            background:var(--green);
+
+            box-shadow:
+                0 0 0 5px rgba(22,163,74,.13);
+        }
+
+        /* =====================================================
+           FAQ
+        ===================================================== */
+
+        .faq-list{
+            display:grid;
+            gap:11px;
+        }
+
+        .faq-item{
+            overflow:hidden;
+
+            border:1px solid #e6ebf2;
+            border-radius:15px;
+
+            background:#fafcff;
+        }
+
+        .faq-question{
+            width:100%;
+
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+
+            padding:15px;
+
+            border:0;
+
+            color:var(--navy);
+            background:transparent;
+
+            font-size:10px;
+            font-weight:900;
+            text-align:left;
+
+            cursor:pointer;
+        }
+
+        .faq-question i{
+            transition:transform .25s ease;
+        }
+
+        .faq-item.active .faq-question i{
+            transform:rotate(180deg);
+        }
+
+        .faq-answer{
+            display:none;
+
+            padding:0 15px 15px;
+
+            color:var(--gray);
+
+            font-size:9px;
+            line-height:1.7;
+        }
+
+        .faq-item.active .faq-answer{
+            display:block;
+        }
+
+        /* =====================================================
+           SÉCURITÉ
+        ===================================================== */
+
+        .security-box{
+            display:flex;
+            align-items:flex-start;
+            gap:12px;
+
+            padding:17px;
+
+            border:1px solid #cfe0ff;
+            border-radius:17px;
+
+            color:#315687;
+            background:#f4f8ff;
+        }
+
+        .security-box i{
+            flex:0 0 38px;
+
+            width:38px;
+            height:38px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:12px;
+
+            color:var(--blue);
+            background:white;
+        }
+
+        .security-box strong{
+            display:block;
+
+            margin-bottom:5px;
+
+            color:var(--navy);
+
+            font-size:11px;
+            font-weight:900;
+        }
+
+        .security-box p{
+            margin:0;
+
+            font-size:9px;
+            line-height:1.65;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media(max-width:950px){
+            .support-hero{
+                grid-template-columns:1fr;
+            }
+
+            .help-box{
+                width:100%;
+            }
+
+            .content-grid{
+                grid-template-columns:1fr;
+            }
+        }
+
+        @media(max-width:650px){
+            .page{
+                padding:15px 10px 30px;
+            }
+
+            .top-navigation{
+                align-items:stretch;
+                flex-direction:column;
+            }
+
+            .btn-back,
+            .security-badge{
+                width:100%;
+                justify-content:center;
+            }
+
+            .support-hero{
+                padding:25px 20px;
+                border-radius:22px;
+            }
+
+            .hero-content{
+                flex-direction:column;
+            }
+
+            .hero-text h1{
+                font-size:27px;
+            }
+
+            .contact-grid,
+            .form-grid{
+                grid-template-columns:1fr;
+            }
+
+            .field-group.full{
+                grid-column:auto;
+            }
+
+            .panel{
+                padding:19px;
+                border-radius:20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="page">
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <div class="top-navigation">
+
+        <button
+            type="button"
+            class="btn-back"
+            onclick="history.back()"
+        >
+            <i class="fa-solid fa-arrow-left"></i>
+            Retour
+        </button>
+
+        <span class="security-badge">
+            <i class="fa-solid fa-shield-halved"></i>
+            Assistance sécurisée
+        </span>
+
+    </div>
+
+
+    <!-- =====================================================
+         EN-TÊTE
+    ====================================================== -->
+
+    <header class="support-hero">
+
+        <div class="hero-content">
+
+            <div class="hero-icon">
+                <i class="fa-solid fa-headset"></i>
+            </div>
+
+            <div class="hero-text">
+
+                <div class="hero-label">
+                    <i class="fa-solid fa-circle-question"></i>
+                    Centre d’assistance
+                </div>
+
+                <h1>
+                    Comment pouvons-nous vous aider ?
+                </h1>
+
+                <p>
+                    Notre équipe vous accompagne pour les problèmes liés
+                    aux bâtiments, locataires, paiements, contrats,
+                    centres commerciaux et autres fonctionnalités de
+                    l’application Hexa Immo.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="help-box">
+
+            <i class="fa-solid fa-headset"></i>
+
+            <div>
+
+                <strong>
+                    Besoin d’aide ?
+                </strong>
+
+                <br>
+
+                <small>
+                    Contactez le support
+                </small>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         CONTENU
+    ====================================================== -->
+
+    <div class="content-grid">
+
+        <!-- COLONNE PRINCIPALE -->
+
+        <div class="column">
+
+            <!-- CONTACTS -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div class="panel-icon">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Contacter le support
+                        </h2>
+
+                        <p>
+                            Choisissez le moyen de communication qui vous convient.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="contact-grid">
+
+                    <article class="contact-card">
+
+                        <div class="contact-icon blue">
+                            <i class="fa-solid fa-envelope"></i>
+                        </div>
+
+                        <h3>
+                            Adresse courriel
+                        </h3>
+
+                        <p>
+                            Envoyez une description complète de votre problème
+                            avec une capture d’écran lorsque cela est possible.
+                        </p>
+
+                        <a
+                            href="mailto:HexaQuébec80@gmail.com"
+                            class="contact-link"
+                        >
+                            <i class="fa-solid fa-paper-plane"></i>
+                            HexaQuébec80@gmail.com
+                        </a>
+
+                    </article>
+
+
+                    <article class="contact-card">
+
+                        <div class="contact-icon green">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+
+                        <h3>
+                            Assistance téléphonique
+                        </h3>
+
+                        <p>
+                            Contactez directement l’équipe HexaQuébec pour
+                            une assistance rapide.
+                        </p>
+
+                        <a
+                            href="tel:+15144677377"
+                            class="contact-link green"
+                        >
+                            <i class="fa-solid fa-phone-volume"></i>
+                            514 467-7377
+                        </a>
+
+                    </article>
+
+
+                    <article class="contact-card">
+
+                        <div class="contact-icon orange">
+                            <i class="fa-solid fa-bug"></i>
+                        </div>
+
+                        <h3>
+                            Signaler un problème
+                        </h3>
+
+                        <p>
+                            Signalez une erreur d’affichage, un problème
+                            de paiement ou un dysfonctionnement.
+                        </p>
+
+                        <a
+                            href="#formulaire-support"
+                            class="contact-link"
+                        >
+                            <i class="fa-solid fa-arrow-down"></i>
+                            Décrire le problème
+                        </a>
+
+                    </article>
+
+
+                    <article class="contact-card">
+
+                        <div class="contact-icon purple">
+                            <i class="fa-solid fa-lightbulb"></i>
+                        </div>
+
+                        <h3>
+                            Demande d’amélioration
+                        </h3>
+
+                        <p>
+                            Proposez une nouvelle fonction ou une amélioration
+                            pour faciliter votre gestion immobilière.
+                        </p>
+
+                        <a
+                            href="#formulaire-support"
+                            class="contact-link"
+                        >
+                            <i class="fa-solid fa-pen"></i>
+                            Envoyer une suggestion
+                        </a>
+
+                    </article>
+
+                </div>
+
+            </section>
+
+
+            <!-- FORMULAIRE -->
+
+            <section
+                class="panel"
+                id="formulaire-support"
+            >
+
+                <div class="panel-header">
+
+                    <div class="panel-icon">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Envoyer une demande
+                        </h2>
+
+                        <p>
+                            Donnez suffisamment de détails pour faciliter l’assistance.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <form
+                    method="POST"
+                    class="support-form"
+                >
+
+                    {% csrf_token %}
+
+                    <div class="form-grid">
+
+                        <div class="field-group">
+
+                            <label for="nom">
+
+                                <i class="fa-solid fa-user"></i>
+
+                                Nom complet
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="nom"
+                                name="nom"
+                                placeholder="Votre nom complet"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="field-group">
+
+                            <label for="email">
+
+                                <i class="fa-solid fa-envelope"></i>
+
+                                Adresse courriel
+
+                            </label>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="exemple@email.com"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="field-group">
+
+                            <label for="telephone">
+
+                                <i class="fa-solid fa-phone"></i>
+
+                                Téléphone
+
+                            </label>
+
+                            <input
+                                type="tel"
+                                id="telephone"
+                                name="telephone"
+                                placeholder="Votre numéro de téléphone"
+                            >
+
+                        </div>
+
+
+                        <div class="field-group">
+
+                            <label for="categorie">
+
+                                <i class="fa-solid fa-layer-group"></i>
+
+                                Catégorie
+
+                            </label>
+
+                            <select
+                                id="categorie"
+                                name="categorie"
+                                required
+                            >
+
+                                <option value="">
+                                    Sélectionnez une catégorie
+                                </option>
+
+                                <option value="connexion">
+                                    Connexion et compte
+                                </option>
+
+                                <option value="batiment">
+                                    Bâtiment ou logement
+                                </option>
+
+                                <option value="locataire">
+                                    Locataire ou location
+                                </option>
+
+                                <option value="paiement">
+                                    Paiement ou reçu
+                                </option>
+
+                                <option value="contrat">
+                                    Contrat commercial
+                                </option>
+
+                                <option value="rapport">
+                                    Rapport ou impression PDF
+                                </option>
+
+                                <option value="erreur">
+                                    Erreur technique
+                                </option>
+
+                                <option value="amelioration">
+                                    Demande d’amélioration
+                                </option>
+
+                                <option value="autre">
+                                    Autre demande
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="field-group full">
+
+                            <label for="sujet">
+
+                                <i class="fa-solid fa-heading"></i>
+
+                                Sujet de la demande
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="sujet"
+                                name="sujet"
+                                placeholder="Exemple : impossible d’imprimer un contrat"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="field-group full">
+
+                            <label for="message">
+
+                                <i class="fa-solid fa-message"></i>
+
+                                Description du problème
+
+                            </label>
+
+                            <textarea
+                                id="message"
+                                name="message"
+                                placeholder="Expliquez ce qui s’est passé, la page concernée et le message d’erreur affiché..."
+                                required
+                            ></textarea>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="btn-send"
+                    >
+                        <i class="fa-solid fa-paper-plane"></i>
+                        Envoyer la demande au support
+                    </button>
+
+                </form>
+
+            </section>
+
+        </div>
+
+
+        <!-- COLONNE LATÉRALE -->
+
+        <aside class="column">
+
+            <!-- HORAIRES -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div class="panel-icon">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Horaires du support
+                        </h2>
+
+                        <p>
+                            Disponibilité de l’équipe HexaQuébec.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="schedule-list">
+
+                    <div class="schedule-row">
+
+                        <span>
+                            Lundi au vendredi
+                        </span>
+
+                        <strong>
+                            9 h à 18 h
+                        </strong>
+
+                    </div>
+
+
+                    <div class="schedule-row">
+
+                        <span>
+                            Samedi
+                        </span>
+
+                        <strong>
+                            10 h à 16 h
+                        </strong>
+
+                    </div>
+
+
+                    <div class="schedule-row">
+
+                        <span>
+                            Dimanche
+                        </span>
+
+                        <strong>
+                            Urgences seulement
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="availability">
+
+                    <span class="availability-dot"></span>
+
+                    <span>
+                        Les demandes envoyées en dehors des heures
+                        d’ouverture seront traitées dès que possible.
+                    </span>
+
+                </div>
+
+            </section>
+
+
+            <!-- FAQ -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div class="panel-icon">
+                        <i class="fa-solid fa-circle-question"></i>
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Questions fréquentes
+                        </h2>
+
+                        <p>
+                            Réponses aux problèmes les plus courants.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="faq-list">
+
+                    <div class="faq-item">
+
+                        <button
+                            type="button"
+                            class="faq-question"
+                        >
+                            Le document PDF est divisé en plusieurs pages
+
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+
+                        <div class="faq-answer">
+
+                            Dans la fenêtre d’impression, sélectionnez le
+                            format A4, les marges minimales et une échelle
+                            comprise entre 85 % et 95 %.
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="faq-item">
+
+                        <button
+                            type="button"
+                            class="faq-question"
+                        >
+                            Un local est occupé sans contrat
+
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+
+                        <div class="faq-answer">
+
+                            Le local doit être relié à un contrat actif.
+                            Libérez d’abord le local concerné, puis utilisez
+                            le bouton « Attribuer ce local à une personne ».
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="faq-item">
+
+                        <button
+                            type="button"
+                            class="faq-question"
+                        >
+                            La photo ou le document ne s’affiche pas
+
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+
+                        <div class="faq-answer">
+
+                            Vérifiez que le fichier a bien été téléversé et
+                            que les paramètres MEDIA_URL et MEDIA_ROOT sont
+                            correctement configurés dans Django.
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="faq-item">
+
+                        <button
+                            type="button"
+                            class="faq-question"
+                        >
+                            Les statistiques ne correspondent pas
+
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+
+                        <div class="faq-answer">
+
+                            Les statistiques doivent être calculées à partir
+                            des contrats actifs et non seulement à partir du
+                            statut manuel du local.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- SÉCURITÉ -->
+
+            <section class="security-box">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+                <div>
+
+                    <strong>
+                        Protection de vos données
+                    </strong>
+
+                    <p>
+                        Ne communiquez jamais votre mot de passe dans une
+                        demande de support. La sécurité de vos données est
+                        notre priorité.
+                    </p>
+
+                </div>
+
+            </section>
+
+        </aside>
+
+    </div>
+
+</main>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+
+        const questions = document.querySelectorAll(
+            ".faq-question"
+        );
+
+        questions.forEach(function(question){
+
+            question.addEventListener("click", function(){
+
+                const item = question.closest(
+                    ".faq-item"
+                );
+
+                document
+                    .querySelectorAll(".faq-item")
+                    .forEach(function(otherItem){
+
+                        if(otherItem !== item){
+                            otherItem.classList.remove(
+                                "active"
+                            );
+                        }
+
+                    });
+
+                item.classList.toggle(
+                    "active"
+                );
+
+            });
+
+        });
+
+    });
+</script>
+
+</body>
+</html>

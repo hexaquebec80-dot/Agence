@@ -1,0 +1,2064 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>
+        Contrat commercial
+        {% firstof contrat.numero contrat.numero_contrat %}
+    </title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        :root{
+            --navy:#071a3d;
+            --blue:#0057ff;
+            --blue-dark:#0043c7;
+            --blue-soft:#eaf1ff;
+
+            --green:#16a34a;
+            --green-dark:#08783a;
+            --green-soft:#eaf9ef;
+
+            --orange:#e78a15;
+            --orange-soft:#fff4e5;
+
+            --red:#dc2626;
+            --red-soft:#fff0f0;
+
+            --purple:#7c3aed;
+            --purple-soft:#f3edff;
+
+            --gray:#64748b;
+            --border:#e2e8f0;
+            --background:#f3f6fb;
+            --white:#ffffff;
+            --text:#0f172a;
+        }
+
+        *{
+            box-sizing:border-box;
+        }
+
+        body{
+            min-height:100vh;
+            margin:0;
+            padding:28px 15px;
+
+            color:var(--text);
+
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(0,87,255,.09),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at bottom right,
+                    rgba(22,163,74,.07),
+                    transparent 25%
+                ),
+                var(--background);
+
+            font-family:
+                "Segoe UI",
+                Arial,
+                sans-serif;
+        }
+
+        a{
+            text-decoration:none;
+        }
+
+        .page{
+            width:100%;
+            max-width:1250px;
+            margin:auto;
+        }
+
+        /* =====================================================
+           NAVIGATION
+        ===================================================== */
+
+        .top-navigation{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:15px;
+            margin-bottom:18px;
+        }
+
+        .top-actions{
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+
+        .btn-back,
+        .btn-print{
+            min-height:46px;
+
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+
+            padding:11px 17px;
+
+            border-radius:14px;
+
+            font-size:11px;
+            font-weight:900;
+        }
+
+        .btn-back{
+            color:#475569;
+            border:1px solid var(--border);
+            background:white;
+
+            box-shadow:
+                0 10px 25px rgba(15,23,42,.06);
+        }
+
+        .btn-back:hover{
+            color:var(--navy);
+        }
+
+        .btn-print{
+            color:white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--green-dark),
+                    var(--green)
+                );
+
+            box-shadow:
+                0 11px 25px rgba(22,163,74,.20);
+        }
+
+        .btn-print:hover{
+            color:white;
+        }
+
+        /* =====================================================
+           MESSAGES
+        ===================================================== */
+
+        .message{
+            display:flex;
+            align-items:flex-start;
+            gap:10px;
+
+            margin-bottom:16px;
+            padding:14px 16px;
+
+            border-radius:15px;
+
+            font-size:11px;
+            font-weight:700;
+            line-height:1.6;
+        }
+
+        .message.success{
+            color:#126535;
+            border:1px solid #bfe9cd;
+            background:#ecfdf3;
+        }
+
+        .message.error{
+            color:#a51d2d;
+            border:1px solid #ffcbd1;
+            background:#fff1f2;
+        }
+
+        /* =====================================================
+           EN-TÊTE DU CONTRAT
+        ===================================================== */
+
+        .contract-hero{
+            position:relative;
+            isolation:isolate;
+            overflow:hidden;
+
+            display:grid;
+            grid-template-columns:minmax(0,1fr) auto;
+            align-items:center;
+            gap:25px;
+
+            margin-bottom:20px;
+            padding:34px;
+
+            border-radius:28px;
+
+            color:white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--navy),
+                    #123d82 55%,
+                    var(--blue)
+                );
+
+            box-shadow:
+                0 24px 60px rgba(7,26,61,.22);
+        }
+
+        .contract-hero::after{
+            content:"";
+
+            position:absolute;
+            z-index:-1;
+
+            width:260px;
+            height:260px;
+
+            right:-110px;
+            top:-135px;
+
+            border:48px solid rgba(255,255,255,.08);
+            border-radius:50%;
+        }
+
+        .hero-main{
+            display:flex;
+            align-items:flex-start;
+            gap:18px;
+        }
+
+        .hero-icon{
+            flex:0 0 68px;
+
+            width:68px;
+            height:68px;
+
+            display:grid;
+            place-items:center;
+
+            border:1px solid rgba(255,255,255,.20);
+            border-radius:21px;
+
+            background:rgba(255,255,255,.12);
+
+            font-size:26px;
+        }
+
+        .hero-label{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+
+            margin-bottom:8px;
+            padding:7px 11px;
+
+            border:1px solid rgba(255,255,255,.16);
+            border-radius:999px;
+
+            color:rgba(255,255,255,.80);
+            background:rgba(255,255,255,.08);
+
+            font-size:8px;
+            font-weight:900;
+            text-transform:uppercase;
+        }
+
+        .hero-content h1{
+            margin:0 0 8px;
+
+            color:white;
+
+            font-size:31px;
+            font-weight:900;
+        }
+
+        .hero-content p{
+            margin:0;
+
+            color:rgba(255,255,255,.72);
+
+            font-size:12px;
+            line-height:1.7;
+        }
+
+        .hero-status{
+            min-width:250px;
+            padding:19px;
+
+            border:1px solid rgba(255,255,255,.17);
+            border-radius:19px;
+
+            background:rgba(255,255,255,.09);
+        }
+
+        .hero-status small{
+            display:block;
+            margin-bottom:6px;
+
+            color:rgba(255,255,255,.65);
+
+            font-size:8px;
+            font-weight:900;
+            text-transform:uppercase;
+        }
+
+        .hero-status strong{
+            display:block;
+
+            color:white;
+
+            font-size:17px;
+            font-weight:900;
+        }
+
+        .status-badge{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+
+            margin-top:11px;
+            padding:8px 11px;
+
+            border-radius:999px;
+
+            font-size:8px;
+            font-weight:900;
+            text-transform:uppercase;
+        }
+
+        .status-badge.active{
+            color:#dcffe8;
+            background:rgba(34,197,94,.22);
+        }
+
+        .status-badge.inactive{
+            color:#ffe1e1;
+            background:rgba(239,68,68,.22);
+        }
+
+        /* =====================================================
+           GRILLE PRINCIPALE
+        ===================================================== */
+
+        .main-grid{
+            display:grid;
+            grid-template-columns:minmax(0,1.45fr) minmax(320px,.55fr);
+            gap:20px;
+        }
+
+        .column{
+            display:grid;
+            gap:20px;
+            align-content:start;
+        }
+
+        .panel{
+            padding:24px;
+
+            border:1px solid var(--border);
+            border-radius:23px;
+
+            background:white;
+
+            box-shadow:
+                0 14px 38px rgba(15,23,42,.06);
+        }
+
+        .panel-header{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:15px;
+
+            margin-bottom:20px;
+        }
+
+        .panel-title{
+            display:flex;
+            align-items:center;
+            gap:11px;
+        }
+
+        .panel-icon{
+            flex:0 0 43px;
+
+            width:43px;
+            height:43px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:14px;
+
+            color:var(--blue);
+            background:var(--blue-soft);
+
+            font-size:16px;
+        }
+
+        .panel-title h2{
+            margin:0;
+
+            color:var(--navy);
+
+            font-size:18px;
+            font-weight:900;
+        }
+
+        .panel-title p{
+            margin:4px 0 0;
+
+            color:var(--gray);
+
+            font-size:10px;
+        }
+
+        /* =====================================================
+           INFORMATIONS
+        ===================================================== */
+
+        .information-grid{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:12px;
+        }
+
+        .information-card{
+            padding:14px;
+
+            border:1px solid #e8edf4;
+            border-radius:15px;
+
+            background:#fafcff;
+        }
+
+        .information-card.full{
+            grid-column:1 / -1;
+        }
+
+        .information-card small{
+            display:flex;
+            align-items:center;
+            gap:7px;
+
+            margin-bottom:6px;
+
+            color:var(--gray);
+
+            font-size:8px;
+            font-weight:900;
+            text-transform:uppercase;
+        }
+
+        .information-card strong{
+            display:block;
+            overflow-wrap:anywhere;
+
+            color:var(--navy);
+
+            font-size:11px;
+            font-weight:900;
+            line-height:1.6;
+        }
+
+        .information-card p{
+            margin:0;
+
+            color:#55647a;
+
+            font-size:11px;
+            line-height:1.7;
+        }
+
+        .information-link{
+            color:var(--blue);
+            font-weight:900;
+        }
+
+        /* =====================================================
+           OCCUPANT
+        ===================================================== */
+
+        .occupant-header{
+            display:flex;
+            align-items:center;
+            gap:14px;
+
+            margin-bottom:20px;
+            padding-bottom:18px;
+
+            border-bottom:1px solid #edf1f6;
+        }
+
+        .occupant-photo{
+            flex:0 0 75px;
+
+            width:75px;
+            height:75px;
+
+            overflow:hidden;
+
+            display:grid;
+            place-items:center;
+
+            border:3px solid white;
+            border-radius:21px;
+
+            color:var(--blue);
+            background:var(--blue-soft);
+
+            box-shadow:
+                0 10px 24px rgba(15,23,42,.13);
+
+            font-size:23px;
+            font-weight:900;
+        }
+
+        .occupant-photo img{
+            width:100%;
+            height:100%;
+            object-fit:cover;
+        }
+
+        .occupant-name small{
+            display:block;
+            margin-bottom:5px;
+
+            color:var(--gray);
+
+            font-size:8px;
+            font-weight:900;
+            text-transform:uppercase;
+        }
+
+        .occupant-name h3{
+            margin:0 0 5px;
+
+            color:var(--navy);
+
+            font-size:20px;
+            font-weight:900;
+        }
+
+        .occupant-name span{
+            color:var(--gray);
+
+            font-size:10px;
+            font-weight:700;
+        }
+
+        /* =====================================================
+           RÉSUMÉ FINANCIER
+        ===================================================== */
+
+        .financial-grid{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:11px;
+        }
+
+        .financial-card{
+            padding:16px;
+
+            border-radius:16px;
+        }
+
+        .financial-card.blue{
+            color:#124a9c;
+            background:var(--blue-soft);
+        }
+
+        .financial-card.green{
+            color:var(--green-dark);
+            background:var(--green-soft);
+        }
+
+        .financial-card.orange{
+            color:#97550c;
+            background:var(--orange-soft);
+        }
+
+        .financial-card.purple{
+            color:#6631bd;
+            background:var(--purple-soft);
+        }
+
+        .financial-card small{
+            display:block;
+            margin-bottom:6px;
+
+            font-size:8px;
+            font-weight:900;
+            text-transform:uppercase;
+        }
+
+        .financial-card strong{
+            display:block;
+
+            font-size:17px;
+            font-weight:900;
+        }
+
+        /* =====================================================
+           VALIDATION
+        ===================================================== */
+
+        .validation-list{
+            display:grid;
+            gap:10px;
+        }
+
+        .validation-item{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+
+            padding:13px;
+
+            border:1px solid #e8edf4;
+            border-radius:14px;
+
+            background:#fafcff;
+
+            font-size:10px;
+            font-weight:800;
+        }
+
+        .validation-item span:first-child{
+            display:flex;
+            align-items:center;
+            gap:8px;
+
+            color:#526177;
+        }
+
+        .validation-state{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+
+            padding:7px 9px;
+
+            border-radius:999px;
+
+            font-size:8px;
+            font-weight:900;
+            text-transform:uppercase;
+        }
+
+        .validation-state.yes{
+            color:var(--green-dark);
+            background:var(--green-soft);
+        }
+
+        .validation-state.no{
+            color:#a25b13;
+            background:var(--orange-soft);
+        }
+
+        /* =====================================================
+           VÉRIFICATION
+        ===================================================== */
+
+        .verification-box{
+            padding:17px;
+
+            border:1px solid #cfe0ff;
+            border-radius:17px;
+
+            background:#f5f9ff;
+        }
+
+        .verification-box h3{
+            display:flex;
+            align-items:center;
+            gap:8px;
+
+            margin:0 0 8px;
+
+            color:var(--navy);
+
+            font-size:13px;
+            font-weight:900;
+        }
+
+        .verification-box p{
+            margin:0 0 12px;
+
+            color:var(--gray);
+
+            font-size:10px;
+            line-height:1.7;
+        }
+
+        .verification-url{
+            display:block;
+            overflow-wrap:anywhere;
+
+            padding:11px;
+
+            border:1px solid #d6e3ff;
+            border-radius:12px;
+
+            color:var(--blue);
+            background:white;
+
+            font-size:9px;
+            font-weight:800;
+            line-height:1.6;
+        }
+
+        /* =====================================================
+           ACTIONS DU CONTRAT
+        ===================================================== */
+
+        .contract-actions{
+            display:grid;
+            gap:10px;
+        }
+
+        .action-button{
+            width:100%;
+            min-height:47px;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+
+            padding:11px 14px;
+
+            border:0;
+            border-radius:14px;
+
+            font-size:10px;
+            font-weight:900;
+        }
+
+        .action-button.print{
+            color:white;
+            background:var(--green);
+        }
+
+        .action-button.back{
+            color:white;
+            background:var(--navy);
+        }
+
+        .action-button.release{
+            color:#a52222;
+            border:1px solid #ffc9c9;
+            background:var(--red-soft);
+        }
+
+        /* =====================================================
+           CERTIFICATION
+        ===================================================== */
+
+        .certification-box{
+            padding:18px;
+
+            border:1px solid #ccebd5;
+            border-radius:17px;
+
+            color:#176437;
+            background:#effcf3;
+        }
+
+        .certification-box h3{
+            display:flex;
+            align-items:center;
+            gap:8px;
+
+            margin:0 0 7px;
+
+            font-size:13px;
+            font-weight:900;
+        }
+
+        .certification-box p{
+            margin:0;
+
+            font-size:10px;
+            line-height:1.7;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media(max-width:950px){
+            .contract-hero{
+                grid-template-columns:1fr;
+            }
+
+            .hero-status{
+                width:100%;
+            }
+
+            .main-grid{
+                grid-template-columns:1fr;
+            }
+        }
+
+        @media(max-width:650px){
+            body{
+                padding:15px 10px;
+            }
+
+            .top-navigation{
+                align-items:stretch;
+                flex-direction:column;
+            }
+
+            .top-actions{
+                width:100%;
+                flex-direction:column;
+            }
+
+            .btn-back,
+            .btn-print{
+                width:100%;
+            }
+
+            .contract-hero{
+                padding:25px 20px;
+                border-radius:22px;
+            }
+
+            .hero-main{
+                flex-direction:column;
+            }
+
+            .hero-content h1{
+                font-size:25px;
+            }
+
+            .panel{
+                padding:18px;
+                border-radius:19px;
+            }
+
+            .information-grid,
+            .financial-grid{
+                grid-template-columns:1fr;
+            }
+
+            .information-card.full{
+                grid-column:auto;
+            }
+
+            .occupant-header{
+                align-items:flex-start;
+                flex-direction:column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="page">
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <div class="top-navigation">
+
+        <a
+            href="{% url 'detail_centre_commercial' centre.id %}"
+            class="btn-back"
+        >
+            <i class="fa-solid fa-arrow-left"></i>
+            Retour au centre commercial
+        </a>
+
+        <div class="top-actions">
+
+            <a
+                href="{% url 'contrat_commercial_pdf' contrat.id %}"
+                target="_blank"
+                class="btn-print"
+            >
+                <i class="fa-solid fa-print"></i>
+                Imprimer le contrat
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MESSAGES
+    ====================================================== -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="message {{ message.tags }}">
+
+                {% if message.tags == "success" %}
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                {% else %}
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                {% endif %}
+
+                <span>
+                    {{ message }}
+                </span>
+
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         EN-TÊTE DU CONTRAT
+    ====================================================== -->
+
+    <header class="contract-hero">
+
+        <div class="hero-main">
+
+            <div class="hero-icon">
+                <i class="fa-solid fa-file-signature"></i>
+            </div>
+
+            <div class="hero-content">
+
+                <div class="hero-label">
+
+                    <i class="fa-solid fa-certificate"></i>
+
+                    Contrat commercial
+
+                </div>
+
+                <h1>
+                    Contrat
+                    {% firstof contrat.numero contrat.numero_contrat "sans numéro" %}
+                </h1>
+
+                <p>
+
+                    Contrat d’occupation du local
+                    N° {{ local.numero }}
+                    situé dans
+                    {{ centre.nom }}.
+
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="hero-status">
+
+            <small>
+                Statut du contrat
+            </small>
+
+            <strong>
+
+                {% if contrat.actif %}
+                    Contrat en cours
+                {% else %}
+                    Contrat terminé
+                {% endif %}
+
+            </strong>
+
+            {% if contrat.actif %}
+
+                <span class="status-badge active">
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                    Actif
+
+                </span>
+
+            {% else %}
+
+                <span class="status-badge inactive">
+
+                    <i class="fa-solid fa-circle-xmark"></i>
+
+                    Inactif
+
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         CONTENU
+    ====================================================== -->
+
+    <div class="main-grid">
+
+        <!-- =================================================
+             COLONNE PRINCIPALE
+        ================================================== -->
+
+        <div class="column">
+
+            <!-- PERSONNE OCCUPANTE -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div class="panel-title">
+
+                        <div class="panel-icon">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Personne occupant le local
+                            </h2>
+
+                            <p>
+                                Identité complète et coordonnées
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="occupant-header">
+
+                    <div class="occupant-photo">
+
+                        {% if occupant.photo %}
+
+                            <img
+                                src="{{ occupant.photo.url }}"
+                                alt="Photo de {{ occupant.prenom }} {{ occupant.nom }}"
+                            >
+
+                        {% else %}
+
+                            {{ occupant.prenom|first }}
+                            {{ occupant.nom|first }}
+
+                        {% endif %}
+
+                    </div>
+
+                    <div class="occupant-name">
+
+                        <small>
+                            Titulaire du contrat
+                        </small>
+
+                        <h3>
+                            {{ occupant.prenom }}
+                            {{ occupant.nom }}
+                        </h3>
+
+                        <span>
+                            {{ occupant.profession|default:"Profession non renseignée" }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="information-grid">
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-calendar-days"></i>
+                            Date de naissance
+                        </small>
+
+                        <strong>
+
+                            {% if occupant.date_naissance %}
+                                {{ occupant.date_naissance|date:"d/m/Y" }}
+                            {% else %}
+                                Non renseignée
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-location-dot"></i>
+                            Lieu de naissance
+                        </small>
+
+                        <strong>
+                            {{ occupant.lieu_naissance|default:"Non renseigné" }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-earth-africa"></i>
+                            Nationalité
+                        </small>
+
+                        <strong>
+                            {{ occupant.nationalite|default:"Non renseignée" }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-briefcase"></i>
+                            Profession
+                        </small>
+
+                        <strong>
+                            {{ occupant.profession|default:"Non renseignée" }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-phone"></i>
+                            Téléphone
+                        </small>
+
+                        <strong>
+
+                            {% if occupant.telephone %}
+
+                                <a
+                                    href="tel:{{ occupant.telephone }}"
+                                    class="information-link"
+                                >
+                                    {{ occupant.telephone }}
+                                </a>
+
+                            {% else %}
+
+                                Non renseigné
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-envelope"></i>
+                            Adresse courriel
+                        </small>
+
+                        <strong>
+
+                            {% if occupant.email %}
+
+                                <a
+                                    href="mailto:{{ occupant.email }}"
+                                    class="information-link"
+                                >
+                                    {{ occupant.email }}
+                                </a>
+
+                            {% else %}
+
+                                Non renseignée
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card full">
+
+                        <small>
+                            <i class="fa-solid fa-house"></i>
+                            Adresse de résidence
+                        </small>
+
+                        <strong>
+                            {{ occupant.adresse|default:"Non renseignée" }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- DOCUMENT OFFICIEL -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div class="panel-title">
+
+                        <div class="panel-icon">
+                            <i class="fa-solid fa-passport"></i>
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Document officiel d’identité
+                            </h2>
+
+                            <p>
+                                Passeport, carte d’identité ou autre document
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="information-grid">
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-id-card"></i>
+                            Type de document
+                        </small>
+
+                        <strong>
+
+                            {% if occupant.type_piece %}
+                                {{ occupant.get_type_piece_display }}
+                            {% else %}
+                                Non renseigné
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-hashtag"></i>
+                            Numéro du document
+                        </small>
+
+                        <strong>
+                            {{ occupant.numero_piece|default:"Non renseigné" }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-calendar-xmark"></i>
+                            Date d’expiration
+                        </small>
+
+                        <strong>
+
+                            {% if occupant.date_expiration_piece %}
+                                {{ occupant.date_expiration_piece|date:"d/m/Y" }}
+                            {% else %}
+                                Non renseignée
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-file-shield"></i>
+                            Copie du document
+                        </small>
+
+                        <strong>
+
+                            {% if occupant.piece_identite %}
+
+                                <a
+                                    href="{{ occupant.piece_identite.url }}"
+                                    target="_blank"
+                                    rel="noopener"
+                                    class="information-link"
+                                >
+                                    <i class="fa-solid fa-eye"></i>
+                                    Voir le document
+                                </a>
+
+                            {% else %}
+
+                                Aucun document enregistré
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ACTIVITÉ COMMERCIALE -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div class="panel-title">
+
+                        <div class="panel-icon">
+                            <i class="fa-solid fa-store"></i>
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Activité commerciale
+                            </h2>
+
+                            <p>
+                                Entreprise et activité exercée dans le local
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="information-grid">
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-building"></i>
+                            Nom de l’entreprise
+                        </small>
+
+                        <strong>
+                            {{ occupant.nom_entreprise|default:"Non renseigné" }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-file-lines"></i>
+                            Registre de commerce
+                        </small>
+
+                        <strong>
+                            {{ occupant.registre_commerce|default:"Non renseigné" }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card full">
+
+                        <small>
+                            <i class="fa-solid fa-shop"></i>
+                            Activité exercée
+                        </small>
+
+                        <strong>
+
+                            {% if occupant.activite_commerciale %}
+                                {{ occupant.activite_commerciale }}
+                            {% else %}
+                                {{ contrat.nom_activite|default:"Non renseignée" }}
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- INFORMATIONS DU LOCAL -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div class="panel-title">
+
+                        <div class="panel-icon">
+                            <i class="fa-solid fa-store"></i>
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Local commercial
+                            </h2>
+
+                            <p>
+                                Local et centre commercial associés
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="information-grid">
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-hashtag"></i>
+                            Numéro du local
+                        </small>
+
+                        <strong>
+                            {{ local.numero }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-layer-group"></i>
+                            Type de local
+                        </small>
+
+                        <strong>
+                            {{ local.get_type_local_display }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-signature"></i>
+                            Nom du local
+                        </small>
+
+                        <strong>
+                            {{ local.nom|default:"Non renseigné" }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-ruler-combined"></i>
+                            Superficie
+                        </small>
+
+                        <strong>
+
+                            {% if local.superficie %}
+                                {{ local.superficie }} m²
+                            {% else %}
+                                Non renseignée
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-building"></i>
+                            Centre commercial
+                        </small>
+
+                        <strong>
+                            {{ centre.nom }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-barcode"></i>
+                            Code du centre
+                        </small>
+
+                        <strong>
+                            {{ centre.code }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card full">
+
+                        <small>
+                            <i class="fa-solid fa-location-dot"></i>
+                            Adresse du centre
+                        </small>
+
+                        <strong>
+
+                            {{ centre.adresse }}
+
+                            {% if centre.quartier %}
+                                · {{ centre.quartier }}
+                            {% endif %}
+
+                            · {{ centre.ville }}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- CONDITIONS DU CONTRAT -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div class="panel-title">
+
+                        <div class="panel-icon">
+                            <i class="fa-solid fa-list-check"></i>
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Conditions du contrat
+                            </h2>
+
+                            <p>
+                                Dates et conditions particulières
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="information-grid">
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-calendar-check"></i>
+                            Date de début
+                        </small>
+
+                        <strong>
+                            {{ contrat.date_debut|date:"d/m/Y" }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card">
+
+                        <small>
+                            <i class="fa-solid fa-calendar-xmark"></i>
+                            Date de fin
+                        </small>
+
+                        <strong>
+
+                            {% if contrat.date_fin %}
+                                {{ contrat.date_fin|date:"d/m/Y" }}
+                            {% else %}
+                                Durée indéterminée
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-card full">
+
+                        <small>
+                            <i class="fa-solid fa-align-left"></i>
+                            Conditions particulières
+                        </small>
+
+                        <p>
+                            {{ contrat.conditions|default:"Aucune condition particulière enregistrée."|linebreaksbr }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+
+        <!-- =================================================
+             COLONNE LATÉRALE
+        ================================================== -->
+
+        <aside class="column">
+
+            <!-- RÉSUMÉ FINANCIER -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div class="panel-title">
+
+                        <div class="panel-icon">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Résumé financier
+                            </h2>
+
+                            <p>
+                                Loyer et caution
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="financial-grid">
+
+                    <div class="financial-card blue">
+
+                        <small>
+                            Prix mensuel
+                        </small>
+
+                        <strong>
+                            {{ contrat.prix_mensuel|default:0|floatformat:0 }}
+                            FCFA
+                        </strong>
+
+                    </div>
+
+
+                    <div class="financial-card green">
+
+                        <small>
+                            Caution
+                        </small>
+
+                        <strong>
+                            {{ contrat.caution|default:0|floatformat:0 }}
+                            FCFA
+                        </strong>
+
+                    </div>
+
+
+                    <div class="financial-card orange">
+
+                        <small>
+                            Caution payée
+                        </small>
+
+                        <strong>
+
+                            {% if contrat.caution_payee %}
+                                Oui
+                            {% else %}
+                                Non
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="financial-card purple">
+
+                        <small>
+                            Activité
+                        </small>
+
+                        <strong>
+                            {{ contrat.nom_activite|default:"Non renseignée" }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- SIGNATURES -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div class="panel-title">
+
+                        <div class="panel-icon">
+                            <i class="fa-solid fa-signature"></i>
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Validation
+                            </h2>
+
+                            <p>
+                                Paiement et signatures
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="validation-list">
+
+                    <div class="validation-item">
+
+                        <span>
+
+                            <i class="fa-solid fa-wallet"></i>
+
+                            Caution payée
+
+                        </span>
+
+                        {% if contrat.caution_payee %}
+
+                            <span class="validation-state yes">
+
+                                <i class="fa-solid fa-check"></i>
+
+                                Oui
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="validation-state no">
+
+                                <i class="fa-solid fa-clock"></i>
+
+                                Non
+
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="validation-item">
+
+                        <span>
+
+                            <i class="fa-solid fa-user-check"></i>
+
+                            Signé par l’occupant
+
+                        </span>
+
+                        {% if contrat.signe_par_occupant %}
+
+                            <span class="validation-state yes">
+
+                                <i class="fa-solid fa-check"></i>
+
+                                Oui
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="validation-state no">
+
+                                <i class="fa-solid fa-clock"></i>
+
+                                Non
+
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="validation-item">
+
+                        <span>
+
+                            <i class="fa-solid fa-user-tie"></i>
+
+                            Signé par le gestionnaire
+
+                        </span>
+
+                        {% if contrat.signe_par_gestionnaire %}
+
+                            <span class="validation-state yes">
+
+                                <i class="fa-solid fa-check"></i>
+
+                                Oui
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="validation-state no">
+
+                                <i class="fa-solid fa-clock"></i>
+
+                                Non
+
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- CERTIFICATION -->
+
+            <section class="certification-box">
+
+                <h3>
+
+                    <i class="fa-solid fa-certificate"></i>
+
+                    Certification interne
+
+                </h3>
+
+                <p>
+
+                    Ce contrat est généré et conservé dans l’application
+                    de gestion immobilière. Cette certification est une
+                    certification interne de l’application et ne remplace
+                    pas une certification délivrée par une autorité publique.
+
+                </p>
+
+            </section>
+
+
+            <!-- VÉRIFICATION -->
+
+            <section class="panel">
+
+                <div class="verification-box">
+
+                    <h3>
+
+                        <i class="fa-solid fa-qrcode"></i>
+
+                        Vérification du contrat
+
+                    </h3>
+
+                    <p>
+
+                        Utilisez ce lien pour vérifier que le contrat est
+                        enregistré dans l’application.
+
+                    </p>
+
+                    <a
+                        href="{{ verification_url }}"
+                        target="_blank"
+                        rel="noopener"
+                        class="verification-url"
+                    >
+                        {{ verification_url }}
+                    </a>
+
+                </div>
+
+            </section>
+
+
+            <!-- ACTIONS -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div class="panel-title">
+
+                        <div class="panel-icon">
+                            <i class="fa-solid fa-gears"></i>
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Actions
+                            </h2>
+
+                            <p>
+                                Gestion du contrat
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="contract-actions">
+
+                    <a
+                        href="{% url 'contrat_commercial_pdf' contrat.id %}"
+                        target="_blank"
+                        class="action-button print"
+                    >
+                        <i class="fa-solid fa-print"></i>
+                        Imprimer le contrat
+                    </a>
+
+
+                    <a
+                        href="{% url 'detail_centre_commercial' centre.id %}"
+                        class="action-button back"
+                    >
+                        <i class="fa-solid fa-building"></i>
+                        Retour au centre
+                    </a>
+
+
+                    {% if contrat.actif %}
+
+                        <form
+                            method="POST"
+                            action="{% url 'liberer_local_commercial' contrat.id %}"
+                            onsubmit="return confirm('Voulez-vous vraiment terminer ce contrat et libérer le local ?');"
+                        >
+
+                            {% csrf_token %}
+
+                            <button
+                                type="submit"
+                                class="action-button release"
+                            >
+                                <i class="fa-solid fa-door-open"></i>
+                                Terminer et libérer le local
+                            </button>
+
+                        </form>
+
+                    {% endif %}
+
+                </div>
+
+            </section>
+
+        </aside>
+
+    </div>
+
+</main>
+
+</body>
+</html>

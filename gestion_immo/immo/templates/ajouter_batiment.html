@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+.card-modern{
+    background:white;
+    border-radius:24px;
+    padding:28px;
+    box-shadow:0 14px 35px rgba(15,23,42,.08);
+}
+
+.form-label{
+    color:#0f172a;
+}
+
+.form-control,
+.form-select{
+    border:1px solid #e5e7eb;
+}
+
+.form-control:focus,
+.form-select:focus{
+    border-color:#2563eb;
+    box-shadow:0 0 0 .2rem rgba(37,99,235,.15);
+}
+
+.help-text{
+    font-size:13px;
+    color:#64748b;
+    margin-top:6px;
+}
+
+.info-box{
+    background:#eff6ff;
+    color:#1e3a8a;
+    border:1px solid #bfdbfe;
+    border-radius:18px;
+    padding:16px 18px;
+    margin-bottom:22px;
+    font-weight:600;
+}
+</style>
+
+<div class="container-fluid">
+
+    <div class="card-modern">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div>
+                <h2 class="fw-bold mb-1">
+                    <i class="fa-solid fa-building text-primary"></i>
+                    Ajouter un bâtiment
+                </h2>
+
+                <p class="text-muted mb-0">
+                    Enregistrer un bâtiment et générer ses logements automatiquement
+                </p>
+            </div>
+
+            <a href="{% url 'batiments' %}"
+               class="btn btn-outline-secondary rounded-4">
+                <i class="fa-solid fa-arrow-left"></i>
+                Retour
+            </a>
+
+        </div>
+
+        <div class="info-box">
+            <i class="fa-solid fa-circle-info"></i>
+            Le nombre indiqué créera automatiquement les logements du bâtiment :
+            Logement 1, Logement 2, Logement 3, etc.
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} rounded-4">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Code bâtiment</label>
+
+                    <input type="text"
+                           name="code_batiment"
+                           class="form-control form-control-lg rounded-4"
+                           placeholder="BAT-001"
+                           required>
+                </div>
+
+                <div class="col-md-8 mb-3">
+                    <label class="form-label fw-bold">Nom du bâtiment</label>
+
+                    <input type="text"
+                           name="nom"
+                           class="form-control form-control-lg rounded-4"
+                           placeholder="Résidence Hexa"
+                           required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Propriétaire</label>
+
+                    <select name="proprietaire"
+                            class="form-select form-select-lg rounded-4"
+                            required>
+                        <option value="">Sélectionner un propriétaire</option>
+
+                        {% for p in proprietaires %}
+                            <option value="{{ p.id }}">
+                                {{ p.nom }} {{ p.prenom }}
+                            </option>
+                        {% empty %}
+                            <option value="" disabled>
+                                Aucun propriétaire disponible
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    {% if not proprietaires %}
+                        <div class="help-text">
+                            Vous devez d'abord ajouter un propriétaire avant de créer un bâtiment.
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Ville</label>
+
+                    <input type="text"
+                           name="ville"
+                           class="form-control form-control-lg rounded-4"
+                           placeholder="Montréal"
+                           required>
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label class="form-label fw-bold">Adresse complète</label>
+
+                    <input type="text"
+                           name="adresse"
+                           class="form-control form-control-lg rounded-4"
+                           placeholder="123 Rue Sainte-Catherine Ouest"
+                           required>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Nombre de logements</label>
+
+                    <input type="number"
+                           name="nombre_logements"
+                           class="form-control form-control-lg rounded-4"
+                           min="1"
+                           value="1"
+                           required>
+
+                    <div class="help-text">
+                        Ce nombre servira à créer les logements et à calculer l’occupation.
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Statut</label>
+
+                    <select name="actif"
+                            class="form-select form-select-lg rounded-4">
+                        <option value="True">Actif</option>
+                        <option value="False">Inactif</option>
+                    </select>
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label class="form-label fw-bold">Description</label>
+
+                    <textarea name="description"
+                              rows="4"
+                              class="form-control rounded-4"
+                              placeholder="Informations complémentaires..."></textarea>
+                </div>
+
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-flex justify-content-end gap-3">
+
+                <a href="{% url 'batiments' %}"
+                   class="btn btn-light btn-lg rounded-4">
+                    Annuler
+                </a>
+
+                <button type="submit"
+                        class="btn btn-primary btn-lg rounded-4 px-5">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Enregistrer
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

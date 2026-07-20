@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>
+        Ajouter un locataire | Espace employé
+    </title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        :root{
+            --navy:#071a3d;
+            --navy-dark:#041127;
+            --blue:#0057ff;
+            --blue-dark:#0043c7;
+            --green:#16813d;
+            --background:#f3f6fb;
+            --surface:#ffffff;
+            --text:#0f172a;
+            --muted:#64748b;
+            --border:#e2e8f0;
+            --danger:#b42331;
+            --danger-soft:#fff0f2;
+            --success-soft:#eaf8ef;
+        }
+
+        *{
+            box-sizing:border-box;
+        }
+
+        body{
+            margin:0;
+            min-height:100vh;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(0,87,255,.12),
+                    transparent 30%
+                ),
+                linear-gradient(
+                    180deg,
+                    #fafcff,
+                    var(--background)
+                );
+
+            color:var(--text);
+            font-family:"Segoe UI",Arial,sans-serif;
+        }
+
+        .page{
+            width:min(100%,1350px);
+            margin:auto;
+            padding:26px;
+        }
+
+        .employee-header{
+            position:relative;
+            overflow:hidden;
+
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:25px;
+
+            margin-bottom:25px;
+            padding:34px;
+
+            border-radius:28px;
+
+            color:white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--navy-dark),
+                    var(--navy) 52%,
+                    var(--blue)
+                );
+
+            box-shadow:0 24px 60px rgba(7,26,61,.22);
+        }
+
+        .employee-header::after{
+            content:"";
+
+            position:absolute;
+            width:260px;
+            height:260px;
+
+            top:-150px;
+            right:-80px;
+
+            border:45px solid rgba(255,255,255,.07);
+            border-radius:50%;
+        }
+
+        .header-content,
+        .header-actions{
+            position:relative;
+            z-index:2;
+        }
+
+        .employee-label{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+
+            margin-bottom:14px;
+            padding:8px 12px;
+
+            border:1px solid rgba(255,255,255,.18);
+            border-radius:999px;
+
+            background:rgba(255,255,255,.10);
+
+            font-size:11px;
+            font-weight:800;
+            text-transform:uppercase;
+        }
+
+        .employee-header h1{
+            margin:0;
+            font-size:clamp(27px,4vw,43px);
+            font-weight:900;
+            letter-spacing:-.04em;
+        }
+
+        .employee-header p{
+            max-width:700px;
+            margin:10px 0 0;
+
+            color:rgba(255,255,255,.75);
+            line-height:1.65;
+        }
+
+        .employee-info{
+            display:flex;
+            align-items:center;
+            gap:11px;
+
+            margin-top:17px;
+        }
+
+        .employee-avatar{
+            width:42px;
+            height:42px;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            border-radius:14px;
+            background:rgba(255,255,255,.14);
+        }
+
+        .employee-info strong,
+        .employee-info small{
+            display:block;
+        }
+
+        .employee-info small{
+            color:rgba(255,255,255,.65);
+        }
+
+        .btn-back{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+
+            padding:13px 18px;
+
+            border-radius:15px;
+
+            color:var(--blue);
+            background:white;
+
+            font-weight:800;
+            text-decoration:none;
+
+            box-shadow:0 12px 30px rgba(0,0,0,.15);
+            transition:.25s ease;
+        }
+
+        .btn-back:hover{
+            color:var(--navy);
+            transform:translateY(-2px);
+        }
+
+        .notice{
+            display:flex;
+            align-items:flex-start;
+            gap:12px;
+
+            margin-bottom:22px;
+            padding:17px 19px;
+
+            border:1px solid #dce8ff;
+            border-radius:18px;
+
+            color:#17458d;
+            background:#f3f7ff;
+        }
+
+        .notice i{
+            margin-top:3px;
+            color:var(--blue);
+        }
+
+        .message{
+            display:flex;
+            align-items:center;
+            gap:10px;
+
+            margin-bottom:18px;
+            padding:15px 18px;
+
+            border-radius:16px;
+            font-weight:700;
+        }
+
+        .message-success{
+            color:#126b34;
+            background:var(--success-soft);
+            border:1px solid #c9eed7;
+        }
+
+        .message-error{
+            color:var(--danger);
+            background:var(--danger-soft);
+            border:1px solid #ffd2d8;
+        }
+
+        .form-container{
+            display:grid;
+            grid-template-columns:290px minmax(0,1fr);
+            gap:22px;
+            align-items:start;
+        }
+
+        .side-panel{
+            position:sticky;
+            top:20px;
+
+            padding:24px;
+
+            border:1px solid var(--border);
+            border-radius:23px;
+
+            background:white;
+            box-shadow:0 15px 40px rgba(15,23,42,.07);
+        }
+
+        .side-panel h3{
+            margin:0 0 8px;
+            color:var(--navy);
+            font-size:18px;
+            font-weight:900;
+        }
+
+        .side-panel > p{
+            margin:0 0 22px;
+            color:var(--muted);
+            font-size:13px;
+            line-height:1.6;
+        }
+
+        .step{
+            display:flex;
+            align-items:center;
+            gap:12px;
+
+            margin-bottom:12px;
+            padding:12px;
+
+            border-radius:15px;
+            background:#f8faff;
+        }
+
+        .step-number{
+            flex:0 0 34px;
+            width:34px;
+            height:34px;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            border-radius:11px;
+
+            color:var(--blue);
+            background:#eaf1ff;
+
+            font-size:12px;
+            font-weight:900;
+        }
+
+        .step strong{
+            display:block;
+            color:var(--navy);
+            font-size:12px;
+        }
+
+        .step small{
+            color:var(--muted);
+            font-size:10px;
+        }
+
+        .form-card{
+            padding:25px;
+
+            border:1px solid var(--border);
+            border-radius:25px;
+
+            background:white;
+            box-shadow:0 18px 48px rgba(15,23,42,.08);
+        }
+
+        .form-section{
+            margin-bottom:22px;
+            padding:22px;
+
+            border:1px solid #e9eef6;
+            border-radius:21px;
+
+            background:#fbfcff;
+        }
+
+        .section-header{
+            display:flex;
+            align-items:center;
+            gap:12px;
+
+            margin-bottom:21px;
+        }
+
+        .section-icon{
+            flex:0 0 43px;
+            width:43px;
+            height:43px;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            border-radius:14px;
+
+            color:var(--blue);
+            background:#eaf1ff;
+        }
+
+        .section-header h2{
+            margin:0;
+            color:var(--navy);
+            font-size:17px;
+            font-weight:900;
+        }
+
+        .section-header p{
+            margin:3px 0 0;
+            color:var(--muted);
+            font-size:11px;
+        }
+
+        .form-label{
+            margin-bottom:7px;
+
+            color:#263653;
+            font-size:13px;
+            font-weight:800;
+        }
+
+        .required{
+            color:#dc2626;
+        }
+
+        .form-control,
+        .form-select{
+            min-height:52px;
+
+            border:1px solid #dce4ef;
+            border-radius:14px;
+
+            color:var(--text);
+            background:white;
+
+            font-size:14px;
+        }
+
+        .form-control:focus,
+        .form-select:focus{
+            border-color:var(--blue);
+            box-shadow:0 0 0 4px rgba(0,87,255,.10);
+        }
+
+        textarea.form-control{
+            min-height:105px;
+            resize:vertical;
+        }
+
+        .input-icon{
+            position:relative;
+        }
+
+        .input-icon > i{
+            position:absolute;
+            z-index:2;
+
+            top:50%;
+            left:16px;
+
+            color:#8a98ad;
+            transform:translateY(-50%);
+        }
+
+        .input-icon .form-control{
+            padding-left:44px;
+        }
+
+        .checkbox-card{
+            display:flex;
+            align-items:center;
+            gap:12px;
+
+            min-height:52px;
+            padding:12px 15px;
+
+            border:1px solid #dce4ef;
+            border-radius:14px;
+
+            background:white;
+        }
+
+        .checkbox-card input{
+            width:19px;
+            height:19px;
+            accent-color:var(--green);
+        }
+
+        .checkbox-card label{
+            margin:0;
+            color:#263653;
+            font-size:13px;
+            font-weight:800;
+        }
+
+        .upload-card{
+            height:100%;
+            padding:17px;
+
+            border:2px dashed #ccd6e5;
+            border-radius:17px;
+
+            background:white;
+        }
+
+        .upload-card i{
+            display:block;
+
+            margin-bottom:10px;
+
+            color:var(--blue);
+            font-size:24px;
+        }
+
+        .upload-card small{
+            display:block;
+            margin:5px 0 12px;
+            color:var(--muted);
+        }
+
+        .form-actions{
+            display:grid;
+            grid-template-columns:220px minmax(0,1fr);
+            gap:13px;
+        }
+
+        .btn-cancel,
+        .btn-save{
+            min-height:56px;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:9px;
+
+            border-radius:16px;
+
+            font-weight:900;
+            text-decoration:none;
+        }
+
+        .btn-cancel{
+            border:1px solid var(--border);
+            color:#475569;
+            background:white;
+        }
+
+        .btn-save{
+            border:0;
+
+            color:white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    var(--blue-dark)
+                );
+
+            box-shadow:0 15px 32px rgba(0,87,255,.24);
+        }
+
+        .btn-save:hover{
+            transform:translateY(-2px);
+        }
+
+        .empty-option{
+            padding:15px;
+
+            border:1px solid #ffd9a8;
+            border-radius:14px;
+
+            color:#8b4d00;
+            background:#fff8e8;
+
+            font-size:13px;
+        }
+
+        @media(max-width:1000px){
+
+            .form-container{
+                grid-template-columns:1fr;
+            }
+
+            .side-panel{
+                position:static;
+            }
+
+            .steps{
+                display:grid;
+                grid-template-columns:repeat(2,1fr);
+                gap:10px;
+            }
+
+            .step{
+                margin:0;
+            }
+        }
+
+        @media(max-width:768px){
+
+            .page{
+                padding:13px;
+            }
+
+            .employee-header{
+                align-items:flex-start;
+                flex-direction:column;
+
+                padding:24px 20px;
+                border-radius:22px;
+            }
+
+            .header-actions,
+            .btn-back{
+                width:100%;
+            }
+
+            .form-card{
+                padding:14px;
+                border-radius:20px;
+            }
+
+            .form-section{
+                padding:17px;
+                border-radius:17px;
+            }
+
+            .steps{
+                grid-template-columns:1fr;
+            }
+
+            .form-actions{
+                grid-template-columns:1fr;
+            }
+
+            .btn-cancel{
+                order:2;
+            }
+
+            .btn-save{
+                order:1;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+<main class="page">
+
+    <!-- =========================================
+         EN-TÊTE EMPLOYÉ
+    ========================================== -->
+
+    <header class="employee-header">
+
+        <div class="header-content">
+
+            <div class="employee-label">
+                <i class="fa-solid fa-user-shield"></i>
+                Espace employé
+            </div>
+
+            <h1>
+                Ajouter un locataire
+            </h1>
+
+            <p>
+                Enregistrez le locataire, attribuez-lui un logement
+                disponible et renseignez les informations de caution.
+            </p>
+
+            <div class="employee-info">
+
+                <div class="employee-avatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div>
+                    <strong>
+                        {{ employe.prenom }}
+                        {{ employe.nom }}
+                    </strong>
+
+                    <small>
+                        {{ employe.get_type_employe_display }}
+                        {% if agence %}
+                            · {{ agence.nom }}
+                        {% endif %}
+                    </small>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="header-actions">
+
+            <a
+                href="{% url 'espace_employe' %}"
+                class="btn-back"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+                Retour à mon espace
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================
+         MESSAGES
+    ========================================== -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div
+                class="message
+                {% if message.tags == 'success' %}
+                    message-success
+                {% else %}
+                    message-error
+                {% endif %}"
+            >
+
+                {% if message.tags == "success" %}
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                {% else %}
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                {% endif %}
+
+                {{ message }}
+
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <div class="notice">
+
+        <i class="fa-solid fa-circle-info"></i>
+
+        <div>
+            <strong>Accès employé limité</strong>
+
+            <div>
+                Le locataire sera automatiquement rattaché à votre agence.
+                Vous ne pouvez sélectionner que les bâtiments et logements
+                disponibles de cette agence.
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="form-container">
+
+        <!-- =====================================
+             ÉTAPES
+        ====================================== -->
+
+        <aside class="side-panel">
+
+            <h3>Nouvelle inscription</h3>
+
+            <p>
+                Complétez les informations nécessaires pour créer
+                le dossier du locataire.
+            </p>
+
+            <div class="steps">
+
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <div>
+                        <strong>Identité</strong>
+                        <small>Nom et coordonnées</small>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <div>
+                        <strong>Logement</strong>
+                        <small>Bâtiment et chambre</small>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <div>
+                        <strong>Caution</strong>
+                        <small>Montants et dates</small>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <div>
+                        <strong>Documents</strong>
+                        <small>Pièce et photo</small>
+                    </div>
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- =====================================
+             FORMULAIRE
+        ====================================== -->
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+            class="form-card"
+        >
+
+            {% csrf_token %}
+
+            <!-- =================================
+                 IDENTITÉ
+            ================================== -->
+
+            <section class="form-section">
+
+                <div class="section-header">
+
+                    <div class="section-icon">
+                        <i class="fa-solid fa-address-card"></i>
+                    </div>
+
+                    <div>
+                        <h2>Informations personnelles</h2>
+                        <p>Identité principale du locataire</p>
+                    </div>
+
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Nom
+                            <span class="required">*</span>
+                        </label>
+
+                        <div class="input-icon">
+
+                            <i class="fa-solid fa-user"></i>
+
+                            <input
+                                type="text"
+                                name="nom"
+                                class="form-control"
+                                value="{{ request.POST.nom }}"
+                                placeholder="Nom du locataire"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Prénom
+                        </label>
+
+                        <div class="input-icon">
+
+                            <i class="fa-solid fa-user"></i>
+
+                            <input
+                                type="text"
+                                name="prenom"
+                                class="form-control"
+                                value="{{ request.POST.prenom }}"
+                                placeholder="Prénom du locataire"
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Téléphone
+                            <span class="required">*</span>
+                        </label>
+
+                        <div class="input-icon">
+
+                            <i class="fa-solid fa-phone"></i>
+
+                            <input
+                                type="text"
+                                name="telephone"
+                                class="form-control"
+                                value="{{ request.POST.telephone }}"
+                                placeholder="+223 00 00 00 00"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Adresse email
+                        </label>
+
+                        <div class="input-icon">
+
+                            <i class="fa-solid fa-envelope"></i>
+
+                            <input
+                                type="email"
+                                name="email"
+                                class="form-control"
+                                value="{{ request.POST.email }}"
+                                placeholder="email@exemple.com"
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Date de naissance
+                        </label>
+
+                        <input
+                            type="date"
+                            name="date_naissance"
+                            class="form-control"
+                            value="{{ request.POST.date_naissance }}"
+                        >
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Lieu de naissance
+                        </label>
+
+                        <input
+                            type="text"
+                            name="lieu_naissance"
+                            class="form-control"
+                            value="{{ request.POST.lieu_naissance }}"
+                            placeholder="Ville ou pays"
+                        >
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Sexe
+                        </label>
+
+                        <select
+                            name="sexe"
+                            class="form-select"
+                        >
+
+                            <option value="">
+                                Sélectionner
+                            </option>
+
+                            <option
+                                value="Homme"
+                                {% if request.POST.sexe == "Homme" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Homme
+                            </option>
+
+                            <option
+                                value="Femme"
+                                {% if request.POST.sexe == "Femme" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Femme
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================
+                 PROFESSION ET ADRESSE
+            ================================== -->
+
+            <section class="form-section">
+
+                <div class="section-header">
+
+                    <div class="section-icon">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+
+                    <div>
+                        <h2>Profession et adresse</h2>
+                        <p>Situation professionnelle et résidence actuelle</p>
+                    </div>
+
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Profession
+                        </label>
+
+                        <input
+                            type="text"
+                            name="profession"
+                            class="form-control"
+                            value="{{ request.POST.profession }}"
+                            placeholder="Exemple : Commerçant"
+                        >
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Employeur
+                        </label>
+
+                        <input
+                            type="text"
+                            name="employeur"
+                            class="form-control"
+                            value="{{ request.POST.employeur }}"
+                            placeholder="Nom de l’employeur"
+                        >
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Revenu mensuel
+                        </label>
+
+                        <input
+                            type="number"
+                            name="revenu_mensuel"
+                            step="0.01"
+                            min="0"
+                            class="form-control"
+                            value="{{ request.POST.revenu_mensuel }}"
+                            placeholder="0"
+                        >
+
+                    </div>
+
+                    <div class="col-12">
+
+                        <label class="form-label">
+                            Adresse actuelle
+                        </label>
+
+                        <textarea
+                            name="adresse_actuelle"
+                            class="form-control"
+                            placeholder="Adresse complète"
+                        >{{ request.POST.adresse_actuelle }}</textarea>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Ville
+                        </label>
+
+                        <input
+                            type="text"
+                            name="ville"
+                            class="form-control"
+                            value="{{ request.POST.ville }}"
+                            placeholder="Ville"
+                        >
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Pays
+                        </label>
+
+                        <input
+                            type="text"
+                            name="pays"
+                            class="form-control"
+                            value="{{ request.POST.pays }}"
+                            placeholder="Pays"
+                        >
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================
+                 LOGEMENT
+            ================================== -->
+
+            <section class="form-section">
+
+                <div class="section-header">
+
+                    <div class="section-icon">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+
+                    <div>
+                        <h2>Location et logement</h2>
+                        <p>Attribuer un logement disponible au locataire</p>
+                    </div>
+
+                </div>
+
+                {% if chambres_disponibles %}
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Bâtiment
+                                <span class="required">*</span>
+                            </label>
+
+                            <select
+                                name="batiment"
+                                id="batimentSelect"
+                                class="form-select"
+                                required
+                            >
+
+                                <option value="">
+                                    Sélectionner un bâtiment
+                                </option>
+
+                                {% for batiment in batiments %}
+
+                                    <option
+                                        value="{{ batiment.id }}"
+                                    >
+                                        {{ batiment.nom }}
+                                        — {{ batiment.ville|default:"Ville non renseignée" }}
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Logement ou chambre
+                                <span class="required">*</span>
+                            </label>
+
+                            <select
+                                name="chambre"
+                                id="chambreSelect"
+                                class="form-select"
+                                required
+                                disabled
+                            >
+
+                                <option value="">
+                                    Choisir d’abord un bâtiment
+                                </option>
+
+                                {% for chambre in chambres_disponibles %}
+
+                                    <option
+                                        value="{{ chambre.id }}"
+                                        data-batiment="{{ chambre.batiment_id }}"
+                                        hidden
+                                    >
+
+                                        {% if chambre.numero %}
+                                            N° {{ chambre.numero }}
+                                        {% endif %}
+
+                                        {% if chambre.nom %}
+                                            — {{ chambre.nom }}
+                                        {% endif %}
+
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Montant du loyer
+                                <span class="required">*</span>
+                            </label>
+
+                            <input
+                                type="number"
+                                name="loyer"
+                                step="0.01"
+                                min="1"
+                                class="form-control"
+                                value="{{ request.POST.loyer }}"
+                                placeholder="Montant du loyer"
+                                required
+                            >
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Date de début
+                                <span class="required">*</span>
+                            </label>
+
+                            <input
+                                type="date"
+                                name="date_debut"
+                                class="form-control"
+                                value="{{ request.POST.date_debut }}"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-option">
+
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+
+                        Aucun logement disponible dans votre agence.
+                        Un administrateur ou un directeur doit d’abord
+                        ajouter un logement libre.
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+
+            <!-- =================================
+                 CAUTION
+            ================================== -->
+
+            <section class="form-section">
+
+                <div class="section-header">
+
+                    <div class="section-icon">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+
+                    <div>
+                        <h2>Informations de caution</h2>
+                        <p>Montant, état du paiement et observation</p>
+                    </div>
+
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Montant de la caution
+                        </label>
+
+                        <input
+                            type="number"
+                            name="caution"
+                            step="0.01"
+                            min="0"
+                            class="form-control"
+                            value="{{ request.POST.caution }}"
+                            placeholder="0"
+                        >
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            État de la caution
+                        </label>
+
+                        <div class="checkbox-card">
+
+                            <input
+                                type="checkbox"
+                                name="caution_payee"
+                                id="cautionPayee"
+                                {% if request.POST.caution_payee %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            <label for="cautionPayee">
+                                Caution payée
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Date de la caution
+                        </label>
+
+                        <input
+                            type="date"
+                            name="date_caution"
+                            id="dateCaution"
+                            class="form-control"
+                            value="{{ request.POST.date_caution }}"
+                        >
+
+                    </div>
+
+                    <div class="col-12">
+
+                        <label class="form-label">
+                            Observation
+                        </label>
+
+                        <textarea
+                            name="observation_caution"
+                            class="form-control"
+                            placeholder="Observation concernant la caution"
+                        >{{ request.POST.observation_caution }}</textarea>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================
+                 URGENCE
+            ================================== -->
+
+            <section class="form-section">
+
+                <div class="section-header">
+
+                    <div class="section-icon">
+                        <i class="fa-solid fa-phone-volume"></i>
+                    </div>
+
+                    <div>
+                        <h2>Contact d’urgence</h2>
+                        <p>Personne à contacter en cas de besoin</p>
+                    </div>
+
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Nom complet
+                        </label>
+
+                        <input
+                            type="text"
+                            name="contact_urgence_nom"
+                            class="form-control"
+                            value="{{ request.POST.contact_urgence_nom }}"
+                            placeholder="Nom du contact"
+                        >
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Téléphone
+                        </label>
+
+                        <input
+                            type="text"
+                            name="contact_urgence_telephone"
+                            class="form-control"
+                            value="{{ request.POST.contact_urgence_telephone }}"
+                            placeholder="+223 00 00 00 00"
+                        >
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Lien avec le locataire
+                        </label>
+
+                        <input
+                            type="text"
+                            name="contact_urgence_lien"
+                            class="form-control"
+                            value="{{ request.POST.contact_urgence_lien }}"
+                            placeholder="Frère, sœur, ami..."
+                        >
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================
+                 DOCUMENTS
+            ================================== -->
+
+            <section class="form-section">
+
+                <div class="section-header">
+
+                    <div class="section-icon">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+
+                    <div>
+                        <h2>Documents</h2>
+                        <p>Documents personnels du locataire</p>
+                    </div>
+
+                </div>
+
+                <div class="row g-3 mb-3">
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Numéro de pièce d’identité
+                        </label>
+
+                        <input
+                            type="text"
+                            name="numero_piece_identite"
+                            class="form-control"
+                            value="{{ request.POST.numero_piece_identite }}"
+                            placeholder="Numéro de la pièce"
+                        >
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Date d’expiration
+                        </label>
+
+                        <input
+                            type="date"
+                            name="date_expiration_piece"
+                            class="form-control"
+                            value="{{ request.POST.date_expiration_piece }}"
+                        >
+
+                    </div>
+
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+
+                        <div class="upload-card">
+
+                            <i class="fa-solid fa-id-card"></i>
+
+                            <label class="form-label">
+                                Pièce d’identité
+                            </label>
+
+                            <small>
+                                PDF, JPG, JPEG ou PNG
+                            </small>
+
+                            <input
+                                type="file"
+                                name="piece_identite"
+                                class="form-control"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <div class="upload-card">
+
+                            <i class="fa-solid fa-file-lines"></i>
+
+                            <label class="form-label">
+                                Acte de naissance
+                            </label>
+
+                            <small>
+                                PDF, JPG, JPEG ou PNG
+                            </small>
+
+                            <input
+                                type="file"
+                                name="acte_naissance"
+                                class="form-control"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <div class="upload-card">
+
+                            <i class="fa-solid fa-camera"></i>
+
+                            <label class="form-label">
+                                Photo du locataire
+                            </label>
+
+                            <small>
+                                JPG, JPEG ou PNG
+                            </small>
+
+                            <input
+                                type="file"
+                                name="photo"
+                                class="form-control"
+                                accept=".jpg,.jpeg,.png"
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================
+                 BOUTONS
+            ================================== -->
+
+            <div class="form-actions">
+
+                <a
+                    href="{% url 'espace_employe' %}"
+                    class="btn-cancel"
+                >
+                    <i class="fa-solid fa-xmark"></i>
+                    Annuler
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn-save"
+                    {% if not chambres_disponibles %}
+                        disabled
+                    {% endif %}
+                >
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Enregistrer le locataire et sa location
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</main>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+    const batimentSelect =
+        document.getElementById("batimentSelect");
+
+    const chambreSelect =
+        document.getElementById("chambreSelect");
+
+    const cautionPayee =
+        document.getElementById("cautionPayee");
+
+    const dateCaution =
+        document.getElementById("dateCaution");
+
+
+    /* =========================================
+       FILTRER LES LOGEMENTS PAR BÂTIMENT
+    ========================================== */
+
+    function filtrerChambres(){
+
+        if(!batimentSelect || !chambreSelect){
+            return;
+        }
+
+        const batimentId = batimentSelect.value;
+
+        let logementDisponible = false;
+
+        chambreSelect.value = "";
+
+        Array.from(
+            chambreSelect.options
+        ).forEach(function(option,index){
+
+            if(index === 0){
+                return;
+            }
+
+            const correspond =
+                option.dataset.batiment === batimentId;
+
+            option.hidden = !correspond;
+            option.disabled = !correspond;
+
+            if(correspond){
+                logementDisponible = true;
+            }
+
+        });
+
+        chambreSelect.disabled = !batimentId;
+
+        if(!batimentId){
+
+            chambreSelect.options[0].textContent =
+                "Choisir d’abord un bâtiment";
+
+        }else if(logementDisponible){
+
+            chambreSelect.options[0].textContent =
+                "Sélectionner un logement disponible";
+
+        }else{
+
+            chambreSelect.options[0].textContent =
+                "Aucun logement disponible dans ce bâtiment";
+        }
+    }
+
+    if(batimentSelect){
+
+        batimentSelect.addEventListener(
+            "change",
+            filtrerChambres
+        );
+
+        filtrerChambres();
+    }
+
+
+    /* =========================================
+       DATE DE CAUTION
+    ========================================== */
+
+    function gererDateCaution(){
+
+        if(!cautionPayee || !dateCaution){
+            return;
+        }
+
+        dateCaution.disabled = !cautionPayee.checked;
+
+        if(!cautionPayee.checked){
+            dateCaution.value = "";
+        }
+    }
+
+    if(cautionPayee){
+
+        cautionPayee.addEventListener(
+            "change",
+            gererDateCaution
+        );
+
+        gererDateCaution();
+    }
+
+});
+</script>
+
+</body>
+</html>

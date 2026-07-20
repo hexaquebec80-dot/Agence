@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+.profile-hero{
+    background:linear-gradient(135deg,#071a3d,#0057ff);
+    color:white;
+    border-radius:28px;
+    padding:30px;
+    margin-bottom:25px;
+    box-shadow:0 20px 50px rgba(0,87,255,.22);
+}
+
+.profile-avatar{
+    width:90px;
+    height:90px;
+    border-radius:28px;
+    background:white;
+    color:#0057ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:36px;
+    font-weight:900;
+}
+
+.info-card{
+    background:white;
+    border:1px solid #e4ecf8;
+    border-radius:24px;
+    padding:24px;
+    box-shadow:0 15px 40px rgba(15,23,42,.08);
+    margin-bottom:25px;
+}
+
+.info-box{
+    background:#f8fbff;
+    border:1px solid #e4ecf8;
+    border-radius:18px;
+    padding:18px;
+    height:100%;
+}
+
+.info-label{
+    color:#6b7a99;
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:6px;
+}
+
+.info-value{
+    color:#071a3d;
+    font-size:18px;
+    font-weight:800;
+    margin:0;
+}
+
+.badge-agent{
+    background:#eaf1ff;
+    color:#0057ff;
+    padding:10px 16px;
+    border-radius:999px;
+    font-weight:800;
+}
+
+.badge-sec{
+    background:#dcfce7;
+    color:#15803d;
+    padding:10px 16px;
+    border-radius:999px;
+    font-weight:800;
+}
+</style>
+
+<div class="profile-hero d-flex justify-content-between align-items-center flex-wrap gap-4">
+
+    <div class="d-flex align-items-center gap-4">
+        <div class="profile-avatar">
+            {{ employe.nom|slice:":1" }}{{ employe.prenom|slice:":1" }}
+        </div>
+
+        <div>
+            <h2 class="fw-bold mb-2">
+                {{ employe.nom }} {{ employe.prenom }}
+            </h2>
+
+            {% if employe.type_employe == "agent" %}
+                <span class="badge-agent">Agent immobilier</span>
+            {% else %}
+                <span class="badge-sec">Secrétaire</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'modifier_employe' employe.id %}" class="btn btn-warning rounded-4 px-4">
+            <i class="fa-solid fa-pen"></i>
+            Modifier
+        </a>
+
+        <a href="{% url 'employes' %}" class="btn btn-light rounded-4 px-4">
+            <i class="fa-solid fa-arrow-left"></i>
+            Retour
+        </a>
+    </div>
+
+</div>
+
+<div class="info-card">
+
+    <h4 class="fw-bold mb-4">
+        <i class="fa-solid fa-user text-primary"></i>
+        Informations personnelles
+    </h4>
+
+    <div class="row g-3">
+
+        <div class="col-md-4">
+            <div class="info-box">
+                <div class="info-label">Nom</div>
+                <p class="info-value">{{ employe.nom }}</p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="info-box">
+                <div class="info-label">Prénom</div>
+                <p class="info-value">{{ employe.prenom }}</p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="info-box">
+                <div class="info-label">Nationalité</div>
+                <p class="info-value">{{ employe.nationalite }}</p>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="info-box">
+                <div class="info-label">Téléphone</div>
+                <p class="info-value">
+                    <i class="fa-solid fa-phone text-primary me-2"></i>
+                    {{ employe.telephone }}
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="info-box">
+                <div class="info-label">Ville</div>
+                <p class="info-value">
+                    <i class="fa-solid fa-location-dot text-primary me-2"></i>
+                    {{ employe.ville }}
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="info-box">
+                <div class="info-label">Adresse</div>
+                <p class="info-value">{{ employe.adresse }}</p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="info-card">
+
+    <h4 class="fw-bold mb-4">
+        <i class="fa-solid fa-briefcase text-primary"></i>
+        Informations professionnelles
+    </h4>
+
+    <div class="row g-3">
+
+        <div class="col-md-4">
+            <div class="info-box">
+                <div class="info-label">Poste</div>
+                <p class="info-value">
+                    {% if employe.type_employe == "agent" %}
+                        Agent immobilier
+                    {% else %}
+                        Secrétaire
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="info-box">
+                <div class="info-label">Numéro de poste</div>
+                <p class="info-value">
+                    {{ employe.numero_poste|default:"Non renseigné" }}
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="info-box">
+                <div class="info-label">Salaire</div>
+                <p class="info-value">{{ employe.salaire }} $</p>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="info-box">
+                <div class="info-label">Acte de naissance</div>
+                <p class="info-value">
+                    {{ employe.acte_naissance|default:"Non renseigné" }}
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="info-card">
+
+    <h4 class="fw-bold mb-4">
+        <i class="fa-solid fa-lock text-primary"></i>
+        Compte de connexion
+    </h4>
+
+    <div class="row g-3">
+
+        <div class="col-md-6">
+
+    <div class="info-box">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+
+                <div class="info-label">
+                    Nom utilisateur
+                </div>
+
+                <p class="info-value mb-0">
+                    {{ employe.utilisateur.username }}
+                </p>
+
+            </div>
+
+            <a href="{% url 'modifier_username_employe' employe.id %}"
+               class="btn btn-warning rounded-4">
+
+                <i class="fa-solid fa-user-pen"></i>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+        <div class="col-md-6">
+
+<div class="col-md-6">
+
+    <div class="info-box">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+
+                <div class="info-label">
+                    Mot de passe
+                </div>
+
+                <p class="info-value text-muted mb-0">
+                    <i class="fa-solid fa-lock me-2"></i>
+                    Mot de passe sécurisé
+                </p>
+
+            </div>
+
+            <a href="{% url 'reset_password_employe' employe.id %}"
+               class="btn btn-warning rounded-4">
+
+                <i class="fa-solid fa-key"></i>
+                Réinitialiser
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+        <div class="col-md-6">
+            <div class="info-box">
+                <div class="info-label">Date de création</div>
+                <p class="info-value">
+                    {{ employe.date_creation|date:"d/m/Y H:i" }}
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

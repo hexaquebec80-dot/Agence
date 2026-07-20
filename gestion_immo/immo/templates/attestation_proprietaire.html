@@ -1,0 +1,1473 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Attestation de propriété —
+        {{ proprietaire.prenom }}
+        {{ proprietaire.nom }}
+    </title>
+
+    <style>
+        :root{
+            --primary:#0b4fc4;
+            --primary-dark:#082d70;
+            --secondary:#2563eb;
+            --text:#152238;
+            --muted:#66758f;
+            --border:#dce4f0;
+            --background:#eef3f9;
+            --success:#15803d;
+            --success-light:#dcfce7;
+            --warning:#b45309;
+            --warning-light:#fff7ed;
+            --danger:#dc2626;
+        }
+
+        *{
+            box-sizing:border-box;
+        }
+
+        html{
+            scroll-behavior:smooth;
+        }
+
+        body{
+            margin:0;
+            padding:30px;
+            color:var(--text);
+            background:var(--background);
+            font-family:
+                "Segoe UI",
+                Arial,
+                Helvetica,
+                sans-serif;
+        }
+
+        button,
+        a{
+            font-family:inherit;
+        }
+
+        /* =====================================================
+           ACTIONS
+        ====================================================== */
+
+        .document-actions{
+            width:100%;
+            max-width:1050px;
+            margin:0 auto 20px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:15px;
+        }
+
+        .document-button{
+            min-height:48px;
+            padding:0 18px;
+            border:0;
+            border-radius:14px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:9px;
+            color:white;
+            background:var(--primary);
+            text-decoration:none;
+            font-size:14px;
+            font-weight:800;
+            cursor:pointer;
+            box-shadow:0 12px 28px rgba(11,79,196,.20);
+            transition:
+                transform .2s ease,
+                background .2s ease,
+                box-shadow .2s ease;
+        }
+
+        .document-button:hover{
+            color:white;
+            background:var(--primary-dark);
+            transform:translateY(-2px);
+            box-shadow:0 17px 35px rgba(11,79,196,.25);
+        }
+
+        .document-button:disabled{
+            opacity:.7;
+            cursor:not-allowed;
+            transform:none;
+        }
+
+        .document-button.secondary{
+            color:var(--text);
+            background:white;
+            border:1px solid var(--border);
+            box-shadow:none;
+        }
+
+        .document-button.secondary:hover{
+            color:var(--primary);
+            background:#f8fbff;
+            border-color:#b9cff2;
+        }
+
+        /* =====================================================
+           FEUILLE DU DOCUMENT
+        ====================================================== */
+
+        .document-sheet{
+            position:relative;
+            width:100%;
+            max-width:1050px;
+            min-height:1420px;
+            margin:0 auto;
+            overflow:hidden;
+            background:white;
+            border-radius:10px;
+            box-shadow:0 30px 80px rgba(15,23,42,.16);
+        }
+
+        .document-sheet::before{
+            content:"";
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+            height:9px;
+            background:
+                linear-gradient(
+                    90deg,
+                    var(--primary-dark),
+                    var(--secondary),
+                    #6d28d9
+                );
+        }
+
+        .document-content{
+            position:relative;
+            z-index:2;
+            padding:52px 62px 45px;
+        }
+
+        /* =====================================================
+           EN-TÊTE DE L’AGENCE
+        ====================================================== */
+
+        .agency-header{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:30px;
+            padding-bottom:25px;
+            border-bottom:2px solid var(--primary-dark);
+        }
+
+        .agency-brand{
+            display:flex;
+            align-items:center;
+            gap:18px;
+            min-width:0;
+        }
+
+        .agency-logo-box{
+            flex:0 0 95px;
+            width:95px;
+            height:95px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            overflow:hidden;
+            border:1px solid var(--border);
+            border-radius:18px;
+            background:white;
+            box-shadow:0 10px 25px rgba(15,23,42,.07);
+        }
+
+        .agency-logo{
+            width:100%;
+            height:100%;
+            padding:7px;
+            object-fit:contain;
+        }
+
+        .agency-logo-fallback{
+            width:100%;
+            height:100%;
+            display:grid;
+            place-items:center;
+            color:white;
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary-dark),
+                    var(--secondary)
+                );
+            font-size:30px;
+            font-weight:900;
+        }
+
+        .agency-name{
+            margin:0 0 6px;
+            color:var(--primary-dark);
+            font-size:27px;
+            font-weight:950;
+            line-height:1.15;
+            overflow-wrap:anywhere;
+        }
+
+        .agency-type{
+            margin:0;
+            color:var(--muted);
+            font-size:13px;
+            font-weight:750;
+            text-transform:uppercase;
+            letter-spacing:.7px;
+        }
+
+        .agency-contact{
+            max-width:350px;
+            display:grid;
+            gap:8px;
+            text-align:right;
+        }
+
+        .agency-contact-item{
+            display:flex;
+            align-items:flex-start;
+            justify-content:flex-end;
+            gap:9px;
+            color:#42516b;
+            font-size:12px;
+            line-height:1.45;
+        }
+
+        .agency-contact-icon{
+            flex:0 0 25px;
+            width:25px;
+            height:25px;
+            display:grid;
+            place-items:center;
+            border-radius:8px;
+            color:var(--primary);
+            background:#eaf2ff;
+            font-size:11px;
+            font-weight:900;
+        }
+
+        /* =====================================================
+           INFORMATIONS DU DOCUMENT
+        ====================================================== */
+
+        .document-meta{
+            display:grid;
+            grid-template-columns:repeat(3,minmax(0,1fr));
+            gap:12px;
+            margin:24px 0 32px;
+        }
+
+        .meta-box{
+            padding:13px 15px;
+            border:1px solid var(--border);
+            border-radius:12px;
+            background:#f8faff;
+        }
+
+        .meta-label{
+            margin-bottom:5px;
+            color:var(--muted);
+            font-size:9px;
+            font-weight:900;
+            text-transform:uppercase;
+            letter-spacing:.6px;
+        }
+
+        .meta-value{
+            color:var(--primary-dark);
+            font-size:12px;
+            font-weight:850;
+            overflow-wrap:anywhere;
+        }
+
+        /* =====================================================
+           TITRE
+        ====================================================== */
+
+        .document-title-section{
+            margin-bottom:30px;
+            text-align:center;
+        }
+
+        .document-small-title{
+            display:inline-block;
+            margin-bottom:11px;
+            padding:7px 13px;
+            border-radius:999px;
+            color:var(--primary);
+            background:#eaf2ff;
+            font-size:10px;
+            font-weight:900;
+            text-transform:uppercase;
+            letter-spacing:.8px;
+        }
+
+        .document-title{
+            margin:0 0 10px;
+            color:var(--primary-dark);
+            font-family:Georgia, "Times New Roman", serif;
+            font-size:32px;
+            font-weight:800;
+            line-height:1.25;
+            text-transform:uppercase;
+        }
+
+        .document-title-line{
+            width:90px;
+            height:4px;
+            margin:15px auto 0;
+            border-radius:999px;
+            background:
+                linear-gradient(
+                    90deg,
+                    var(--primary),
+                    #7c3aed
+                );
+        }
+
+        /* =====================================================
+           INTRODUCTION
+        ====================================================== */
+
+        .attestation-introduction{
+            margin-bottom:25px;
+            color:#2e3d57;
+            font-family:Georgia, "Times New Roman", serif;
+            font-size:16px;
+            line-height:1.95;
+            text-align:justify;
+        }
+
+        .attestation-introduction strong{
+            color:var(--primary-dark);
+        }
+
+        /* =====================================================
+           PROPRIÉTAIRE
+        ====================================================== */
+
+        .owner-identity-card{
+            position:relative;
+            display:grid;
+            grid-template-columns:90px minmax(0,1fr);
+            gap:22px;
+            margin:25px 0;
+            padding:22px;
+            overflow:hidden;
+            border:1px solid #cddbf0;
+            border-radius:17px;
+            background:
+                linear-gradient(
+                    135deg,
+                    #f7faff,
+                    #ffffff
+                );
+        }
+
+        .owner-identity-card::after{
+            content:"";
+            position:absolute;
+            top:-70px;
+            right:-70px;
+            width:170px;
+            height:170px;
+            border-radius:50%;
+            background:var(--primary);
+            opacity:.045;
+        }
+
+        .owner-document-avatar{
+            position:relative;
+            z-index:2;
+            width:90px;
+            height:90px;
+            display:grid;
+            place-items:center;
+            border-radius:20px;
+            color:white;
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary-dark),
+                    var(--secondary)
+                );
+            font-size:28px;
+            font-weight:950;
+            text-transform:uppercase;
+            box-shadow:0 12px 25px rgba(11,79,196,.18);
+        }
+
+        .owner-document-content{
+            position:relative;
+            z-index:2;
+        }
+
+        .owner-document-name{
+            margin:0 0 11px;
+            color:var(--primary-dark);
+            font-size:23px;
+            font-weight:950;
+        }
+
+        .owner-document-grid{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:11px 22px;
+        }
+
+        .owner-document-info{
+            padding:10px 12px;
+            border:1px solid #e4ebf5;
+            border-radius:10px;
+            color:#465570;
+            background:white;
+            font-size:12px;
+            line-height:1.5;
+        }
+
+        .owner-document-info strong{
+            color:var(--text);
+        }
+
+        /* =====================================================
+           BÂTIMENTS
+        ====================================================== */
+
+        .buildings-section{
+            margin-top:30px;
+        }
+
+        .section-heading{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:15px;
+            margin-bottom:14px;
+        }
+
+        .section-title{
+            margin:0;
+            color:var(--primary-dark);
+            font-size:18px;
+            font-weight:950;
+        }
+
+        .section-count{
+            padding:7px 11px;
+            border-radius:999px;
+            color:var(--success);
+            background:var(--success-light);
+            font-size:10px;
+            font-weight:900;
+            white-space:nowrap;
+        }
+
+        .buildings-table-wrapper{
+            width:100%;
+            overflow-x:auto;
+            border-radius:12px;
+        }
+
+        .buildings-table{
+            width:100%;
+            border-collapse:separate;
+            border-spacing:0;
+            overflow:hidden;
+            border:1px solid var(--border);
+            border-radius:12px;
+        }
+
+        .buildings-table thead th{
+            padding:12px 10px;
+            border-bottom:1px solid var(--border);
+            color:white;
+            background:var(--primary-dark);
+            font-size:9px;
+            font-weight:900;
+            text-align:left;
+            text-transform:uppercase;
+            letter-spacing:.4px;
+            white-space:nowrap;
+        }
+
+        .buildings-table tbody td{
+            padding:12px 10px;
+            border-bottom:1px solid #e9eef5;
+            color:#3e4d67;
+            font-size:11px;
+            line-height:1.45;
+            vertical-align:top;
+        }
+
+        .buildings-table tbody tr:last-child td{
+            border-bottom:0;
+        }
+
+        .buildings-table tbody tr:nth-child(even){
+            background:#f8faff;
+        }
+
+        .building-number{
+            width:28px;
+            height:28px;
+            display:grid;
+            place-items:center;
+            border-radius:9px;
+            color:var(--primary);
+            background:#eaf2ff;
+            font-size:10px;
+            font-weight:900;
+        }
+
+        .building-code{
+            color:var(--primary);
+            font-weight:900;
+        }
+
+        .building-name{
+            color:var(--primary-dark);
+            font-weight:900;
+        }
+
+        .building-status{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            padding:6px 9px;
+            border-radius:999px;
+            color:var(--success);
+            background:var(--success-light);
+            font-size:9px;
+            font-weight:900;
+            white-space:nowrap;
+        }
+
+        .building-status::before{
+            content:"";
+            width:6px;
+            height:6px;
+            border-radius:50%;
+            background:currentColor;
+        }
+
+        .empty-building{
+            padding:28px 15px !important;
+            color:var(--muted) !important;
+            font-size:12px !important;
+            font-weight:700;
+            text-align:center;
+        }
+
+        /* =====================================================
+           CERTIFICATION
+        ====================================================== */
+
+        .certification-text{
+            margin:28px 0 20px;
+            color:#2e3d57;
+            font-family:Georgia, "Times New Roman", serif;
+            font-size:15px;
+            line-height:1.9;
+            text-align:justify;
+        }
+
+        .certification-text strong{
+            color:var(--primary-dark);
+        }
+
+        .legal-notice{
+            display:flex;
+            align-items:flex-start;
+            gap:12px;
+            margin-top:20px;
+            padding:15px;
+            border:1px solid #fed7aa;
+            border-radius:12px;
+            color:#8a4310;
+            background:var(--warning-light);
+            font-size:10px;
+            line-height:1.6;
+        }
+
+        .legal-notice-icon{
+            flex:0 0 31px;
+            width:31px;
+            height:31px;
+            display:grid;
+            place-items:center;
+            border-radius:10px;
+            color:var(--warning);
+            background:#ffedd5;
+            font-weight:900;
+        }
+
+        /* =====================================================
+           SIGNATURE
+        ====================================================== */
+
+        .signature-section{
+            margin-top:48px;
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:60px;
+        }
+
+        .signature-location{
+            color:#45546d;
+            font-family:Georgia, "Times New Roman", serif;
+            font-size:13px;
+            line-height:1.7;
+        }
+
+        .signature-location strong{
+            color:var(--primary-dark);
+        }
+
+        .signature-box{
+            min-height:145px;
+            text-align:center;
+        }
+
+        .signature-space{
+            height:70px;
+            border-bottom:1px solid #94a3b8;
+        }
+
+        .signature-title{
+            margin-top:9px;
+            color:var(--primary-dark);
+            font-size:12px;
+            font-weight:900;
+        }
+
+        .signature-name{
+            margin-top:4px;
+            color:var(--muted);
+            font-size:10px;
+        }
+
+        .stamp-area{
+            margin-top:12px;
+            color:#94a3b8;
+            font-size:9px;
+            font-weight:800;
+            text-transform:uppercase;
+            letter-spacing:.5px;
+        }
+
+        /* =====================================================
+           PIED DE PAGE
+        ====================================================== */
+
+        .document-footer{
+            margin-top:45px;
+            padding-top:17px;
+            border-top:1px solid var(--border);
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:20px;
+            color:#7a879d;
+            font-size:9px;
+            line-height:1.5;
+        }
+
+        .footer-reference{
+            color:var(--primary-dark);
+            font-weight:900;
+        }
+
+        .verification-code{
+            display:flex;
+            align-items:center;
+            gap:9px;
+        }
+
+        .verification-symbol{
+            flex:0 0 31px;
+            width:31px;
+            height:31px;
+            display:grid;
+            place-items:center;
+            border-radius:8px;
+            color:white;
+            background:var(--primary-dark);
+            font-size:12px;
+            font-weight:900;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ====================================================== */
+
+        @media(max-width:750px){
+            body{
+                padding:10px;
+            }
+
+            .document-content{
+                padding:35px 22px;
+            }
+
+            .agency-header{
+                align-items:flex-start;
+                flex-direction:column;
+            }
+
+            .agency-contact{
+                max-width:none;
+                text-align:left;
+            }
+
+            .agency-contact-item{
+                justify-content:flex-start;
+            }
+
+            .document-meta{
+                grid-template-columns:1fr;
+            }
+
+            .owner-identity-card{
+                grid-template-columns:1fr;
+            }
+
+            .owner-document-grid{
+                grid-template-columns:1fr;
+            }
+
+            .signature-section{
+                grid-template-columns:1fr;
+                gap:20px;
+            }
+
+            .document-footer{
+                align-items:flex-start;
+                flex-direction:column;
+            }
+
+            .document-actions{
+                flex-direction:column;
+            }
+
+            .document-button{
+                width:100%;
+            }
+
+            .buildings-table{
+                min-width:720px;
+            }
+        }
+
+        /* =====================================================
+           IMPRESSION A4
+        ====================================================== */
+
+        @page{
+            size:A4;
+            margin:12mm;
+        }
+
+        @media print{
+            body{
+                padding:0;
+                background:white;
+                print-color-adjust:exact;
+                -webkit-print-color-adjust:exact;
+            }
+
+            .document-actions{
+                display:none !important;
+            }
+
+            .document-sheet{
+                width:100%;
+                max-width:none;
+                min-height:auto;
+                border-radius:0;
+                box-shadow:none;
+            }
+
+            .document-content{
+                padding:15px 20px;
+            }
+
+            .agency-logo-box{
+                width:80px;
+                height:80px;
+                flex-basis:80px;
+            }
+
+            .agency-name{
+                font-size:23px;
+            }
+
+            .document-meta{
+                margin:17px 0 23px;
+            }
+
+            .document-title{
+                font-size:27px;
+            }
+
+            .owner-identity-card,
+            .buildings-section,
+            .legal-notice,
+            .signature-section{
+                break-inside:avoid;
+                page-break-inside:avoid;
+            }
+
+            .buildings-table thead{
+                display:table-header-group;
+            }
+
+            .buildings-table tr{
+                break-inside:avoid;
+                page-break-inside:avoid;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- =====================================================
+         ACTIONS NON IMPRIMÉES
+    ====================================================== -->
+
+    <div class="document-actions">
+
+        <button
+            type="button"
+            class="document-button secondary"
+            id="closeDocumentButton"
+        >
+            ← Retour à la fiche
+        </button>
+
+        <button
+            type="button"
+            class="document-button"
+            id="printDocumentButton"
+        >
+            Imprimer ou enregistrer en PDF
+        </button>
+
+    </div>
+
+    <!-- =====================================================
+         DOCUMENT
+    ====================================================== -->
+
+    <main class="document-sheet">
+
+        <div class="document-content">
+
+            <!-- =================================================
+                 EN-TÊTE DE L’AGENCE
+            ================================================== -->
+
+            <header class="agency-header">
+
+                <div class="agency-brand">
+
+                    <div class="agency-logo-box">
+
+                        {% if agence.logo %}
+
+                            <img
+                                src="{{ agence.logo.url }}"
+                                alt="Logo de {{ agence.nom|default:'l’agence' }}"
+                                class="agency-logo"
+                            >
+
+                        {% else %}
+
+                            <img
+                                src="{% static 'images/logoHexa.png' %}"
+                                alt="Logo de l’agence"
+                                class="agency-logo"
+                                onerror="
+                                    this.style.display='none';
+                                    this.nextElementSibling.style.display='grid';
+                                "
+                            >
+
+                            <div
+                                class="agency-logo-fallback"
+                                style="display:none;"
+                            >
+                                AG
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <div>
+
+                        <h1 class="agency-name">
+                            {{ agence.nom|default:"Agence immobilière" }}
+                        </h1>
+
+                        <p class="agency-type">
+                            Gestion et administration immobilière
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="agency-contact">
+
+                    <div class="agency-contact-item">
+
+                        <span class="agency-contact-icon">
+                            A
+                        </span>
+
+                        <span>
+                            {{ agence.adresse|default:"Adresse non renseignée" }}
+
+                            {% if agence.ville %}
+                                <br>
+                                {{ agence.ville }}
+                            {% endif %}
+                        </span>
+
+                    </div>
+
+                    <div class="agency-contact-item">
+
+                        <span class="agency-contact-icon">
+                            T
+                        </span>
+
+                        <span>
+                            {{ agence.telephone|default:"Téléphone non renseigné" }}
+                        </span>
+
+                    </div>
+
+                    <div class="agency-contact-item">
+
+                        <span class="agency-contact-icon">
+                            @
+                        </span>
+
+                        <span>
+                            {{ agence.email|default:"Courriel non renseigné" }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- =================================================
+                 MÉTADONNÉES
+            ================================================== -->
+
+            <section class="document-meta">
+
+                <div class="meta-box">
+
+                    <div class="meta-label">
+                        Référence du document
+                    </div>
+
+                    <div class="meta-value">
+                        {{ reference_document|default:"Référence non disponible" }}
+                    </div>
+
+                </div>
+
+                <div class="meta-box">
+
+                    <div class="meta-label">
+                        Date d’émission
+                    </div>
+
+                    <div class="meta-value">
+                        {{ date_emission|date:"d/m/Y à H:i" }}
+                    </div>
+
+                </div>
+
+                <div class="meta-box">
+
+                    <div class="meta-label">
+                        Code propriétaire
+                    </div>
+
+                    <div class="meta-value">
+                        {{ proprietaire.code_client|default:"Non attribué" }}
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- =================================================
+                 TITRE
+            ================================================== -->
+
+            <section class="document-title-section">
+
+                <div class="document-small-title">
+                    Document administratif
+                </div>
+
+                <h2 class="document-title">
+                    Attestation de rattachement immobilier
+                </h2>
+
+                <div class="document-title-line"></div>
+
+            </section>
+
+            <!-- =================================================
+                 INTRODUCTION
+            ================================================== -->
+
+            <p class="attestation-introduction">
+
+                Nous soussignés,
+
+                <strong>
+                    {{ agence.nom|default:"l’agence immobilière" }}
+                </strong>,
+
+                attestons par la présente que la personne identifiée
+                ci-dessous est régulièrement enregistrée dans notre système
+                de gestion en qualité de
+
+                <strong>propriétaire immobilier</strong>.
+
+                Les bâtiments indiqués dans le présent document sont
+                rattachés à son dossier au sein de notre agence.
+
+            </p>
+
+            <!-- =================================================
+                 IDENTITÉ DU PROPRIÉTAIRE
+            ================================================== -->
+
+            <section class="owner-identity-card">
+
+                <div class="owner-document-avatar">
+                    {{ proprietaire.prenom|slice:":1" }}{{ proprietaire.nom|slice:":1" }}
+                </div>
+
+                <div class="owner-document-content">
+
+                    <h3 class="owner-document-name">
+                        {{ proprietaire.prenom|default:"" }}
+                        {{ proprietaire.nom|default:"" }}
+                    </h3>
+
+                    <div class="owner-document-grid">
+
+                        <div class="owner-document-info">
+
+                            <strong>Code client :</strong>
+                            <br>
+
+                            {{ proprietaire.code_client|default:"Non attribué" }}
+
+                        </div>
+
+                        <div class="owner-document-info">
+
+                            <strong>Statut résident :</strong>
+                            <br>
+
+                            {% if proprietaire.resident %}
+                                Résident
+                            {% else %}
+                                Non résident
+                            {% endif %}
+
+                        </div>
+
+                        <div class="owner-document-info">
+
+                            <strong>Téléphone :</strong>
+                            <br>
+
+                            {{ proprietaire.telephone|default:"Non renseigné" }}
+
+                        </div>
+
+                        <div class="owner-document-info">
+
+                            <strong>Courriel :</strong>
+                            <br>
+
+                            {{ proprietaire.email|default:"Non renseigné" }}
+
+                        </div>
+
+                        <div class="owner-document-info">
+
+                            <strong>Adresse :</strong>
+                            <br>
+
+                            {{ proprietaire.adresse|default:"Non renseignée" }}
+
+                        </div>
+
+                        <div class="owner-document-info">
+
+                            <strong>Date d’enregistrement :</strong>
+                            <br>
+
+                            {{ proprietaire.date_creation|date:"d/m/Y"|default:"Non renseignée" }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- =================================================
+                 LISTE DES BÂTIMENTS
+            ================================================== -->
+
+            <section class="buildings-section">
+
+                <div class="section-heading">
+
+                    <h3 class="section-title">
+                        Bâtiments associés au propriétaire
+                    </h3>
+
+                    <span class="section-count">
+
+                        {{ nombre_batiments|default:"0" }}
+
+                        bâtiment{{ nombre_batiments|pluralize }}
+
+                    </span>
+
+                </div>
+
+                <div class="buildings-table-wrapper">
+
+                    <table class="buildings-table">
+
+                        <thead>
+
+                            <tr>
+                                <th>N°</th>
+                                <th>Code</th>
+                                <th>Désignation</th>
+                                <th>Adresse</th>
+                                <th>Ville</th>
+                                <th>Statut</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for batiment in batiments %}
+
+                                <tr>
+
+                                    <td>
+
+                                        <div class="building-number">
+                                            {{ forloop.counter }}
+                                        </div>
+
+                                    </td>
+
+                                    <td>
+
+                                        <span class="building-code">
+                                            {{ batiment.code_batiment|default:"—" }}
+                                        </span>
+
+                                    </td>
+
+                                    <td>
+
+                                        <span class="building-name">
+                                            {{ batiment.nom|default:"Bâtiment immobilier" }}
+                                        </span>
+
+                                    </td>
+
+                                    <td>
+                                        {{ batiment.adresse|default:"—" }}
+                                    </td>
+
+                                    <td>
+                                        {{ batiment.ville|default:"—" }}
+                                    </td>
+
+                                    <td>
+
+                                        <span class="building-status">
+                                            {{ batiment.statut_occupation|default:"Enregistré" }}
+                                        </span>
+
+                                    </td>
+
+                                </tr>
+
+                            {% empty %}
+
+                                <tr>
+
+                                    <td
+                                        colspan="6"
+                                        class="empty-building"
+                                    >
+                                        Aucun bâtiment n’est associé à ce propriétaire.
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+            <!-- =================================================
+                 CERTIFICATION
+            ================================================== -->
+
+            <p class="certification-text">
+
+                En foi de quoi, la présente attestation est délivrée à
+                l’intéressé(e) pour servir et valoir ce que de droit.
+
+                Elle confirme que les
+
+                <strong>
+                    {{ nombre_batiments|default:"0" }}
+                    bâtiment{{ nombre_batiments|pluralize }}
+                </strong>
+
+                mentionnés ci-dessus sont enregistrés dans le portefeuille
+                de gestion de notre agence sous le dossier du propriétaire
+
+                <strong>
+                    {{ proprietaire.prenom }}
+                    {{ proprietaire.nom }}
+                </strong>.
+
+            </p>
+
+            <!-- =================================================
+                 AVERTISSEMENT
+            ================================================== -->
+
+            <div class="legal-notice">
+
+                <div class="legal-notice-icon">
+                    !
+                </div>
+
+                <div>
+
+                    Cette attestation confirme uniquement le rattachement
+                    administratif des bâtiments dans le système de gestion
+                    de l’agence.
+
+                    Elle ne remplace pas un titre foncier, un acte notarié,
+                    un certificat de propriété ni tout autre document officiel
+                    délivré par une autorité publique compétente.
+
+                </div>
+
+            </div>
+
+            <!-- =================================================
+                 SIGNATURE
+            ================================================== -->
+
+            <section class="signature-section">
+
+                <div class="signature-location">
+
+                    Fait à
+
+                    <strong>
+                        {{ agence.ville|default:"________________" }}
+                    </strong>,
+
+                    le
+
+                    <strong>
+                        {{ date_emission|date:"d/m/Y" }}
+                    </strong>.
+
+                    <br><br>
+
+                    Référence :
+
+                    <strong>
+                        {{ reference_document|default:"Non disponible" }}
+                    </strong>
+
+                </div>
+
+                <div class="signature-box">
+
+                    <div class="signature-space"></div>
+
+                    <div class="signature-title">
+                        Signature du responsable de l’agence
+                    </div>
+
+                    <div class="signature-name">
+                        {{ signataire|default:"Responsable de l’agence" }}
+                    </div>
+
+                    <div class="stamp-area">
+                        Cachet officiel de l’agence
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- =================================================
+                 PIED DE PAGE
+            ================================================== -->
+
+            <footer class="document-footer">
+
+                <div>
+
+                    Document généré par le système de gestion immobilière de
+
+                    <strong>
+                        {{ agence.nom|default:"l’agence" }}
+                    </strong>.
+
+                    <br>
+
+                    Toute modification non autorisée peut entraîner
+                    l’invalidation du document.
+
+                </div>
+
+                <div class="verification-code">
+
+                    <div class="verification-symbol">
+                        ✓
+                    </div>
+
+                    <div>
+
+                        Document vérifiable avec la référence
+
+                        <br>
+
+                        <span class="footer-reference">
+                            {{ reference_document|default:"Non disponible" }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </footer>
+
+        </div>
+
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const printButton =
+                document.getElementById("printDocumentButton");
+
+            const closeButton =
+                document.getElementById("closeDocumentButton");
+
+
+            if (printButton) {
+
+                printButton.addEventListener("click", function () {
+
+                    const originalText =
+                        printButton.innerHTML;
+
+                    printButton.innerHTML =
+                        "Préparation du document...";
+
+                    printButton.disabled = true;
+
+                    window.setTimeout(function () {
+
+                        window.print();
+
+                        printButton.innerHTML =
+                            originalText;
+
+                        printButton.disabled = false;
+
+                    }, 250);
+
+                });
+
+            }
+
+
+            if (closeButton) {
+
+                closeButton.addEventListener("click", function () {
+
+                    if (window.history.length > 1) {
+
+                        window.history.back();
+
+                    } else {
+
+                        window.close();
+
+                    }
+
+                });
+
+            }
+
+        });
+    </script>
+
+</body>
+
+</html>

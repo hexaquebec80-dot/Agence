@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="card-modern">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div>
+                <h2 class="fw-bold mb-1">
+                    <i class="fa-solid fa-user-tie text-primary"></i>
+                    Ajouter un propriétaire
+                </h2>
+
+                <p class="text-muted mb-0">
+                    Enregistrer un nouveau propriétaire immobilier
+                </p>
+            </div>
+
+            <a href="{% url 'proprietaires' %}"
+               class="btn btn-outline-secondary rounded-4">
+                <i class="fa-solid fa-arrow-left"></i>
+                Retour
+            </a>
+
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} rounded-4 mb-4">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Code client</label>
+                    <input type="text"
+                           name="code_client"
+                           class="form-control form-control-lg rounded-4"
+                           placeholder="Ex: CLI-001"
+                           required>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Nom</label>
+                    <input type="text"
+                           name="nom"
+                           class="form-control form-control-lg rounded-4"
+                           placeholder="Nom"
+                           required>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Prénom</label>
+                    <input type="text"
+                           name="prenom"
+                           class="form-control form-control-lg rounded-4"
+                           placeholder="Prénom"
+                           required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Téléphone</label>
+                    <input type="text"
+                           name="telephone"
+                           class="form-control form-control-lg rounded-4"
+                           placeholder="+1 514 000 0000"
+                           required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Adresse email</label>
+                    <input type="email"
+                           name="email"
+                           class="form-control form-control-lg rounded-4"
+                           placeholder="email@exemple.com">
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label class="form-label fw-bold">Adresse complète</label>
+                    <input type="text"
+                           name="adresse"
+                           class="form-control form-control-lg rounded-4"
+                           placeholder="Adresse du propriétaire"
+                           required>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label class="form-label fw-bold">Statut résident</label>
+                    <select name="resident"
+                            class="form-select form-select-lg rounded-4">
+                        <option value="True">Résident</option>
+                        <option value="False">Non résident</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-flex justify-content-end gap-3">
+
+                <a href="{% url 'proprietaires' %}"
+                   class="btn btn-light btn-lg rounded-4">
+                    Annuler
+                </a>
+
+                <button type="submit"
+                        class="btn btn-primary btn-lg rounded-4 px-5">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Enregistrer
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

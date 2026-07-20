@@ -1,0 +1,1414 @@
+```html
+{% extends "base.html" %}
+
+{% block title %}
+Ajouter une dépense
+{% endblock %}
+
+{% block content %}
+
+<style>
+    :root{
+        --navy:#071a3d;
+        --blue:#0057ff;
+        --blue-soft:#eef4ff;
+        --red:#ef4444;
+        --red-soft:#fff1f2;
+        --green:#16a34a;
+        --green-soft:#ecfdf3;
+        --orange:#f59e0b;
+        --orange-soft:#fff7ed;
+        --purple:#7c3aed;
+        --purple-soft:#f5f3ff;
+        --text:#172033;
+        --muted:#6b7280;
+        --border:#e5eaf2;
+        --white:#ffffff;
+        --bg:#f5f8ff;
+        --shadow:0 18px 50px rgba(7,26,61,.10);
+    }
+
+    *{
+        box-sizing:border-box;
+    }
+
+    body{
+        background:var(--bg);
+    }
+
+    .expense-page{
+        padding:28px;
+        min-height:100vh;
+    }
+
+    .expense-container{
+        max-width:1100px;
+        margin:0 auto;
+    }
+
+    .expense-hero{
+        position:relative;
+        overflow:hidden;
+        background:
+            radial-gradient(
+                circle at 90% 15%,
+                rgba(255,255,255,.18),
+                transparent 28%
+            ),
+            linear-gradient(
+                135deg,
+                var(--navy),
+                var(--blue)
+            );
+        border-radius:28px;
+        padding:32px;
+        color:white;
+        box-shadow:0 24px 60px rgba(0,87,255,.20);
+        margin-bottom:24px;
+    }
+
+    .expense-hero::before{
+        content:"";
+        position:absolute;
+        width:230px;
+        height:230px;
+        border-radius:50%;
+        background:rgba(255,255,255,.07);
+        right:-70px;
+        bottom:-100px;
+    }
+
+    .expense-hero-content{
+        position:relative;
+        z-index:2;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:20px;
+    }
+
+    .hero-left{
+        display:flex;
+        align-items:center;
+        gap:18px;
+    }
+
+    .hero-icon{
+        width:66px;
+        height:66px;
+        min-width:66px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        border-radius:20px;
+        background:rgba(255,255,255,.16);
+        border:1px solid rgba(255,255,255,.22);
+        backdrop-filter:blur(10px);
+        font-size:27px;
+    }
+
+    .hero-text small{
+        display:inline-flex;
+        align-items:center;
+        gap:7px;
+        padding:7px 12px;
+        border-radius:999px;
+        background:rgba(255,255,255,.13);
+        font-size:12px;
+        font-weight:800;
+        margin-bottom:9px;
+    }
+
+    .hero-text h1{
+        margin:0;
+        font-size:30px;
+        font-weight:900;
+        letter-spacing:-.7px;
+    }
+
+    .hero-text p{
+        margin:8px 0 0;
+        color:rgba(255,255,255,.78);
+        font-size:14px;
+    }
+
+    .back-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:9px;
+        min-height:46px;
+        padding:0 18px;
+        border-radius:14px;
+        background:white;
+        color:var(--navy);
+        text-decoration:none;
+        font-weight:800;
+        transition:.25s ease;
+        white-space:nowrap;
+    }
+
+    .back-btn:hover{
+        transform:translateY(-2px);
+        color:var(--blue);
+        box-shadow:0 12px 30px rgba(0,0,0,.14);
+    }
+
+    .messages-zone{
+        margin-bottom:20px;
+    }
+
+    .alert-pro{
+        display:flex;
+        align-items:center;
+        gap:12px;
+        padding:15px 17px;
+        border-radius:16px;
+        margin-bottom:10px;
+        font-weight:700;
+        font-size:14px;
+    }
+
+    .alert-pro.success{
+        background:var(--green-soft);
+        color:#166534;
+        border:1px solid #bbf7d0;
+    }
+
+    .alert-pro.error{
+        background:var(--red-soft);
+        color:#b91c1c;
+        border:1px solid #fecdd3;
+    }
+
+    .alert-pro.warning{
+        background:var(--orange-soft);
+        color:#9a3412;
+        border:1px solid #fed7aa;
+    }
+
+    .expense-grid{
+        display:grid;
+        grid-template-columns:minmax(0,1fr) 310px;
+        gap:22px;
+        align-items:start;
+    }
+
+    .form-card{
+        background:white;
+        border:1px solid var(--border);
+        border-radius:24px;
+        box-shadow:var(--shadow);
+        overflow:hidden;
+    }
+
+    .form-card-header{
+        padding:22px 24px;
+        border-bottom:1px solid var(--border);
+        display:flex;
+        align-items:center;
+        gap:13px;
+    }
+
+    .form-card-icon{
+        width:46px;
+        height:46px;
+        min-width:46px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        border-radius:14px;
+        background:var(--blue-soft);
+        color:var(--blue);
+        font-size:18px;
+    }
+
+    .form-card-header h2{
+        margin:0;
+        color:var(--navy);
+        font-size:19px;
+        font-weight:900;
+    }
+
+    .form-card-header p{
+        margin:4px 0 0;
+        color:var(--muted);
+        font-size:13px;
+    }
+
+    .expense-form{
+        padding:24px;
+    }
+
+    .type-section{
+        margin-bottom:24px;
+    }
+
+    .section-label{
+        display:block;
+        margin-bottom:10px;
+        color:var(--navy);
+        font-size:13px;
+        font-weight:900;
+    }
+
+    .type-selector{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:12px;
+    }
+
+    .type-option{
+        position:relative;
+    }
+
+    .type-option input{
+        position:absolute;
+        opacity:0;
+        pointer-events:none;
+    }
+
+    .type-card{
+        min-height:92px;
+        padding:16px;
+        border-radius:17px;
+        border:2px solid var(--border);
+        background:#fff;
+        display:flex;
+        align-items:center;
+        gap:13px;
+        cursor:pointer;
+        transition:.25s ease;
+    }
+
+    .type-card:hover{
+        border-color:#b8cbff;
+        transform:translateY(-2px);
+    }
+
+    .type-icon{
+        width:46px;
+        height:46px;
+        min-width:46px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        border-radius:14px;
+        font-size:18px;
+    }
+
+    .type-icon.agence{
+        background:var(--blue-soft);
+        color:var(--blue);
+    }
+
+    .type-icon.owner{
+        background:var(--purple-soft);
+        color:var(--purple);
+    }
+
+    .type-card strong{
+        display:block;
+        color:var(--navy);
+        font-size:14px;
+        font-weight:900;
+    }
+
+    .type-card small{
+        display:block;
+        color:var(--muted);
+        margin-top:4px;
+        line-height:1.4;
+    }
+
+    .type-option input:checked + .type-card{
+        border-color:var(--blue);
+        background:var(--blue-soft);
+        box-shadow:0 10px 25px rgba(0,87,255,.12);
+    }
+
+    .type-option.owner-option input:checked + .type-card{
+        border-color:var(--purple);
+        background:var(--purple-soft);
+    }
+
+    .form-grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:18px;
+    }
+
+    .form-group{
+        margin-bottom:18px;
+    }
+
+    .form-group.full{
+        grid-column:1 / -1;
+    }
+
+    .form-label{
+        display:flex;
+        align-items:center;
+        gap:7px;
+        margin-bottom:8px;
+        color:var(--navy);
+        font-size:13px;
+        font-weight:900;
+    }
+
+    .form-label i{
+        color:var(--blue);
+        width:15px;
+    }
+
+    .required{
+        color:var(--red);
+    }
+
+    .input-wrap{
+        position:relative;
+    }
+
+    .input-icon{
+        position:absolute;
+        top:50%;
+        left:15px;
+        transform:translateY(-50%);
+        color:#94a3b8;
+        pointer-events:none;
+        z-index:2;
+    }
+
+    .form-control-pro,
+    .form-select-pro{
+        width:100%;
+        height:50px;
+        border:1px solid var(--border);
+        border-radius:14px;
+        background:#fbfcff;
+        color:var(--text);
+        padding:0 15px;
+        font-size:14px;
+        font-family:inherit;
+        outline:none;
+        transition:.22s ease;
+    }
+
+    .with-icon{
+        padding-left:44px;
+    }
+
+    .form-control-pro:focus,
+    .form-select-pro:focus{
+        border-color:var(--blue);
+        background:white;
+        box-shadow:0 0 0 4px rgba(0,87,255,.10);
+    }
+
+    textarea.form-control-pro{
+        height:120px;
+        resize:vertical;
+        padding-top:14px;
+        line-height:1.6;
+    }
+
+    input[type="file"].form-control-pro{
+        height:auto;
+        min-height:50px;
+        padding:11px 14px;
+        cursor:pointer;
+    }
+
+    input[type="file"].form-control-pro::file-selector-button{
+        border:none;
+        border-radius:10px;
+        background:var(--blue-soft);
+        color:var(--blue);
+        font-weight:800;
+        padding:9px 13px;
+        margin-right:12px;
+        cursor:pointer;
+    }
+
+    .help-text{
+        display:block;
+        margin-top:7px;
+        color:var(--muted);
+        font-size:12px;
+    }
+
+    #proprietaireBlock{
+        grid-column:1 / -1;
+        display:none;
+        padding:18px;
+        border-radius:18px;
+        background:var(--purple-soft);
+        border:1px solid #ddd6fe;
+        margin-bottom:4px;
+    }
+
+    #proprietaireBlock.active{
+        display:block;
+        animation:fadeOwner .3s ease;
+    }
+
+    @keyframes fadeOwner{
+        from{
+            opacity:0;
+            transform:translateY(-8px);
+        }
+
+        to{
+            opacity:1;
+            transform:translateY(0);
+        }
+    }
+
+    .owner-info{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        margin-bottom:13px;
+        color:#5b21b6;
+        font-size:13px;
+        font-weight:800;
+    }
+
+    .form-actions{
+        display:flex;
+        align-items:center;
+        justify-content:flex-end;
+        gap:12px;
+        margin-top:8px;
+        padding-top:22px;
+        border-top:1px solid var(--border);
+    }
+
+    .btn-cancel,
+    .btn-submit{
+        min-height:49px;
+        padding:0 20px;
+        border-radius:14px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:9px;
+        font-size:14px;
+        font-weight:900;
+        text-decoration:none;
+        cursor:pointer;
+        transition:.25s ease;
+    }
+
+    .btn-cancel{
+        background:#f3f5f9;
+        color:var(--navy);
+        border:1px solid var(--border);
+    }
+
+    .btn-cancel:hover{
+        background:#e9edf5;
+        color:var(--navy);
+    }
+
+    .btn-submit{
+        border:none;
+        color:white;
+        background:linear-gradient(135deg,var(--navy),var(--blue));
+        box-shadow:0 12px 25px rgba(0,87,255,.22);
+    }
+
+    .btn-submit:hover{
+        transform:translateY(-2px);
+        box-shadow:0 16px 32px rgba(0,87,255,.28);
+    }
+
+    .btn-submit:disabled{
+        opacity:.65;
+        cursor:not-allowed;
+        transform:none;
+    }
+
+    .side-panel{
+        display:flex;
+        flex-direction:column;
+        gap:16px;
+    }
+
+    .info-card{
+        background:white;
+        border:1px solid var(--border);
+        border-radius:21px;
+        padding:20px;
+        box-shadow:0 12px 35px rgba(7,26,61,.07);
+    }
+
+    .info-card h3{
+        margin:0 0 14px;
+        color:var(--navy);
+        font-size:16px;
+        font-weight:900;
+    }
+
+    .info-item{
+        display:flex;
+        gap:11px;
+        padding:12px 0;
+        border-bottom:1px solid #eef1f6;
+    }
+
+    .info-item:last-child{
+        border-bottom:none;
+        padding-bottom:0;
+    }
+
+    .info-item:first-of-type{
+        padding-top:0;
+    }
+
+    .mini-icon{
+        width:38px;
+        height:38px;
+        min-width:38px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        border-radius:12px;
+    }
+
+    .mini-icon.blue{
+        background:var(--blue-soft);
+        color:var(--blue);
+    }
+
+    .mini-icon.purple{
+        background:var(--purple-soft);
+        color:var(--purple);
+    }
+
+    .mini-icon.orange{
+        background:var(--orange-soft);
+        color:var(--orange);
+    }
+
+    .info-item strong{
+        display:block;
+        color:var(--navy);
+        font-size:13px;
+        font-weight:900;
+    }
+
+    .info-item span{
+        display:block;
+        margin-top:3px;
+        color:var(--muted);
+        font-size:12px;
+        line-height:1.45;
+    }
+
+    .security-card{
+        background:linear-gradient(135deg,#071a3d,#0d2b62);
+        color:white;
+        border:none;
+    }
+
+    .security-card h3{
+        color:white;
+    }
+
+    .security-card p{
+        margin:0;
+        color:rgba(255,255,255,.72);
+        font-size:13px;
+        line-height:1.6;
+    }
+
+    .security-icon{
+        width:48px;
+        height:48px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        border-radius:15px;
+        background:rgba(255,255,255,.12);
+        margin-bottom:14px;
+        font-size:19px;
+    }
+
+    @media(max-width:950px){
+        .expense-grid{
+            grid-template-columns:1fr;
+        }
+
+        .side-panel{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+        }
+    }
+
+    @media(max-width:700px){
+        .expense-page{
+            padding:15px;
+        }
+
+        .expense-hero{
+            padding:22px;
+            border-radius:21px;
+        }
+
+        .expense-hero-content{
+            flex-direction:column;
+            align-items:flex-start;
+        }
+
+        .hero-left{
+            align-items:flex-start;
+        }
+
+        .hero-icon{
+            width:55px;
+            height:55px;
+            min-width:55px;
+            border-radius:17px;
+        }
+
+        .hero-text h1{
+            font-size:23px;
+        }
+
+        .back-btn{
+            width:100%;
+        }
+
+        .form-grid{
+            grid-template-columns:1fr;
+        }
+
+        .form-group.full,
+        #proprietaireBlock{
+            grid-column:auto;
+        }
+
+        .type-selector{
+            grid-template-columns:1fr;
+        }
+
+        .side-panel{
+            grid-template-columns:1fr;
+        }
+
+        .form-actions{
+            flex-direction:column-reverse;
+        }
+
+        .btn-cancel,
+        .btn-submit{
+            width:100%;
+        }
+    }
+
+    @media(max-width:430px){
+        .hero-left{
+            flex-direction:column;
+        }
+
+        .expense-form{
+            padding:18px;
+        }
+
+        .form-card-header{
+            padding:18px;
+        }
+    }
+</style>
+
+<div class="expense-page">
+    <div class="expense-container">
+
+        <section class="expense-hero">
+            <div class="expense-hero-content">
+
+                <div class="hero-left">
+
+                    <div class="hero-icon">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+
+                    <div class="hero-text">
+                        <small>
+                            <i class="fa-solid fa-wallet"></i>
+                            Gestion financière
+                        </small>
+
+                        <h1>Ajouter une dépense</h1>
+
+                        <p>
+                            Enregistrez une dépense de l’agence
+                            ou d’un propriétaire.
+                        </p>
+                    </div>
+
+                </div>
+
+                {% if type_depense == "proprietaire" %}
+                    <a href="{% url 'rapports' %}"
+                       class="back-btn">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Retour aux rapports
+                    </a>
+                {% else %}
+                    <a href="{% url 'depenses_agence' %}"
+                       class="back-btn">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Dépenses agence
+                    </a>
+                {% endif %}
+
+            </div>
+        </section>
+
+        {% if messages %}
+            <div class="messages-zone">
+                {% for message in messages %}
+                    <div class="alert-pro
+                        {% if message.tags == 'success' %}
+                            success
+                        {% elif message.tags == 'warning' %}
+                            warning
+                        {% else %}
+                            error
+                        {% endif %}
+                    ">
+                        {% if message.tags == "success" %}
+                            <i class="fa-solid fa-circle-check"></i>
+                        {% elif message.tags == "warning" %}
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        {% else %}
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                        {% endif %}
+
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="expense-grid">
+
+            <div class="form-card">
+
+                <div class="form-card-header">
+
+                    <div class="form-card-icon">
+                        <i class="fa-solid fa-file-circle-plus"></i>
+                    </div>
+
+                    <div>
+                        <h2>Informations de la dépense</h2>
+                        <p>
+                            Complétez les informations ci-dessous.
+                        </p>
+                    </div>
+
+                </div>
+
+                <form method="POST"
+                      enctype="multipart/form-data"
+                      class="expense-form"
+                      id="expenseForm">
+
+                    {% csrf_token %}
+
+                    <div class="type-section">
+
+                        <span class="section-label">
+                            Type de dépense
+                            <span class="required">*</span>
+                        </span>
+
+                        <div class="type-selector">
+
+                            <label class="type-option">
+
+                                <input
+                                    type="radio"
+                                    name="type_depense"
+                                    value="agence"
+                                    id="typeAgence"
+                                    {% if type_depense == "agence" %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                <span class="type-card">
+
+                                    <span class="type-icon agence">
+                                        <i class="fa-solid fa-building"></i>
+                                    </span>
+
+                                    <span>
+                                        <strong>Dépense agence</strong>
+                                        <small>
+                                            Frais directement supportés
+                                            par l’agence.
+                                        </small>
+                                    </span>
+
+                                </span>
+
+                            </label>
+
+                            <label class="type-option owner-option">
+
+                                <input
+                                    type="radio"
+                                    name="type_depense"
+                                    value="proprietaire"
+                                    id="typeProprietaire"
+                                    {% if type_depense == "proprietaire" %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                <span class="type-card">
+
+                                    <span class="type-icon owner">
+                                        <i class="fa-solid fa-user-tie"></i>
+                                    </span>
+
+                                    <span>
+                                        <strong>Dépense propriétaire</strong>
+                                        <small>
+                                            Dépense imputée au compte
+                                            d’un propriétaire.
+                                        </small>
+                                    </span>
+
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-grid">
+
+                        <div id="proprietaireBlock"
+                             class="{% if type_depense == 'proprietaire' %}active{% endif %}">
+
+                            <div class="owner-info">
+                                <i class="fa-solid fa-circle-info"></i>
+
+                                <span>
+                                    Sélectionnez le propriétaire
+                                    concerné par cette dépense.
+                                </span>
+                            </div>
+
+                            <label class="form-label"
+                                   for="proprietaire">
+                                <i class="fa-solid fa-user-tie"></i>
+                                Propriétaire
+                                <span class="required">*</span>
+                            </label>
+
+                            <select
+                                name="proprietaire"
+                                id="proprietaire"
+                                class="form-select-pro"
+                            >
+                                <option value="">
+                                    -- Sélectionner un propriétaire --
+                                </option>
+
+                                {% for proprietaire in proprietaires %}
+                                    <option
+                                        value="{{ proprietaire.id }}"
+                                        {% if request.POST.proprietaire == proprietaire.id|stringformat:"s" %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        {{ proprietaire.nom }}
+                                        {{ proprietaire.prenom }}
+                                    </option>
+                                {% empty %}
+                                    <option value="" disabled>
+                                        Aucun propriétaire disponible
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label class="form-label"
+                                   for="titre">
+                                <i class="fa-solid fa-pen"></i>
+                                Titre de la dépense
+                                <span class="required">*</span>
+                            </label>
+
+                            <div class="input-wrap">
+
+                                <i class="fa-solid fa-receipt input-icon"></i>
+
+                                <input
+                                    type="text"
+                                    name="titre"
+                                    id="titre"
+                                    class="form-control-pro with-icon"
+                                    placeholder="Ex : Réparation du compteur"
+                                    value="{{ request.POST.titre|default:'' }}"
+                                    maxlength="200"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label class="form-label"
+                                   for="montant">
+                                <i class="fa-solid fa-money-bill-wave"></i>
+                                Montant
+                                <span class="required">*</span>
+                            </label>
+
+                            <div class="input-wrap">
+
+                                <i class="fa-solid fa-coins input-icon"></i>
+
+                                <input
+                                    type="number"
+                                    name="montant"
+                                    id="montant"
+                                    class="form-control-pro with-icon"
+                                    placeholder="0.00"
+                                    min="0.01"
+                                    step="0.01"
+                                    value="{{ request.POST.montant|default:'' }}"
+                                    required
+                                >
+
+                            </div>
+
+                            <small class="help-text">
+                                Montant total de la dépense.
+                            </small>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label class="form-label"
+                                   for="date_depense">
+                                <i class="fa-solid fa-calendar-days"></i>
+                                Date de dépense
+                                <span class="required">*</span>
+                            </label>
+
+                            <div class="input-wrap">
+
+                                <i class="fa-solid fa-calendar input-icon"></i>
+
+                                <input
+                                    type="date"
+                                    name="date_depense"
+                                    id="date_depense"
+                                    class="form-control-pro with-icon"
+                                    value="{{ request.POST.date_depense|default:'' }}"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label class="form-label"
+                                   for="categorie">
+                                <i class="fa-solid fa-layer-group"></i>
+                                Catégorie
+                                <span class="required">*</span>
+                            </label>
+
+                            <select
+                                name="categorie"
+                                id="categorie"
+                                class="form-select-pro"
+                                required
+                            >
+                                <option value="">
+                                    -- Choisir une catégorie --
+                                </option>
+
+                                <option value="entretien"
+                                    {% if request.POST.categorie == "entretien" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Entretien
+                                </option>
+
+                                <option value="reparation"
+                                    {% if request.POST.categorie == "reparation" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Réparation
+                                </option>
+
+                                <option value="electricite"
+                                    {% if request.POST.categorie == "electricite" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Électricité
+                                </option>
+
+                                <option value="eau"
+                                    {% if request.POST.categorie == "eau" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Eau
+                                </option>
+
+                                <option value="gardiennage"
+                                    {% if request.POST.categorie == "gardiennage" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Gardiennage
+                                </option>
+
+                                <option value="nettoyage"
+                                    {% if request.POST.categorie == "nettoyage" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Nettoyage
+                                </option>
+
+                                <option value="taxe"
+                                    {% if request.POST.categorie == "taxe" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Taxe
+                                </option>
+
+                                <option value="assurance"
+                                    {% if request.POST.categorie == "assurance" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Assurance
+                                </option>
+
+                                <option value="transport"
+                                    {% if request.POST.categorie == "transport" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Transport
+                                </option>
+
+                                <option value="administration"
+                                    {% if request.POST.categorie == "administration" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Administration
+                                </option>
+
+                                <option value="construction"
+                                    {% if request.POST.categorie == "construction" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Construction
+                                </option>
+
+                                <option value="autre"
+                                    {% if request.POST.categorie == "autre" or not request.POST.categorie %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Autre
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="form-group full">
+
+                            <label class="form-label"
+                                   for="description">
+                                <i class="fa-solid fa-align-left"></i>
+                                Description
+                            </label>
+
+                            <textarea
+                                name="description"
+                                id="description"
+                                class="form-control-pro"
+                                placeholder="Ajoutez les détails de la dépense..."
+                            >{{ request.POST.description|default:'' }}</textarea>
+
+                        </div>
+
+                        <div class="form-group full">
+
+                            <label class="form-label"
+                                   for="justificatif">
+                                <i class="fa-solid fa-paperclip"></i>
+                                Justificatif
+                            </label>
+
+                            <input
+                                type="file"
+                                name="justificatif"
+                                id="justificatif"
+                                class="form-control-pro"
+                                accept=".pdf,.jpg,.jpeg,.png,.webp"
+                            >
+
+                            <small class="help-text">
+                                Formats acceptés : PDF, JPG, JPEG, PNG et WEBP.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-actions">
+
+                        {% if type_depense == "agence" %}
+                            <a href="{% url 'depenses_agence' %}"
+                               class="btn-cancel">
+                                <i class="fa-solid fa-xmark"></i>
+                                Annuler
+                            </a>
+                        {% else %}
+                            <a href="{% url 'rapports' %}"
+                               class="btn-cancel">
+                                <i class="fa-solid fa-xmark"></i>
+                                Annuler
+                            </a>
+                        {% endif %}
+
+                        <button type="submit"
+                                class="btn-submit"
+                                id="submitBtn">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span>Enregistrer la dépense</span>
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <aside class="side-panel">
+
+                <div class="info-card">
+
+                    <h3>
+                        <i class="fa-solid fa-circle-info"></i>
+                        Types de dépenses
+                    </h3>
+
+                    <div class="info-item">
+
+                        <div class="mini-icon blue">
+                            <i class="fa-solid fa-building"></i>
+                        </div>
+
+                        <div>
+                            <strong>Agence</strong>
+                            <span>
+                                Charges internes, transport,
+                                administration et fonctionnement.
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div class="info-item">
+
+                        <div class="mini-icon purple">
+                            <i class="fa-solid fa-user-tie"></i>
+                        </div>
+
+                        <div>
+                            <strong>Propriétaire</strong>
+                            <span>
+                                Réparations, entretien, construction
+                                et charges liées à ses biens.
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div class="info-item">
+
+                        <div class="mini-icon orange">
+                            <i class="fa-solid fa-file-invoice"></i>
+                        </div>
+
+                        <div>
+                            <strong>Justificatif</strong>
+                            <span>
+                                Ajoutez une facture, un reçu,
+                                une photo ou un document PDF.
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="info-card security-card">
+
+                    <div class="security-icon">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <h3>Suivi financier</h3>
+
+                    <p>
+                        Chaque dépense est associée à votre agence
+                        et enregistrée avec le nom de l’utilisateur
+                        qui l’a ajoutée.
+                    </p>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+    const form =
+        document.getElementById("expenseForm");
+
+    const typeAgence =
+        document.getElementById("typeAgence");
+
+    const typeProprietaire =
+        document.getElementById("typeProprietaire");
+
+    const proprietaireBlock =
+        document.getElementById("proprietaireBlock");
+
+    const proprietaireSelect =
+        document.getElementById("proprietaire");
+
+    const dateInput =
+        document.getElementById("date_depense");
+
+    const submitBtn =
+        document.getElementById("submitBtn");
+
+
+    function updateExpenseType(){
+
+        if(typeProprietaire.checked){
+
+            proprietaireBlock.classList.add("active");
+
+            proprietaireSelect.setAttribute(
+                "required",
+                "required"
+            );
+
+        }else{
+
+            proprietaireBlock.classList.remove("active");
+
+            proprietaireSelect.removeAttribute(
+                "required"
+            );
+
+            proprietaireSelect.value = "";
+        }
+    }
+
+
+    typeAgence.addEventListener(
+        "change",
+        updateExpenseType
+    );
+
+    typeProprietaire.addEventListener(
+        "change",
+        updateExpenseType
+    );
+
+
+    if(dateInput && !dateInput.value){
+
+        const today = new Date();
+
+        const year =
+            today.getFullYear();
+
+        const month =
+            String(today.getMonth() + 1)
+                .padStart(2, "0");
+
+        const day =
+            String(today.getDate())
+                .padStart(2, "0");
+
+        dateInput.value =
+            `${year}-${month}-${day}`;
+    }
+
+
+    form.addEventListener("submit", function(event){
+
+        if(
+            typeProprietaire.checked
+            && !proprietaireSelect.value
+        ){
+            event.preventDefault();
+
+            proprietaireSelect.focus();
+
+            alert(
+                "Veuillez sélectionner un propriétaire."
+            );
+
+            return;
+        }
+
+        submitBtn.disabled = true;
+
+        submitBtn.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>Enregistrement...</span>
+        `;
+    });
+
+
+    updateExpenseType();
+
+});
+</script>
+
+{% endblock %}
+

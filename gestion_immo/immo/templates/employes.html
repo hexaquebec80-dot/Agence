@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+.staff-hero{
+    background:linear-gradient(135deg,#071a3d,#0057ff);
+    color:white;
+    border-radius:28px;
+    padding:28px;
+    margin-bottom:25px;
+    box-shadow:0 20px 50px rgba(0,87,255,.22);
+}
+
+.staff-card{
+    background:white;
+    border:1px solid #e4ecf8;
+    border-radius:26px;
+    padding:25px;
+    box-shadow:0 15px 45px rgba(15,23,42,.08);
+}
+
+.avatar-staff{
+    width:48px;
+    height:48px;
+    border-radius:16px;
+    background:#eaf1ff;
+    color:#0057ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+}
+
+.badge-agent{
+    background:#eaf1ff;
+    color:#0057ff;
+    padding:8px 14px;
+    border-radius:999px;
+    font-weight:800;
+}
+
+.badge-sec{
+    background:#dcfce7;
+    color:#15803d;
+    padding:8px 14px;
+    border-radius:999px;
+    font-weight:800;
+}
+
+.table thead th{
+    background:#f8fbff;
+    color:#4d638a;
+    text-transform:uppercase;
+    font-size:12px;
+    padding:18px;
+}
+
+.table tbody td{
+    padding:18px;
+}
+
+.action-btn{
+    width:38px;
+    height:38px;
+    border-radius:12px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+}
+</style>
+
+<div class="staff-hero d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+        <h2 class="fw-bold mb-1">
+            <i class="fa-solid fa-user-group"></i>
+            Agents & Secrétaires
+        </h2>
+        <p class="mb-0 opacity-75">Gestion du personnel de l’agence</p>
+    </div>
+
+    <a href="{% url 'ajouter_employe' %}" class="btn btn-light rounded-4 px-4">
+        <i class="fa-solid fa-plus"></i>
+        Ajouter
+    </a>
+</div>
+
+<div class="staff-card">
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+
+            <thead>
+                <tr>
+                    <th>Employé</th>
+                    <th>Poste</th>
+                    <th>Téléphone</th>
+                    <th>Ville</th>
+                    <th>Salaire</th>
+                    <th>Utilisateur</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for e in employes %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar-staff">
+                                {{ e.nom|slice:":1" }}{{ e.prenom|slice:":1" }}
+                            </div>
+                            <div>
+                                <strong>{{ e.nom }} {{ e.prenom }}</strong><br>
+                                <small class="text-muted">{{ e.nationalite }}</small>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        {% if e.type_employe == "agent" %}
+                            <span class="badge-agent">Agent immobilier</span>
+                        {% else %}
+                            <span class="badge-sec">Secrétaire</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <i class="fa-solid fa-phone text-primary me-2"></i>
+                        {{ e.telephone }}
+                    </td>
+
+                    <td>
+                        <i class="fa-solid fa-location-dot text-primary me-2"></i>
+                        {{ e.ville }}
+                    </td>
+
+                    <td>
+                        <strong>{{ e.salaire }} $</strong>
+                    </td>
+
+                    <td>
+                        <span class="badge bg-dark rounded-pill">
+                            {{ e.utilisateur.username }}
+                        </span>
+                    </td>
+
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+
+                            <a href="{% url 'detail_employe' e.id %}"
+                               class="btn btn-sm btn-outline-primary action-btn"
+                               title="Voir">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+
+                            <a href="{% url 'modifier_employe' e.id %}"
+                               class="btn btn-sm btn-outline-warning action-btn"
+                               title="Modifier">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+
+                            <a href="{% url 'supprimer_employe' e.id %}"
+                               class="btn btn-sm btn-outline-danger action-btn"
+                               onclick="return confirm('Voulez-vous vraiment supprimer cet employé ?')"
+                               title="Supprimer">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+
+                        </div>
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-5">
+                        <i class="fa-solid fa-users-slash fa-2x mb-3"></i><br>
+                        Aucun employé enregistré
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

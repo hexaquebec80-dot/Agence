@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+.edit-owner-hero{
+    background:linear-gradient(135deg,#071a3d,#0057ff);
+    color:white;
+    border-radius:28px;
+    padding:30px;
+    margin-bottom:25px;
+    box-shadow:0 20px 50px rgba(0,87,255,.22);
+}
+
+.edit-owner-card{
+    background:white;
+    border:1px solid #e4ecf8;
+    border-radius:28px;
+    padding:30px;
+    box-shadow:0 15px 45px rgba(15,23,42,.08);
+}
+
+.hero-icon{
+    width:70px;
+    height:70px;
+    border-radius:22px;
+    background:rgba(255,255,255,.15);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+}
+
+.section-title{
+    font-size:18px;
+    font-weight:900;
+    color:#071a3d;
+    margin-bottom:20px;
+}
+
+.form-label{
+    font-weight:800;
+    color:#071a3d;
+}
+
+.form-control,
+.form-select{
+    height:56px;
+    border-radius:16px;
+    border:1px solid #dbe4ff;
+}
+
+.form-control:focus,
+.form-select:focus{
+    border-color:#0057ff;
+    box-shadow:0 0 0 .2rem rgba(0,87,255,.15);
+}
+
+.input-icon{
+    position:relative;
+}
+
+.input-icon i{
+    position:absolute;
+    left:17px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#0057ff;
+    z-index:2;
+}
+
+.input-icon input,
+.input-icon select{
+    padding-left:48px;
+}
+</style>
+
+<div class="edit-owner-hero d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+    <div class="d-flex align-items-center gap-3">
+        <div class="hero-icon">
+            <i class="fa-solid fa-user-pen"></i>
+        </div>
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                Modifier le propriétaire
+            </h2>
+
+            <p class="mb-0 opacity-75">
+                {{ proprietaire.nom }} {{ proprietaire.prenom }}
+            </p>
+        </div>
+    </div>
+
+    <a href="{% url 'detail_proprietaire' proprietaire.id %}"
+       class="btn btn-light rounded-4 px-4">
+        <i class="fa-solid fa-arrow-left"></i>
+        Retour
+    </a>
+
+</div>
+
+<div class="edit-owner-card">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} rounded-4">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <h5 class="section-title">
+            <i class="fa-solid fa-id-card text-primary"></i>
+            Informations du propriétaire
+        </h5>
+
+        <div class="row">
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Code client</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-barcode"></i>
+                    <input type="text"
+                           name="code_client"
+                           value="{{ proprietaire.code_client }}"
+                           class="form-control"
+                           required>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Nom</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text"
+                           name="nom"
+                           value="{{ proprietaire.nom }}"
+                           class="form-control"
+                           required>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Prénom</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-user-pen"></i>
+                    <input type="text"
+                           name="prenom"
+                           value="{{ proprietaire.prenom }}"
+                           class="form-control"
+                           required>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Téléphone</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-phone"></i>
+                    <input type="text"
+                           name="telephone"
+                           value="{{ proprietaire.telephone }}"
+                           class="form-control"
+                           required>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Adresse email</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email"
+                           name="email"
+                           value="{{ proprietaire.email }}"
+                           class="form-control">
+                </div>
+            </div>
+
+            <div class="col-md-12 mb-3">
+                <label class="form-label">Adresse complète</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <input type="text"
+                           name="adresse"
+                           value="{{ proprietaire.adresse }}"
+                           class="form-control"
+                           required>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Statut résident</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-house-user"></i>
+                    <select name="resident"
+                            class="form-select">
+                        <option value="True"
+                        {% if proprietaire.resident %}
+                            selected
+                        {% endif %}
+                        >
+                            Résident
+                        </option>
+
+                        <option value="False"
+                        {% if not proprietaire.resident %}
+                            selected
+                        {% endif %}
+                        >
+                            Non résident
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-end gap-3 flex-wrap">
+
+            <a href="{% url 'detail_proprietaire' proprietaire.id %}"
+               class="btn btn-light btn-lg rounded-4">
+                Annuler
+            </a>
+
+            <button type="submit"
+                    class="btn btn-primary btn-lg rounded-4 px-5">
+                <i class="fa-solid fa-floppy-disk"></i>
+                Enregistrer
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

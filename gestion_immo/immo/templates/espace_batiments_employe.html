@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>Bâtiments — Espace employé</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        :root{
+            --primary:#0057ff;
+            --primary-dark:#003dad;
+            --navy:#071a3d;
+            --background:#f4f7fc;
+            --white:#ffffff;
+            --border:#e2e8f0;
+            --muted:#64748b;
+            --success:#16a34a;
+            --danger:#dc2626;
+            --warning:#f59e0b;
+            --purple:#7c3aed;
+            --shadow:0 18px 45px rgba(15,23,42,.08);
+        }
+
+        *{
+            box-sizing:border-box;
+        }
+
+        html{
+            scroll-behavior:smooth;
+        }
+
+        body{
+            margin:0;
+            min-height:100vh;
+            color:#0f172a;
+            font-family:"Segoe UI",Arial,sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(0,87,255,.11),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at bottom left,
+                    rgba(124,58,237,.06),
+                    transparent 25%
+                ),
+                var(--background);
+        }
+
+        a{
+            text-decoration:none;
+        }
+
+        .page-wrapper{
+            width:100%;
+            max-width:1480px;
+            margin:0 auto;
+            padding:28px;
+        }
+
+        /* =========================================
+           MESSAGES
+        ========================================= */
+
+        .page-alert{
+            display:flex;
+            align-items:flex-start;
+            gap:11px;
+            padding:15px 17px;
+            margin-bottom:18px;
+            border:1px solid transparent;
+            border-radius:17px;
+            font-weight:750;
+            box-shadow:0 10px 28px rgba(15,23,42,.06);
+        }
+
+        .page-alert-success{
+            color:#166534;
+            background:#ecfdf3;
+            border-color:#bbf7d0;
+        }
+
+        .page-alert-error,
+        .page-alert-danger{
+            color:#991b1b;
+            background:#fef2f2;
+            border-color:#fecaca;
+        }
+
+        .page-alert-warning{
+            color:#92400e;
+            background:#fffbeb;
+            border-color:#fde68a;
+        }
+
+        .page-alert-info{
+            color:#1d4ed8;
+            background:#eff6ff;
+            border-color:#bfdbfe;
+        }
+
+        /* =========================================
+           HERO
+        ========================================= */
+
+        .page-hero{
+            position:relative;
+            overflow:hidden;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:28px;
+            padding:35px;
+            margin-bottom:24px;
+            color:white;
+            border-radius:32px;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(255,255,255,.18),
+                    transparent 30%
+                ),
+                linear-gradient(
+                    135deg,
+                    #06152f,
+                    #071a3d 48%,
+                    #0057ff
+                );
+
+            box-shadow:0 25px 65px rgba(7,26,61,.22);
+        }
+
+        .page-hero::before{
+            content:"";
+            position:absolute;
+            top:-110px;
+            right:-90px;
+            width:280px;
+            height:280px;
+            border-radius:50%;
+            background:rgba(255,255,255,.07);
+        }
+
+        .page-hero::after{
+            content:"";
+            position:absolute;
+            left:-90px;
+            bottom:-140px;
+            width:260px;
+            height:260px;
+            border-radius:50%;
+            background:rgba(255,255,255,.05);
+        }
+
+        .hero-content,
+        .hero-side{
+            position:relative;
+            z-index:2;
+        }
+
+        .hero-content{
+            flex:1;
+        }
+
+        .back-link{
+            display:inline-flex;
+            align-items:center;
+            gap:9px;
+            padding:11px 15px;
+            margin-bottom:22px;
+            color:white;
+            border:1px solid rgba(255,255,255,.20);
+            border-radius:15px;
+            background:rgba(255,255,255,.12);
+            font-weight:900;
+            transition:.23s ease;
+        }
+
+        .back-link:hover{
+            color:white;
+            background:rgba(255,255,255,.22);
+            transform:translateX(-3px);
+        }
+
+        .hero-badge{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            padding:8px 13px;
+            margin-bottom:13px;
+            border-radius:999px;
+            background:rgba(255,255,255,.14);
+            font-size:12px;
+            font-weight:900;
+        }
+
+        .page-hero h1{
+            margin:0 0 10px;
+            font-size:clamp(30px,4vw,45px);
+            font-weight:950;
+        }
+
+        .page-hero p{
+            max-width:720px;
+            margin:0;
+            color:rgba(255,255,255,.80);
+            line-height:1.7;
+        }
+
+        .employee-card{
+            display:flex;
+            align-items:center;
+            gap:13px;
+            min-width:260px;
+            padding:17px;
+            border:1px solid rgba(255,255,255,.18);
+            border-radius:21px;
+            background:rgba(255,255,255,.12);
+            backdrop-filter:blur(8px);
+        }
+
+        .employee-icon{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            flex-shrink:0;
+            width:52px;
+            height:52px;
+            color:var(--primary);
+            border-radius:17px;
+            background:white;
+            font-size:20px;
+        }
+
+        .employee-card small{
+            display:block;
+            margin-bottom:2px;
+            color:rgba(255,255,255,.70);
+            font-weight:700;
+        }
+
+        .employee-card strong{
+            display:block;
+            color:white;
+            font-weight:900;
+        }
+
+        /* =========================================
+           NOTICE
+        ========================================= */
+
+        .readonly-notice{
+            display:flex;
+            align-items:flex-start;
+            gap:12px;
+            padding:16px 18px;
+            margin-bottom:24px;
+            color:#1e40af;
+            border:1px solid #bfdbfe;
+            border-radius:18px;
+            background:#eff6ff;
+            font-weight:750;
+        }
+
+        /* =========================================
+           STATISTIQUES
+        ========================================= */
+
+        .stat-card{
+            height:100%;
+            padding:23px;
+            border:1px solid var(--border);
+            border-radius:24px;
+            background:white;
+            box-shadow:0 13px 34px rgba(15,23,42,.07);
+            transition:.24s ease;
+        }
+
+        .stat-card:hover{
+            transform:translateY(-5px);
+            box-shadow:0 20px 45px rgba(15,23,42,.12);
+        }
+
+        .stat-icon{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            width:57px;
+            height:57px;
+            margin-bottom:16px;
+            border-radius:18px;
+            font-size:22px;
+        }
+
+        .icon-blue{
+            color:var(--primary);
+            background:#eaf1ff;
+        }
+
+        .icon-purple{
+            color:var(--purple);
+            background:#f3e8ff;
+        }
+
+        .icon-red{
+            color:#b91c1c;
+            background:#fee2e2;
+        }
+
+        .icon-green{
+            color:#15803d;
+            background:#dcfce7;
+        }
+
+        .stat-label{
+            margin-bottom:4px;
+            color:var(--muted);
+            font-size:14px;
+            font-weight:750;
+        }
+
+        .stat-number{
+            color:var(--navy);
+            font-size:32px;
+            font-weight:950;
+        }
+
+        /* =========================================
+           OUTILS
+        ========================================= */
+
+        .tools-card{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:20px;
+            padding:21px;
+            margin:25px 0;
+            border:1px solid var(--border);
+            border-radius:23px;
+            background:white;
+            box-shadow:0 13px 34px rgba(15,23,42,.06);
+        }
+
+        .tools-title h2{
+            margin:0 0 4px;
+            color:var(--navy);
+            font-size:21px;
+            font-weight:950;
+        }
+
+        .tools-title p{
+            margin:0;
+            color:var(--muted);
+            font-size:13px;
+        }
+
+        .tools-actions{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            width:min(100%,620px);
+        }
+
+        .search-wrapper{
+            position:relative;
+            flex:1;
+        }
+
+        .search-wrapper i{
+            position:absolute;
+            top:50%;
+            left:16px;
+            color:#94a3b8;
+            transform:translateY(-50%);
+        }
+
+        .search-input,
+        .status-filter{
+            width:100%;
+            min-height:49px;
+            padding:11px 15px;
+            color:#172033;
+            border:1px solid #dbe4f0;
+            border-radius:15px;
+            outline:none;
+            background:#f8fbff;
+        }
+
+        .search-input{
+            padding-left:45px;
+        }
+
+        .status-filter{
+            width:210px;
+            cursor:pointer;
+        }
+
+        .search-input:focus,
+        .status-filter:focus{
+            border-color:var(--primary);
+            box-shadow:0 0 0 4px rgba(0,87,255,.10);
+        }
+
+        /* =========================================
+           BÂTIMENTS
+        ========================================= */
+
+        .buildings-grid{
+            display:grid;
+            grid-template-columns:repeat(3,minmax(0,1fr));
+            gap:23px;
+        }
+
+        .building-card{
+            position:relative;
+            overflow:hidden;
+            display:flex;
+            flex-direction:column;
+            min-height:445px;
+            border:1px solid var(--border);
+            border-radius:27px;
+            background:white;
+            box-shadow:var(--shadow);
+            transition:.25s ease;
+        }
+
+        .building-card:hover{
+            transform:translateY(-7px);
+            border-color:#bfd3ff;
+            box-shadow:0 26px 55px rgba(15,23,42,.14);
+        }
+
+        .building-cover{
+            position:relative;
+            overflow:hidden;
+            padding:25px;
+            color:white;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(255,255,255,.20),
+                    transparent 35%
+                ),
+                linear-gradient(
+                    135deg,
+                    #071a3d,
+                    #0057ff
+                );
+        }
+
+        .building-cover::after{
+            content:"";
+            position:absolute;
+            right:-50px;
+            bottom:-60px;
+            width:145px;
+            height:145px;
+            border-radius:50%;
+            background:rgba(255,255,255,.08);
+        }
+
+        .building-cover-top{
+            position:relative;
+            z-index:2;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            margin-bottom:19px;
+        }
+
+        .building-icon{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            width:58px;
+            height:58px;
+            border:1px solid rgba(255,255,255,.18);
+            border-radius:19px;
+            background:rgba(255,255,255,.14);
+            font-size:23px;
+        }
+
+        .building-code{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            padding:8px 11px;
+            border-radius:999px;
+            background:rgba(255,255,255,.14);
+            font-size:11px;
+            font-weight:900;
+        }
+
+        .building-cover h3{
+            position:relative;
+            z-index:2;
+            margin:0 0 8px;
+            font-size:23px;
+            font-weight:950;
+        }
+
+        .building-address{
+            position:relative;
+            z-index:2;
+            display:flex;
+            align-items:flex-start;
+            gap:8px;
+            margin:0;
+            color:rgba(255,255,255,.78);
+            font-size:13px;
+            line-height:1.6;
+        }
+
+        .building-body{
+            display:flex;
+            flex:1;
+            flex-direction:column;
+            padding:23px;
+        }
+
+        .owner-row{
+            display:flex;
+            align-items:center;
+            gap:11px;
+            padding-bottom:17px;
+            margin-bottom:18px;
+            border-bottom:1px solid #edf1f7;
+        }
+
+        .owner-icon{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            flex-shrink:0;
+            width:42px;
+            height:42px;
+            color:var(--purple);
+            border-radius:13px;
+            background:#f3e8ff;
+        }
+
+        .owner-row small{
+            display:block;
+            color:var(--muted);
+            font-size:11px;
+            font-weight:700;
+        }
+
+        .owner-row strong{
+            display:block;
+            color:var(--navy);
+            font-size:14px;
+            font-weight:900;
+        }
+
+        .building-stats{
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            gap:10px;
+            margin-bottom:19px;
+        }
+
+        .mini-stat{
+            padding:13px 8px;
+            text-align:center;
+            border:1px solid #edf1f7;
+            border-radius:15px;
+            background:#f8fbff;
+        }
+
+        .mini-stat strong{
+            display:block;
+            margin-bottom:2px;
+            color:var(--navy);
+            font-size:20px;
+            font-weight:950;
+        }
+
+        .mini-stat small{
+            color:var(--muted);
+            font-size:10px;
+            font-weight:750;
+        }
+
+        .occupation-block{
+            margin-bottom:20px;
+        }
+
+        .occupation-row{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:10px;
+            margin-bottom:9px;
+        }
+
+        .occupation-row span{
+            color:var(--muted);
+            font-size:12px;
+            font-weight:750;
+        }
+
+        .occupation-row strong{
+            color:var(--primary);
+            font-size:13px;
+            font-weight:950;
+        }
+
+        .progress-track{
+            width:100%;
+            height:10px;
+            overflow:hidden;
+            border-radius:999px;
+            background:#e8eef7;
+        }
+
+        .progress-value{
+            width:0;
+            height:100%;
+            border-radius:999px;
+
+            background:linear-gradient(
+                90deg,
+                #0057ff,
+                #7c3aed
+            );
+
+            transition:width .6s ease;
+        }
+
+        .building-footer{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:11px;
+            margin-top:auto;
+        }
+
+        .status-badge{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            padding:8px 11px;
+            border-radius:999px;
+            font-size:11px;
+            font-weight:900;
+        }
+
+        .status-free{
+            color:#166534;
+            background:#dcfce7;
+        }
+
+        .status-partial{
+            color:#92400e;
+            background:#fef3c7;
+        }
+
+        .status-full{
+            color:#991b1b;
+            background:#fee2e2;
+        }
+
+        .status-empty{
+            color:#475569;
+            background:#e2e8f0;
+        }
+
+        .detail-button{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+            min-height:44px;
+            padding:10px 16px;
+            color:white;
+            border-radius:14px;
+
+            background:linear-gradient(
+                135deg,
+                var(--primary),
+                var(--primary-dark)
+            );
+
+            font-size:13px;
+            font-weight:900;
+            box-shadow:0 11px 24px rgba(0,87,255,.20);
+            transition:.22s ease;
+        }
+
+        .detail-button:hover{
+            color:white;
+            transform:translateY(-2px);
+            box-shadow:0 15px 30px rgba(0,87,255,.28);
+        }
+
+        /* =========================================
+           ÉTAT VIDE
+        ========================================= */
+
+        .empty-state{
+            grid-column:1/-1;
+            padding:65px 25px;
+            text-align:center;
+            border:1px dashed #cbd5e1;
+            border-radius:27px;
+            background:white;
+        }
+
+        .empty-icon{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            width:80px;
+            height:80px;
+            margin:0 auto 18px;
+            color:var(--primary);
+            border-radius:25px;
+            background:#eaf1ff;
+            font-size:31px;
+        }
+
+        .empty-state h3{
+            margin:0 0 8px;
+            color:var(--navy);
+            font-weight:950;
+        }
+
+        .empty-state p{
+            margin:0;
+            color:var(--muted);
+        }
+
+        /* =========================================
+           RESPONSIVE
+        ========================================= */
+
+        @media(max-width:1180px){
+            .buildings-grid{
+                grid-template-columns:repeat(2,minmax(0,1fr));
+            }
+        }
+
+        @media(max-width:850px){
+            .page-wrapper{
+                padding:18px;
+            }
+
+            .page-hero{
+                align-items:flex-start;
+                flex-direction:column;
+            }
+
+            .hero-side,
+            .employee-card{
+                width:100%;
+            }
+
+            .tools-card{
+                align-items:flex-start;
+                flex-direction:column;
+            }
+
+            .tools-actions{
+                width:100%;
+            }
+        }
+
+        @media(max-width:650px){
+            .page-wrapper{
+                padding:10px;
+            }
+
+            .page-hero{
+                padding:23px 19px;
+                border-radius:22px;
+            }
+
+            .tools-actions{
+                align-items:stretch;
+                flex-direction:column;
+            }
+
+            .status-filter{
+                width:100%;
+            }
+
+            .buildings-grid{
+                grid-template-columns:1fr;
+            }
+
+            .building-card{
+                border-radius:22px;
+            }
+
+            .building-footer{
+                align-items:stretch;
+                flex-direction:column;
+            }
+
+            .detail-button{
+                width:100%;
+            }
+
+            .back-link{
+                width:100%;
+                justify-content:center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page-wrapper">
+
+    {% if messages %}
+        {% for message in messages %}
+
+            <div class="page-alert page-alert-{{ message.tags|default:'info' }}">
+
+                {% if message.tags == "success" %}
+                    <i class="fa-solid fa-circle-check mt-1"></i>
+
+                {% elif message.tags == "error" or message.tags == "danger" %}
+                    <i class="fa-solid fa-circle-exclamation mt-1"></i>
+
+                {% elif message.tags == "warning" %}
+                    <i class="fa-solid fa-triangle-exclamation mt-1"></i>
+
+                {% else %}
+                    <i class="fa-solid fa-circle-info mt-1"></i>
+                {% endif %}
+
+                <span>{{ message }}</span>
+
+            </div>
+
+        {% endfor %}
+    {% endif %}
+
+    <!-- HERO -->
+
+    <section class="page-hero">
+
+        <div class="hero-content">
+
+            <a
+                href="{% url 'espace_employe' %}"
+                class="back-link"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+                Retour à mon espace
+            </a>
+
+            <div>
+                <span class="hero-badge">
+                    <i class="fa-solid fa-building-shield"></i>
+                    Consultation des bâtiments
+                </span>
+            </div>
+
+            <h1>Bâtiments de l’agence</h1>
+
+            <p>
+                Consultez les bâtiments, les logements occupés,
+                les logements disponibles et le taux d’occupation
+                de chaque immeuble.
+            </p>
+
+        </div>
+
+        <div class="hero-side">
+
+            <div class="employee-card">
+
+                <div class="employee-icon">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+
+                <div>
+                    <small>Employé connecté</small>
+
+                    <strong>
+                        {{ employe.prenom|default:"Employé" }}
+                        {{ employe.nom|default:"" }}
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <div class="readonly-notice">
+
+        <i class="fa-solid fa-circle-info mt-1"></i>
+
+        <div>
+            Cet espace est en lecture seule. Vous pouvez consulter
+            les bâtiments et leurs logements, sans pouvoir modifier
+            ou supprimer les informations.
+        </div>
+
+    </div>
+
+    <!-- STATISTIQUES -->
+
+    <section class="row g-4 mb-4">
+
+        <div class="col-sm-6 col-xl-3">
+
+            <article class="stat-card">
+
+                <div class="stat-icon icon-blue">
+                    <i class="fa-solid fa-building"></i>
+                </div>
+
+                <div class="stat-label">Total bâtiments</div>
+
+                <div class="stat-number">
+                    {{ total_batiments|default:"0" }}
+                </div>
+
+            </article>
+
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+
+            <article class="stat-card">
+
+                <div class="stat-icon icon-purple">
+                    <i class="fa-solid fa-door-closed"></i>
+                </div>
+
+                <div class="stat-label">Total logements</div>
+
+                <div class="stat-number">
+                    {{ total_logements|default:"0" }}
+                </div>
+
+            </article>
+
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+
+            <article class="stat-card">
+
+                <div class="stat-icon icon-red">
+                    <i class="fa-solid fa-house-lock"></i>
+                </div>
+
+                <div class="stat-label">Logements occupés</div>
+
+                <div class="stat-number">
+                    {{ total_occupes|default:"0" }}
+                </div>
+
+            </article>
+
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+
+            <article class="stat-card">
+
+                <div class="stat-icon icon-green">
+                    <i class="fa-solid fa-door-open"></i>
+                </div>
+
+                <div class="stat-label">Logements disponibles</div>
+
+                <div class="stat-number">
+                    {{ total_libres|default:"0" }}
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+    <!-- RECHERCHE -->
+
+    <section class="tools-card">
+
+        <div class="tools-title">
+
+            <h2>Liste des bâtiments</h2>
+
+            <p>
+                Recherchez un bâtiment ou filtrez selon son occupation.
+            </p>
+
+        </div>
+
+        <div class="tools-actions">
+
+            <div class="search-wrapper">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="search"
+                    id="buildingSearch"
+                    class="search-input"
+                    placeholder="Nom, code, adresse, ville..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+            <select
+                id="statusFilter"
+                class="status-filter"
+            >
+                <option value="">Tous les statuts</option>
+                <option value="libre">Libres</option>
+                <option value="partiellement occupé">Partiellement occupés</option>
+                <option value="complètement occupé">Complètement occupés</option>
+                <option value="aucun logement">Aucun logement</option>
+            </select>
+
+        </div>
+
+    </section>
+
+    <!-- BÂTIMENTS -->
+
+    <section
+        class="buildings-grid"
+        id="buildingsGrid"
+    >
+
+        {% for batiment in batiments %}
+
+            <article
+                class="building-card"
+                data-search="
+                    {{ batiment.nom|default:''|lower }}
+                    {{ batiment.code_batiment|default:''|lower }}
+                    {{ batiment.adresse|default:''|lower }}
+                    {{ batiment.ville|default:''|lower }}
+                    {{ batiment.proprietaire.nom|default:''|lower }}
+                    {{ batiment.proprietaire.prenom|default:''|lower }}
+                "
+                data-status="{{ batiment.statut_occupation_employe|default:''|lower }}"
+            >
+
+                <div class="building-cover">
+
+                    <div class="building-cover-top">
+
+                        <div class="building-icon">
+                            <i class="fa-solid fa-building"></i>
+                        </div>
+
+                        <span class="building-code">
+
+                            <i class="fa-solid fa-hashtag"></i>
+
+                            {{ batiment.code_batiment|default:"Sans code" }}
+
+                        </span>
+
+                    </div>
+
+                    <h3>
+                        {{ batiment.nom|default:"Bâtiment" }}
+                    </h3>
+
+                    <p class="building-address">
+
+                        <i class="fa-solid fa-location-dot mt-1"></i>
+
+                        <span>
+
+                            {{ batiment.adresse|default:"Adresse non renseignée" }}
+
+                            {% if batiment.ville %}
+                                — {{ batiment.ville }}
+                            {% endif %}
+
+                        </span>
+
+                    </p>
+
+                </div>
+
+                <div class="building-body">
+
+                    <div class="owner-row">
+
+                        <div class="owner-icon">
+                            <i class="fa-solid fa-user-tie"></i>
+                        </div>
+
+                        <div>
+
+                            <small>Propriétaire</small>
+
+                            <strong>
+
+                                {% if batiment.proprietaire %}
+
+                                    {{ batiment.proprietaire.nom|default:"" }}
+                                    {{ batiment.proprietaire.prenom|default:"" }}
+
+                                {% else %}
+
+                                    Non renseigné
+
+                                {% endif %}
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    <div class="building-stats">
+
+                        <div class="mini-stat">
+
+                            <strong>
+                                {{ batiment.total_logements_employe|default:"0" }}
+                            </strong>
+
+                            <small>Logements</small>
+
+                        </div>
+
+                        <div class="mini-stat">
+
+                            <strong>
+                                {{ batiment.total_occupes_employe|default:"0" }}
+                            </strong>
+
+                            <small>Occupés</small>
+
+                        </div>
+
+                        <div class="mini-stat">
+
+                            <strong>
+                                {{ batiment.total_libres_employe|default:"0" }}
+                            </strong>
+
+                            <small>Libres</small>
+
+                        </div>
+
+                    </div>
+
+                    <div class="occupation-block">
+
+                        <div class="occupation-row">
+
+                            <span>Taux d’occupation</span>
+
+                            <strong>
+                                {{ batiment.taux_occupation_employe|default:"0" }} %
+                            </strong>
+
+                        </div>
+
+                        <div class="progress-track">
+
+                            <div
+                                class="progress-value building-progress"
+                                data-percentage="{{ batiment.taux_occupation_employe|default:'0' }}"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="building-footer">
+
+                        {% if batiment.statut_occupation_employe == "Libre" %}
+
+                            <span class="status-badge status-free">
+
+                                <i class="fa-solid fa-circle-check"></i>
+                                Libre
+
+                            </span>
+
+                        {% elif batiment.statut_occupation_employe == "Complètement occupé" %}
+
+                            <span class="status-badge status-full">
+
+                                <i class="fa-solid fa-lock"></i>
+                                Tout occupé
+
+                            </span>
+
+                        {% elif batiment.statut_occupation_employe == "Partiellement occupé" %}
+
+                            <span class="status-badge status-partial">
+
+                                <i class="fa-solid fa-circle-half-stroke"></i>
+                                Partiellement occupé
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="status-badge status-empty">
+
+                                <i class="fa-solid fa-minus"></i>
+                                Aucun logement
+
+                            </span>
+
+                        {% endif %}
+
+                        <a
+                            href="{% url 'espace_batiment_employe' batiment.id %}"
+                            class="detail-button"
+                        >
+                            Voir le détail
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        {% empty %}
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="fa-solid fa-building-circle-xmark"></i>
+                </div>
+
+                <h3>Aucun bâtiment disponible</h3>
+
+                <p>
+                    Aucun bâtiment n’est enregistré dans cette agence.
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    </section>
+
+    <div
+        class="empty-state d-none mt-4"
+        id="noSearchResult"
+    >
+
+        <div class="empty-icon">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+
+        <h3>Aucun résultat</h3>
+
+        <p>
+            Aucun bâtiment ne correspond à votre recherche.
+        </p>
+
+    </div>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const progressBars =
+        document.querySelectorAll(".building-progress");
+
+    progressBars.forEach(function (progressBar) {
+
+        const rawPercentage =
+            String(
+                progressBar.dataset.percentage || "0"
+            ).replace(",", ".");
+
+        let percentage =
+            Number.parseFloat(rawPercentage);
+
+        if (!Number.isFinite(percentage)) {
+            percentage = 0;
+        }
+
+        percentage = Math.max(
+            0,
+            Math.min(percentage, 100)
+        );
+
+        requestAnimationFrame(function () {
+            progressBar.style.width = percentage + "%";
+        });
+
+    });
+
+    const searchInput =
+        document.getElementById("buildingSearch");
+
+    const statusFilter =
+        document.getElementById("statusFilter");
+
+    const buildingCards =
+        document.querySelectorAll(".building-card");
+
+    const noSearchResult =
+        document.getElementById("noSearchResult");
+
+    function filterBuildings() {
+
+        const searchValue =
+            (
+                searchInput?.value || ""
+            )
+            .trim()
+            .toLowerCase();
+
+        const statusValue =
+            (
+                statusFilter?.value || ""
+            )
+            .trim()
+            .toLowerCase();
+
+        let visibleCount = 0;
+
+        buildingCards.forEach(function (card) {
+
+            const searchableText =
+                (
+                    card.dataset.search || ""
+                ).toLowerCase();
+
+            const cardStatus =
+                (
+                    card.dataset.status || ""
+                ).toLowerCase();
+
+            const matchesSearch =
+                searchableText.includes(searchValue);
+
+            const matchesStatus =
+                statusValue === "" ||
+                cardStatus === statusValue;
+
+            const isVisible =
+                matchesSearch && matchesStatus;
+
+            card.style.display =
+                isVisible ? "flex" : "none";
+
+            if (isVisible) {
+                visibleCount++;
+            }
+
+        });
+
+        if (noSearchResult) {
+
+            if (
+                buildingCards.length > 0 &&
+                visibleCount === 0
+            ) {
+                noSearchResult.classList.remove("d-none");
+            } else {
+                noSearchResult.classList.add("d-none");
+            }
+
+        }
+
+    }
+
+    searchInput?.addEventListener(
+        "input",
+        filterBuildings
+    );
+
+    statusFilter?.addEventListener(
+        "change",
+        filterBuildings
+    );
+
+});
+</script>
+
+</body>
+</html>

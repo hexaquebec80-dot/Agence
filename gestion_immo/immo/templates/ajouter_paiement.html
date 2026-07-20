@@ -1,0 +1,979 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+:root{
+    --primary:#0057ff;
+    --dark:#071a3d;
+    --soft:#f5f8ff;
+    --border:#e5ecf6;
+    --muted:#64748b;
+    --success:#16a34a;
+    --danger:#dc2626;
+    --warning:#f59e0b;
+}
+
+.page-container{
+    max-width:1150px;
+    margin:auto;
+    padding:30px 15px;
+}
+
+.payment-layout{
+    display:grid;
+    grid-template-columns:1fr 1.8fr;
+    gap:24px;
+}
+
+.info-panel{
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(255,255,255,.22),
+            transparent 35%
+        ),
+        linear-gradient(145deg,#071a3d,#0057ff);
+
+    color:white;
+    border-radius:32px;
+    padding:32px;
+    box-shadow:0 25px 60px rgba(0,87,255,.25);
+    position:relative;
+    overflow:hidden;
+}
+
+.info-panel::after{
+    content:"";
+    position:absolute;
+    width:240px;
+    height:240px;
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+    right:-90px;
+    bottom:-90px;
+}
+
+.back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    color:white;
+    text-decoration:none;
+    font-weight:800;
+    background:rgba(255,255,255,.15);
+    padding:10px 14px;
+    border-radius:14px;
+    margin-bottom:28px;
+    position:relative;
+    z-index:2;
+}
+
+.back-link:hover{
+    color:white;
+    background:rgba(255,255,255,.25);
+}
+
+.big-icon{
+    width:78px;
+    height:78px;
+    border-radius:24px;
+    background:rgba(255,255,255,.18);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:34px;
+    margin-bottom:22px;
+    position:relative;
+    z-index:2;
+}
+
+.info-panel h1,
+.info-panel p,
+.info-item{
+    position:relative;
+    z-index:2;
+}
+
+.info-panel h1{
+    font-size:34px;
+    font-weight:900;
+    margin-bottom:14px;
+}
+
+.info-panel p{
+    opacity:.9;
+    line-height:1.7;
+}
+
+.info-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:16px;
+    font-weight:700;
+}
+
+.info-item i{
+    width:36px;
+    height:36px;
+    border-radius:12px;
+    background:rgba(255,255,255,.16);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.form-card{
+    background:white;
+    border-radius:32px;
+    padding:30px;
+    border:1px solid var(--border);
+    box-shadow:0 20px 55px rgba(15,23,42,.08);
+}
+
+.form-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:15px;
+    margin-bottom:26px;
+}
+
+.form-title{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.form-title-icon{
+    width:54px;
+    height:54px;
+    border-radius:18px;
+    background:#eef4ff;
+    color:var(--primary);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+}
+
+.form-title h2{
+    font-size:24px;
+    font-weight:900;
+    color:var(--dark);
+    margin:0;
+}
+
+.form-title small{
+    color:var(--muted);
+    font-weight:600;
+}
+
+.secure-badge{
+    background:#dcfce7;
+    color:#15803d;
+    padding:9px 14px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:900;
+}
+
+.employee-connected{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    background:#eef4ff;
+    border:1px solid #dbeafe;
+    border-radius:18px;
+    padding:15px;
+    margin-bottom:20px;
+}
+
+.employee-connected-icon{
+    width:46px;
+    height:46px;
+    border-radius:15px;
+    background:var(--primary);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+}
+
+.employee-connected small{
+    display:block;
+    color:var(--muted);
+    font-weight:700;
+}
+
+.employee-connected strong{
+    color:var(--dark);
+    font-size:16px;
+}
+
+.form-section{
+    background:#f8fbff;
+    border:1px solid #edf3fb;
+    border-radius:24px;
+    padding:22px;
+    margin-bottom:20px;
+}
+
+.section-label{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    color:var(--muted);
+    font-weight:900;
+    margin-bottom:18px;
+}
+
+.form-label{
+    font-weight:800;
+    color:#1e293b;
+    margin-bottom:8px;
+}
+
+.form-control,
+.form-select{
+    border-radius:16px;
+    padding:13px 14px;
+    border:1px solid #dbe4f0;
+    font-size:15px;
+}
+
+.form-control:focus,
+.form-select:focus{
+    border-color:var(--primary);
+    box-shadow:0 0 0 4px rgba(0,87,255,.10);
+}
+
+.repartition-box{
+    background:white;
+    border:1px solid #dbeafe;
+    border-radius:20px;
+    padding:18px;
+}
+
+.repartition-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 0;
+    border-bottom:1px dashed #e2e8f0;
+}
+
+.repartition-item:last-child{
+    border-bottom:none;
+}
+
+.repartition-label{
+    color:#64748b;
+    font-weight:800;
+}
+
+.repartition-value{
+    font-weight:900;
+    color:#071a3d;
+}
+
+.agence-value{
+    color:#dc2626;
+}
+
+.owner-value{
+    color:#16a34a;
+}
+
+.btn-save{
+    background:linear-gradient(135deg,#0057ff,#003ecb);
+    color:white;
+    border:none;
+    border-radius:18px;
+    padding:15px 24px;
+    font-weight:900;
+    width:100%;
+    box-shadow:0 14px 30px rgba(0,87,255,.22);
+    transition:.2s;
+}
+
+.btn-save:hover{
+    color:white;
+    transform:translateY(-2px);
+}
+
+.btn-cancel{
+    background:#eef4ff;
+    color:#0057ff;
+    border:none;
+    border-radius:18px;
+    padding:15px 24px;
+    font-weight:900;
+    width:100%;
+    text-decoration:none;
+    display:block;
+    text-align:center;
+}
+
+.btn-cancel:hover{
+    background:#dce9ff;
+    color:#003ecb;
+}
+
+.alert{
+    border:none;
+    border-radius:16px;
+    font-weight:700;
+}
+
+@media(max-width:900px){
+    .payment-layout{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:600px){
+    .page-container{
+        padding:18px 10px;
+    }
+
+    .info-panel,
+    .form-card{
+        border-radius:24px;
+        padding:22px;
+    }
+
+    .info-panel h1{
+        font-size:28px;
+    }
+
+    .repartition-item{
+        align-items:flex-start;
+        flex-direction:column;
+        gap:5px;
+    }
+}
+</style>
+
+<div class="page-container">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="payment-layout">
+
+        <aside class="info-panel">
+
+            <a href="{% url 'espace_employe' %}"
+               class="back-link">
+
+                <i class="fa-solid fa-arrow-left"></i>
+                Retour à mon espace
+
+            </a>
+
+            <div class="big-icon">
+                <i class="fa-solid fa-money-bill-wave"></i>
+            </div>
+
+            <h1>Nouveau paiement</h1>
+
+            <p>
+                Enregistrez un paiement et calculez automatiquement
+                la commission de l’agence et le montant net du propriétaire.
+            </p>
+
+            <div class="info-item">
+                <i class="fa-solid fa-user-check"></i>
+                Locataire, bâtiment et propriétaire
+            </div>
+
+            <div class="info-item">
+                <i class="fa-solid fa-percent"></i>
+                Commission agence 10 %
+            </div>
+
+            <div class="info-item">
+                <i class="fa-solid fa-building-user"></i>
+                Montant propriétaire 90 %
+            </div>
+
+            <div class="info-item">
+                <i class="fa-solid fa-file-signature"></i>
+                Reçu, signature et justificatif
+            </div>
+
+        </aside>
+
+        <main class="form-card">
+
+            <div class="form-header">
+
+                <div class="form-title">
+
+                    <div class="form-title-icon">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+
+                    <div>
+                        <h2>Informations du paiement</h2>
+                        <small>Remplissez les champs du versement</small>
+                    </div>
+
+                </div>
+
+                <span class="secure-badge">
+                    <i class="fa-solid fa-shield-halved me-1"></i>
+                    Sécurisé
+                </span>
+
+            </div>
+
+            <div class="employee-connected">
+
+                <div class="employee-connected-icon">
+                    <i class="fa-solid fa-user-tie"></i>
+                </div>
+
+                <div>
+                    <small>Paiement enregistré par</small>
+
+                    <strong>
+                        {{ employe.prenom }} {{ employe.nom }}
+                    </strong>
+                </div>
+
+            </div>
+
+            <form method="POST"
+                  enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                <!-- Employé connecté automatiquement -->
+                <input type="hidden"
+                       name="employe"
+                       value="{{ employe.id }}">
+
+                <div class="form-section">
+
+                    <div class="section-label">
+                        <i class="fa-solid fa-building me-1"></i>
+                        Location et propriétaire
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                <i class="fa-solid fa-user text-primary"></i>
+                                Locataire
+                            </label>
+
+                            <select name="locataire"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">
+                                    Sélectionner un locataire
+                                </option>
+
+                                {% for locataire in locataires %}
+
+                                    <option value="{{ locataire.id }}"
+                                        {% if request.POST.locataire == locataire.id|stringformat:"s" %}
+                                            selected
+                                        {% endif %}>
+
+                                        {{ locataire.prenom }}
+                                        {{ locataire.nom }}
+
+                                        {% if locataire.telephone %}
+                                            - {{ locataire.telephone }}
+                                        {% endif %}
+
+                                    </option>
+
+                                {% empty %}
+
+                                    <option value="" disabled>
+                                        Aucun locataire disponible
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                <i class="fa-solid fa-building text-primary"></i>
+                                Bâtiment / propriétaire
+                            </label>
+
+                            <select name="batiment"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">
+                                    Sélectionner un bâtiment
+                                </option>
+
+                                {% for batiment in batiments %}
+
+                                    <option value="{{ batiment.id }}"
+                                        {% if request.POST.batiment == batiment.id|stringformat:"s" %}
+                                            selected
+                                        {% endif %}>
+
+                                        {{ batiment.nom }}
+
+                                        {% if batiment.proprietaire %}
+                                            -
+                                            {{ batiment.proprietaire.prenom }}
+                                            {{ batiment.proprietaire.nom }}
+                                        {% endif %}
+
+                                    </option>
+
+                                {% empty %}
+
+                                    <option value="" disabled>
+                                        Aucun bâtiment disponible
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Numéro appartement / chambre
+                            </label>
+
+                            <input type="text"
+                                   name="numero_appartement"
+                                   class="form-control"
+                                   value="{{ request.POST.numero_appartement }}"
+                                   placeholder="Exemple : A1, Chambre 2">
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Date début location
+                            </label>
+
+                            <input type="date"
+                                   name="date_debut"
+                                   class="form-control"
+                                   value="{{ request.POST.date_debut }}"
+                                   required>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="form-section">
+
+                    <div class="section-label">
+                        <i class="fa-solid fa-coins me-1"></i>
+                        Paiement et commission
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Montant payé
+                            </label>
+
+                            <input type="number"
+                                   step="0.01"
+                                   min="1"
+                                   name="montant"
+                                   id="montant"
+                                   class="form-control"
+                                   value="{{ request.POST.montant }}"
+                                   placeholder="Exemple : 50000"
+                                   required>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Mois concerné
+                            </label>
+
+                            <input type="text"
+                                   name="mois"
+                                   class="form-control"
+                                   value="{{ request.POST.mois }}"
+                                   placeholder="Exemple : Juillet 2026"
+                                   required>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Mode de paiement
+                            </label>
+
+                            <select name="mode_paiement"
+                                    class="form-select"
+                                    required>
+
+                                <option value="espece"
+                                    {% if request.POST.mode_paiement == "espece" %}
+                                        selected
+                                    {% endif %}>
+                                    Espèces
+                                </option>
+
+                                <option value="virement"
+                                    {% if request.POST.mode_paiement == "virement" %}
+                                        selected
+                                    {% endif %}>
+                                    Virement bancaire
+                                </option>
+
+                                <option value="cheque"
+                                    {% if request.POST.mode_paiement == "cheque" %}
+                                        selected
+                                    {% endif %}>
+                                    Chèque
+                                </option>
+
+                                <option value="orange_money"
+                                    {% if request.POST.mode_paiement == "orange_money" %}
+                                        selected
+                                    {% endif %}>
+                                    Orange Money
+                                </option>
+
+                                <option value="moov_money"
+                                    {% if request.POST.mode_paiement == "moov_money" %}
+                                        selected
+                                    {% endif %}>
+                                    Moov Money
+                                </option>
+
+                                <option value="wave"
+                                    {% if request.POST.mode_paiement == "wave" %}
+                                        selected
+                                    {% endif %}>
+                                    Wave
+                                </option>
+
+                                <option value="carte"
+                                    {% if request.POST.mode_paiement == "carte" %}
+                                        selected
+                                    {% endif %}>
+                                    Carte bancaire
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Statut
+                            </label>
+
+                            <select name="statut"
+                                    class="form-select"
+                                    required>
+
+                                <option value="paye"
+                                    {% if request.POST.statut == "paye" %}
+                                        selected
+                                    {% endif %}>
+                                    Payé
+                                </option>
+
+                                <option value="attente"
+                                    {% if request.POST.statut == "attente" %}
+                                        selected
+                                    {% endif %}>
+                                    En attente
+                                </option>
+
+                                <option value="retard"
+                                    {% if request.POST.statut == "retard" %}
+                                        selected
+                                    {% endif %}>
+                                    En retard
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                    <div class="repartition-box mt-3">
+
+                        <div class="repartition-item">
+
+                            <span class="repartition-label">
+                                Montant total payé
+                            </span>
+
+                            <span class="repartition-value"
+                                  id="totalPreview">
+                                0 FCFA
+                            </span>
+
+                        </div>
+
+                        <div class="repartition-item">
+
+                            <span class="repartition-label">
+                                Commission agence 10 %
+                            </span>
+
+                            <span class="repartition-value agence-value"
+                                  id="agencePreview">
+                                0 FCFA
+                            </span>
+
+                        </div>
+
+                        <div class="repartition-item">
+
+                            <span class="repartition-label">
+                                Montant propriétaire 90 %
+                            </span>
+
+                            <span class="repartition-value owner-value"
+                                  id="ownerPreview">
+                                0 FCFA
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="form-section">
+
+                    <div class="section-label">
+                        <i class="fa-solid fa-file-invoice me-1"></i>
+                        Reçu et validation
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Numéro de reçu
+                            </label>
+
+                            <input type="text"
+                                   name="numero_recu"
+                                   class="form-control"
+                                   value="{{ request.POST.numero_recu }}"
+                                   placeholder="Exemple : REC-001"
+                                   required>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Employé responsable
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="{{ employe.prenom }} {{ employe.nom }}"
+                                   readonly>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+    <label class="form-label">
+        Signature du directeur / administrateur
+    </label>
+
+    <input type="text"
+           name="signature_employe"
+           class="form-control"
+           value="{{ request.POST.signature_employe }}"
+           placeholder="Nom ou signature">
+
+</div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Signature locataire
+                            </label>
+
+                            <input type="text"
+                                   name="signature_locataire"
+                                   class="form-control"
+                                   value="{{ request.POST.signature_locataire }}"
+                                   placeholder="Signature du locataire">
+
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+
+                            <label class="form-label">
+                                Justificatif
+                            </label>
+
+                            <input type="file"
+                                   name="justificatif"
+                                   class="form-control"
+                                   accept=".jpg,.jpeg,.png,.pdf">
+
+                        </div>
+
+                        <div class="col-md-12">
+
+                            <label class="form-label">
+                                Commentaire
+                            </label>
+
+                            <textarea name="commentaire"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="Note interne ou commentaire...">{{ request.POST.commentaire }}</textarea>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="row mt-4">
+
+                    <div class="col-md-5 mb-2">
+
+                        <a href="{% url 'espace_employe' %}"
+                           class="btn-cancel">
+
+                            <i class="fa-solid fa-xmark me-2"></i>
+                            Annuler
+
+                        </a>
+
+                    </div>
+
+                    <div class="col-md-7 mb-2">
+
+                        <button type="submit"
+                                class="btn-save">
+
+                            <i class="fa-solid fa-floppy-disk me-2"></i>
+                            Enregistrer le paiement
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </main>
+
+    </div>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+    const montantInput =
+        document.getElementById("montant");
+
+    const totalPreview =
+        document.getElementById("totalPreview");
+
+    const agencePreview =
+        document.getElementById("agencePreview");
+
+    const ownerPreview =
+        document.getElementById("ownerPreview");
+
+    function formatMoney(value){
+
+        return new Intl.NumberFormat(
+            "fr-FR",
+            {
+                minimumFractionDigits:0,
+                maximumFractionDigits:2
+            }
+        ).format(value) + " FCFA";
+
+    }
+
+    function updatePreview(){
+
+        if(!montantInput){
+            return;
+        }
+
+        const montant =
+            parseFloat(montantInput.value) || 0;
+
+        const commissionAgence =
+            montant * 0.10;
+
+        const montantProprietaire =
+            montant * 0.90;
+
+        totalPreview.textContent =
+            formatMoney(montant);
+
+        agencePreview.textContent =
+            formatMoney(commissionAgence);
+
+        ownerPreview.textContent =
+            formatMoney(montantProprietaire);
+
+    }
+
+    if(montantInput){
+
+        montantInput.addEventListener(
+            "input",
+            updatePreview
+        );
+
+        updatePreview();
+
+    }
+
+});
+</script>
+
+{% endblock %}

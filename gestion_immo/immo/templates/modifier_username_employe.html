@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+.username-hero{
+    background:linear-gradient(135deg,#071a3d,#0057ff);
+    color:white;
+    border-radius:28px;
+    padding:30px;
+    margin-bottom:25px;
+    box-shadow:0 20px 50px rgba(0,87,255,.22);
+}
+
+.username-card{
+    background:white;
+    border:1px solid #e4ecf8;
+    border-radius:28px;
+    padding:30px;
+    box-shadow:0 15px 45px rgba(15,23,42,.08);
+    max-width:720px;
+}
+
+.icon-box{
+    width:70px;
+    height:70px;
+    border-radius:22px;
+    background:rgba(255,255,255,.15);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+}
+
+.input-wrap{
+    position:relative;
+}
+
+.input-wrap i{
+    position:absolute;
+    top:50%;
+    left:18px;
+    transform:translateY(-50%);
+    color:#0057ff;
+}
+
+.input-wrap input{
+    height:58px;
+    border-radius:18px;
+    padding-left:50px;
+    border:1px solid #dbe4ff;
+}
+
+.input-wrap input:focus{
+    border-color:#0057ff;
+    box-shadow:0 0 0 .2rem rgba(0,87,255,.15);
+}
+</style>
+
+<div class="username-hero d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+    <div class="d-flex align-items-center gap-3">
+        <div class="icon-box">
+            <i class="fa-solid fa-user-pen"></i>
+        </div>
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                Modifier le nom utilisateur
+            </h2>
+            <p class="mb-0 opacity-75">
+                {{ employe.nom }} {{ employe.prenom }}
+            </p>
+        </div>
+    </div>
+
+    <a href="{% url 'detail_employe' employe.id %}"
+       class="btn btn-light rounded-4 px-4">
+        <i class="fa-solid fa-arrow-left"></i>
+        Retour
+    </a>
+
+</div>
+
+<div class="username-card">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} rounded-4">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="mb-4">
+        <p class="text-muted mb-1">Nom utilisateur actuel</p>
+        <h4 class="fw-bold">
+            <i class="fa-solid fa-user text-primary"></i>
+            {{ employe.utilisateur.username }}
+        </h4>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label class="form-label fw-bold">
+            Nouveau nom utilisateur
+        </label>
+
+        <div class="input-wrap mb-4">
+            <i class="fa-solid fa-id-badge"></i>
+            <input type="text"
+                   name="username"
+                   value="{{ employe.utilisateur.username }}"
+                   class="form-control form-control-lg"
+                   required>
+        </div>
+
+        <div class="d-flex justify-content-end gap-3 flex-wrap">
+
+            <a href="{% url 'detail_employe' employe.id %}"
+               class="btn btn-light btn-lg rounded-4">
+                Annuler
+            </a>
+
+            <button type="submit"
+                    class="btn btn-primary btn-lg rounded-4 px-5">
+                <i class="fa-solid fa-floppy-disk"></i>
+                Enregistrer
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

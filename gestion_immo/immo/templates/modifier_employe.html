@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+.edit-hero{
+    background:linear-gradient(135deg,#071a3d,#0057ff);
+    color:white;
+    border-radius:28px;
+    padding:30px;
+    margin-bottom:25px;
+    box-shadow:0 20px 50px rgba(0,87,255,.22);
+}
+
+.edit-card{
+    background:white;
+    border:1px solid #e4ecf8;
+    border-radius:28px;
+    padding:30px;
+    box-shadow:0 15px 45px rgba(15,23,42,.08);
+}
+
+.section-title{
+    font-size:18px;
+    font-weight:800;
+    color:#071a3d;
+    margin-bottom:20px;
+}
+
+.form-label{
+    font-weight:700;
+    color:#071a3d;
+}
+
+.form-control,
+.form-select{
+    height:55px;
+    border-radius:16px;
+    border:1px solid #dbe4ff;
+}
+
+.form-control:focus,
+.form-select:focus{
+    border-color:#0057ff;
+    box-shadow:0 0 0 .2rem rgba(0,87,255,.15);
+}
+
+.icon-box{
+    width:68px;
+    height:68px;
+    border-radius:22px;
+    background:rgba(255,255,255,.15);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+}
+
+textarea.form-control{
+    height:auto;
+}
+</style>
+
+<div class="edit-hero d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+    <div class="d-flex align-items-center gap-3">
+        <div class="icon-box">
+            <i class="fa-solid fa-user-pen"></i>
+        </div>
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                Modifier l’employé
+            </h2>
+            <p class="mb-0 opacity-75">
+                {{ employe.nom }} {{ employe.prenom }}
+            </p>
+        </div>
+    </div>
+
+    <a href="{% url 'employes' %}" class="btn btn-light rounded-4 px-4">
+        <i class="fa-solid fa-arrow-left"></i>
+        Retour
+    </a>
+
+</div>
+
+<div class="edit-card">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} rounded-4">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <h5 class="section-title">
+            <i class="fa-solid fa-user text-primary"></i>
+            Informations personnelles
+        </h5>
+
+        <div class="row">
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Nom</label>
+                <input type="text"
+                       name="nom"
+                       value="{{ employe.nom }}"
+                       class="form-control"
+                       required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Prénom</label>
+                <input type="text"
+                       name="prenom"
+                       value="{{ employe.prenom }}"
+                       class="form-control"
+                       required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Téléphone</label>
+                <input type="text"
+                       name="telephone"
+                       value="{{ employe.telephone }}"
+                       class="form-control"
+                       required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Nationalité</label>
+                <input type="text"
+                       name="nationalite"
+                       value="{{ employe.nationalite }}"
+                       class="form-control"
+                       required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Ville</label>
+                <input type="text"
+                       name="ville"
+                       value="{{ employe.ville }}"
+                       class="form-control"
+                       required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Adresse</label>
+                <input type="text"
+                       name="adresse"
+                       value="{{ employe.adresse }}"
+                       class="form-control"
+                       required>
+            </div>
+
+        </div>
+
+        <hr class="my-4">
+
+        <h5 class="section-title">
+            <i class="fa-solid fa-briefcase text-primary"></i>
+            Informations professionnelles
+        </h5>
+
+        <div class="row">
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Type employé</label>
+                <select name="type_employe" class="form-select">
+                    <option value="agent" {% if employe.type_employe == "agent" %}selected{% endif %}>
+                        Agent immobilier
+                    </option>
+
+                    <option value="secretaire" {% if employe.type_employe == "secretaire" %}selected{% endif %}>
+                        Secrétaire
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Numéro de poste</label>
+                <input type="text"
+                       name="numero_poste"
+                       value="{{ employe.numero_poste }}"
+                       class="form-control">
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Salaire</label>
+                <input type="number"
+                       step="0.01"
+                       name="salaire"
+                       value="{{ employe.salaire }}"
+                       class="form-control">
+            </div>
+
+            <div class="col-md-12 mb-3">
+                <label class="form-label">Acte de naissance</label>
+                <input type="text"
+                       name="acte_naissance"
+                       value="{{ employe.acte_naissance }}"
+                       class="form-control"
+                       placeholder="Référence ou numéro du document">
+            </div>
+
+        </div>
+
+        <hr class="my-4">
+
+        <h5 class="section-title">
+            <i class="fa-solid fa-lock text-primary"></i>
+            Compte de connexion
+        </h5>
+
+        <div class="row">
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Nom d'utilisateur</label>
+                <input type="text"
+                       value="{{ employe.utilisateur.username }}"
+                       class="form-control"
+                       readonly>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Mot de passe</label>
+                <div class="d-flex gap-2">
+                    <input type="text"
+                           value="Mot de passe sécurisé"
+                           class="form-control"
+                           readonly>
+
+                    <a href="{% url 'reset_password_employe' employe.id %}"
+                       class="btn btn-warning rounded-4 d-flex align-items-center px-4">
+                        <i class="fa-solid fa-key"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="d-flex justify-content-end gap-3 mt-4 flex-wrap">
+
+            <a href="{% url 'detail_employe' employe.id %}"
+               class="btn btn-light btn-lg rounded-4">
+                Annuler
+            </a>
+
+            <button type="submit"
+                    class="btn btn-primary btn-lg rounded-4 px-5">
+                <i class="fa-solid fa-floppy-disk"></i>
+                Enregistrer
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

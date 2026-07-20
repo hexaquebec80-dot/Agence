@@ -1,0 +1,4052 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <meta
+        name="theme-color"
+        content="#071a3d"
+    >
+
+    <title>
+        Ajouter un paiement - Espace employé
+    </title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        :root{
+            --primary:#0057ff;
+            --primary-dark:#003ecb;
+            --navy:#071a3d;
+            --background:#f4f7fc;
+            --white:#ffffff;
+            --border:#e2e8f0;
+            --muted:#64748b;
+            --success:#16a34a;
+            --danger:#dc2626;
+            --warning:#f59e0b;
+        }
+
+        *{
+            box-sizing:border-box;
+        }
+
+        html{
+            scroll-behavior:smooth;
+        }
+
+        body{
+            margin:0;
+            min-height:100vh;
+
+            color:#0f172a;
+            background:var(--background);
+
+            font-family:
+                "Segoe UI",
+                Arial,
+                sans-serif;
+        }
+
+        button,
+        input,
+        select,
+        textarea{
+            font:inherit;
+        }
+
+        .payment-page{
+            min-height:100vh;
+            padding:32px 18px;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(0,87,255,.09),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at bottom left,
+                    rgba(124,58,237,.06),
+                    transparent 25%
+                ),
+                var(--background);
+        }
+
+        .payment-container{
+            width:100%;
+            max-width:1250px;
+            margin:0 auto;
+        }
+
+
+        /* =====================================================
+           MESSAGES DJANGO
+        ====================================================== */
+
+        .payment-alert{
+            display:flex;
+            align-items:flex-start;
+            gap:12px;
+
+            margin-bottom:18px;
+            padding:16px 18px;
+
+            border:1px solid transparent;
+            border-radius:18px;
+
+            font-weight:750;
+
+            box-shadow:
+                0 10px 25px rgba(15,23,42,.05);
+        }
+
+        .payment-alert i{
+            margin-top:3px;
+            font-size:18px;
+        }
+
+        .payment-alert-success{
+            color:#166534;
+            background:#ecfdf3;
+            border-color:#bbf7d0;
+        }
+
+        .payment-alert-error,
+        .payment-alert-danger{
+            color:#991b1b;
+            background:#fef2f2;
+            border-color:#fecaca;
+        }
+
+        .payment-alert-warning{
+            color:#92400e;
+            background:#fffbeb;
+            border-color:#fde68a;
+        }
+
+        .payment-alert-info{
+            color:#1d4ed8;
+            background:#eff6ff;
+            border-color:#bfdbfe;
+        }
+
+
+        /* =====================================================
+           STRUCTURE
+        ====================================================== */
+
+        .payment-layout{
+            display:grid;
+
+            grid-template-columns:
+                360px
+                minmax(0,1fr);
+
+            gap:26px;
+            align-items:start;
+        }
+
+
+        /* =====================================================
+           PANNEAU GAUCHE
+        ====================================================== */
+
+        .payment-sidebar{
+            position:sticky;
+            top:22px;
+
+            min-height:620px;
+            padding:32px;
+
+            overflow:hidden;
+
+            color:white;
+
+            border-radius:32px;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(255,255,255,.20),
+                    transparent 32%
+                ),
+                linear-gradient(
+                    145deg,
+                    #06152f,
+                    #071a3d 48%,
+                    #0057ff
+                );
+
+            box-shadow:
+                0 24px 60px rgba(7,26,61,.22);
+        }
+
+        .payment-sidebar::before{
+            content:"";
+
+            position:absolute;
+            right:-120px;
+            bottom:-110px;
+
+            width:260px;
+            height:260px;
+
+            border-radius:50%;
+
+            background:
+                rgba(255,255,255,.08);
+        }
+
+        .payment-sidebar::after{
+            content:"";
+
+            position:absolute;
+            top:-80px;
+            left:-80px;
+
+            width:180px;
+            height:180px;
+
+            border-radius:50%;
+
+            background:
+                rgba(255,255,255,.04);
+        }
+
+        .payment-sidebar-content{
+            position:relative;
+            z-index:2;
+        }
+
+        .payment-back{
+            display:inline-flex;
+            align-items:center;
+            gap:9px;
+
+            margin-bottom:30px;
+            padding:11px 15px;
+
+            color:white;
+
+            text-decoration:none;
+            font-weight:900;
+
+            border:
+                1px solid rgba(255,255,255,.20);
+
+            border-radius:15px;
+
+            background:
+                rgba(255,255,255,.12);
+
+            transition:.25s ease;
+        }
+
+        .payment-back:hover{
+            color:white;
+
+            background:
+                rgba(255,255,255,.22);
+
+            transform:
+                translateX(-3px);
+        }
+
+        .payment-main-icon{
+            width:82px;
+            height:82px;
+
+            display:grid;
+            place-items:center;
+
+            margin-bottom:22px;
+
+            border:
+                1px solid rgba(255,255,255,.18);
+
+            border-radius:25px;
+
+            background:
+                rgba(255,255,255,.16);
+
+            font-size:35px;
+        }
+
+        .payment-sidebar h1{
+            margin:0 0 13px;
+
+            font-size:34px;
+            line-height:1.15;
+            font-weight:950;
+        }
+
+        .payment-sidebar-description{
+            margin:0 0 28px;
+
+            color:
+                rgba(255,255,255,.82);
+
+            line-height:1.7;
+        }
+
+        .employee-card{
+            display:flex;
+            align-items:center;
+            gap:13px;
+
+            margin-bottom:28px;
+            padding:15px;
+
+            border:
+                1px solid rgba(255,255,255,.18);
+
+            border-radius:19px;
+
+            background:
+                rgba(255,255,255,.11);
+        }
+
+        .employee-avatar{
+            flex:0 0 48px;
+
+            width:48px;
+            height:48px;
+
+            display:grid;
+            place-items:center;
+
+            color:var(--primary);
+
+            border-radius:16px;
+
+            background:white;
+
+            font-size:19px;
+        }
+
+        .employee-card small{
+            display:block;
+
+            margin-bottom:2px;
+
+            color:
+                rgba(255,255,255,.72);
+
+            font-weight:700;
+        }
+
+        .employee-card strong{
+            display:block;
+
+            color:white;
+
+            font-size:16px;
+            font-weight:900;
+        }
+
+        .payment-feature{
+            display:flex;
+            align-items:center;
+            gap:12px;
+
+            margin-bottom:15px;
+
+            font-weight:800;
+        }
+
+        .payment-feature-icon{
+            flex:0 0 38px;
+
+            width:38px;
+            height:38px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:13px;
+
+            background:
+                rgba(255,255,255,.14);
+        }
+
+
+        /* =====================================================
+           CARTE FORMULAIRE
+        ====================================================== */
+
+        .payment-form-card{
+            padding:30px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius:32px;
+
+            background:
+                var(--white);
+
+            box-shadow:
+                0 20px 55px rgba(15,23,42,.08);
+        }
+
+        .payment-form-header{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:18px;
+
+            margin-bottom:26px;
+        }
+
+        .payment-form-title{
+            display:flex;
+            align-items:center;
+            gap:14px;
+        }
+
+        .payment-form-title-icon{
+            flex:0 0 58px;
+
+            width:58px;
+            height:58px;
+
+            display:grid;
+            place-items:center;
+
+            color:var(--primary);
+
+            border-radius:19px;
+
+            background:#eef4ff;
+
+            font-size:23px;
+        }
+
+        .payment-form-title h2{
+            margin:0 0 4px;
+
+            color:var(--navy);
+
+            font-size:25px;
+            font-weight:950;
+        }
+
+        .payment-form-title p{
+            margin:0;
+
+            color:var(--muted);
+
+            font-size:14px;
+        }
+
+        .secure-badge{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+
+            padding:9px 13px;
+
+            color:#15803d;
+
+            border-radius:999px;
+
+            background:#dcfce7;
+
+            font-size:12px;
+            font-weight:900;
+
+            white-space:nowrap;
+        }
+
+
+        /* =====================================================
+           SECTIONS
+        ====================================================== */
+
+        .payment-section,
+        .payment-signature-section{
+            margin-bottom:22px;
+            padding:23px;
+
+            border:
+                1px solid #eaf0f8;
+
+            border-radius:24px;
+
+            background:#f8fbff;
+        }
+
+        .payment-signature-section{
+            border-color:#dbeafe;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #ffffff,
+                    #f8fbff
+                );
+
+            box-shadow:
+                0 16px 38px rgba(15,23,42,.05);
+        }
+
+        .payment-section-header{
+            display:flex;
+            align-items:center;
+            gap:11px;
+
+            margin-bottom:20px;
+        }
+
+        .payment-section-icon{
+            flex:0 0 39px;
+
+            width:39px;
+            height:39px;
+
+            display:grid;
+            place-items:center;
+
+            color:var(--primary);
+
+            border-radius:13px;
+
+            background:#eaf1ff;
+        }
+
+        .payment-section-header h3{
+            margin:0;
+
+            color:var(--navy);
+
+            font-size:17px;
+            font-weight:950;
+        }
+
+        .payment-section-header p{
+            margin:2px 0 0;
+
+            color:var(--muted);
+
+            font-size:12px;
+        }
+
+        .form-label{
+            margin-bottom:8px;
+
+            color:#1e293b;
+
+            font-size:14px;
+            font-weight:850;
+        }
+
+        .required-star{
+            color:var(--danger);
+        }
+
+        .form-control,
+        .form-select{
+            min-height:50px;
+
+            padding:12px 14px;
+
+            color:#172033;
+
+            border:
+                1px solid #dbe4f0;
+
+            border-radius:15px;
+
+            background:white;
+
+            font-size:15px;
+        }
+
+        textarea.form-control{
+            min-height:110px;
+            resize:vertical;
+        }
+
+        .form-control:focus,
+        .form-select:focus{
+            border-color:
+                var(--primary);
+
+            box-shadow:
+                0 0 0 4px rgba(0,87,255,.10);
+        }
+
+        .form-control[readonly]{
+            color:#334155;
+            background:#eef4ff;
+            cursor:not-allowed;
+        }
+
+        .input-group .form-control{
+            border-radius:
+                15px 0 0 15px;
+        }
+
+        .input-group-text{
+            color:var(--primary);
+
+            border:
+                1px solid #dbe4f0;
+
+            border-left:0;
+
+            border-radius:
+                0 15px 15px 0;
+
+            background:#eef4ff;
+
+            font-weight:900;
+        }
+
+        .field-help{
+            display:block;
+
+            margin-top:7px;
+
+            color:var(--muted);
+
+            font-size:12px;
+        }
+
+
+        /* =====================================================
+           COMMISSION
+        ====================================================== */
+
+        .commission-card{
+            margin-top:10px;
+
+            overflow:hidden;
+
+            border:
+                1px solid #dbeafe;
+
+            border-radius:21px;
+
+            background:white;
+        }
+
+        .commission-header{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+
+            padding:15px 18px;
+
+            color:var(--navy);
+
+            background:#eef4ff;
+
+            font-weight:900;
+        }
+
+        .commission-header span{
+            color:var(--primary);
+            font-size:13px;
+        }
+
+        .commission-row{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:15px;
+
+            padding:15px 18px;
+
+            border-bottom:
+                1px dashed #e2e8f0;
+        }
+
+        .commission-row:last-child{
+            border-bottom:none;
+        }
+
+        .commission-label{
+            display:flex;
+            align-items:center;
+            gap:10px;
+
+            color:var(--muted);
+
+            font-weight:800;
+        }
+
+        .commission-dot{
+            flex:0 0 10px;
+
+            width:10px;
+            height:10px;
+
+            border-radius:50%;
+        }
+
+        .dot-total{
+            background:var(--primary);
+        }
+
+        .dot-agency{
+            background:var(--danger);
+        }
+
+        .dot-owner{
+            background:var(--success);
+        }
+
+        .commission-value{
+            color:var(--navy);
+
+            font-size:16px;
+            font-weight:950;
+
+            white-space:nowrap;
+        }
+
+        .commission-value.agency{
+            color:var(--danger);
+        }
+
+        .commission-value.owner{
+            color:var(--success);
+        }
+
+
+        /* =====================================================
+           SIGNATURES
+        ====================================================== */
+
+        .signature-section-header{
+            display:flex;
+            align-items:flex-start;
+            gap:16px;
+
+            padding-bottom:20px;
+            margin-bottom:20px;
+
+            border-bottom:
+                1px solid var(--border);
+        }
+
+        .signature-header-icon{
+            flex:0 0 55px;
+
+            width:55px;
+            height:55px;
+
+            display:grid;
+            place-items:center;
+
+            color:var(--primary);
+
+            border:
+                1px solid #dbeafe;
+
+            border-radius:17px;
+
+            background:#eff6ff;
+
+            font-size:21px;
+        }
+
+        .signature-eyebrow{
+            display:block;
+
+            margin-bottom:5px;
+
+            color:var(--primary);
+
+            font-size:.72rem;
+            font-weight:900;
+            letter-spacing:.08em;
+            text-transform:uppercase;
+        }
+
+        .signature-section-header h2{
+            margin:0 0 6px;
+
+            color:#0f172a;
+
+            font-size:1.25rem;
+            font-weight:900;
+        }
+
+        .signature-section-header p{
+            margin:0;
+
+            color:var(--muted);
+
+            font-size:.90rem;
+            line-height:1.6;
+        }
+
+        .signature-information{
+            display:flex;
+            align-items:flex-start;
+            gap:13px;
+
+            margin-bottom:20px;
+            padding:16px;
+
+            color:#1e40af;
+
+            border:
+                1px solid #bfdbfe;
+
+            border-radius:16px;
+
+            background:#eff6ff;
+        }
+
+        .signature-information-icon{
+            flex:0 0 38px;
+
+            width:38px;
+            height:38px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:12px;
+
+            background:#dbeafe;
+        }
+
+        .signature-information strong{
+            display:block;
+            margin-bottom:3px;
+            font-size:.88rem;
+        }
+
+        .signature-information p{
+            margin:0;
+
+            color:#3b5998;
+
+            font-size:.80rem;
+            line-height:1.5;
+        }
+
+        .signature-error-message{
+            display:none;
+            align-items:center;
+            gap:9px;
+
+            margin-bottom:20px;
+            padding:13px 15px;
+
+            color:#b91c1c;
+
+            border:
+                1px solid #fecaca;
+
+            border-radius:13px;
+
+            background:#fef2f2;
+
+            font-size:.82rem;
+            font-weight:800;
+        }
+
+        .signature-error-message.show{
+            display:flex;
+        }
+
+        .signature-card{
+            height:100%;
+
+            overflow:hidden;
+
+            border:
+                1px solid var(--border);
+
+            border-radius:20px;
+
+            background:white;
+
+            box-shadow:
+                0 12px 30px rgba(15,23,42,.06);
+        }
+
+        .signature-card-header{
+            min-height:78px;
+
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+
+            padding:16px;
+
+            border-bottom:
+                1px solid #edf2f7;
+        }
+
+        .signature-person{
+            min-width:0;
+
+            display:flex;
+            align-items:center;
+            gap:11px;
+        }
+
+        .signature-avatar{
+            flex:0 0 43px;
+
+            width:43px;
+            height:43px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:14px;
+        }
+
+        .signature-avatar.employee{
+            color:var(--primary);
+            background:#eff6ff;
+        }
+
+        .signature-avatar.tenant{
+            color:#059669;
+            background:#ecfdf5;
+        }
+
+        .signature-person strong{
+            display:block;
+
+            overflow:hidden;
+
+            color:#0f172a;
+
+            font-size:.88rem;
+            font-weight:900;
+
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+
+        .signature-role{
+            display:block;
+
+            margin-bottom:2px;
+
+            color:var(--muted);
+
+            font-size:.70rem;
+            font-weight:800;
+            text-transform:uppercase;
+        }
+
+        .signature-status{
+            flex-shrink:0;
+
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+
+            padding:7px 10px;
+
+            color:#b45309;
+
+            border:
+                1px solid #fde68a;
+
+            border-radius:999px;
+
+            background:#fffbeb;
+
+            font-size:.70rem;
+            font-weight:850;
+        }
+
+        .signature-status.signed{
+            color:#047857;
+            border-color:#a7f3d0;
+            background:#ecfdf5;
+        }
+
+        .signature-canvas-container{
+            position:relative;
+
+            width:100%;
+            height:220px;
+
+            overflow:hidden;
+
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 34px,
+                    rgba(148,163,184,.14) 35px
+                ),
+                #ffffff;
+
+            touch-action:none;
+        }
+
+        .signature-canvas{
+            position:relative;
+            z-index:2;
+
+            display:block;
+
+            width:100%;
+            height:100%;
+
+            cursor:crosshair;
+
+            touch-action:none;
+        }
+
+        .signature-placeholder{
+            position:absolute;
+            inset:0;
+            z-index:1;
+
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+
+            padding:20px;
+
+            color:#94a3b8;
+
+            text-align:center;
+
+            pointer-events:none;
+
+            transition:
+                opacity .2s ease,
+                visibility .2s ease;
+        }
+
+        .signature-placeholder i{
+            font-size:27px;
+        }
+
+        .signature-placeholder span{
+            max-width:220px;
+
+            font-size:.78rem;
+            font-weight:700;
+            line-height:1.5;
+        }
+
+        .signature-placeholder.hidden{
+            opacity:0;
+            visibility:hidden;
+        }
+
+        .signature-card-footer{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+
+            padding:12px 15px;
+
+            color:var(--muted);
+
+            border-top:
+                1px solid #edf2f7;
+
+            background:#f8fafc;
+
+            font-size:.72rem;
+            font-weight:700;
+        }
+
+        .signature-card-footer span{
+            display:flex;
+            align-items:center;
+            gap:6px;
+        }
+
+        .btn-clear-signature{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+
+            padding:7px 11px;
+
+            color:var(--danger);
+
+            border:
+                1px solid #fecaca;
+
+            border-radius:10px;
+
+            background:#fff;
+
+            font-size:.72rem;
+            font-weight:850;
+
+            cursor:pointer;
+
+            transition:.2s ease;
+        }
+
+        .btn-clear-signature:hover{
+            background:#fef2f2;
+            transform:translateY(-1px);
+        }
+
+
+        /* =====================================================
+           COURRIEL
+        ====================================================== */
+
+        .receipt-email-card{
+            margin-top:24px;
+            padding:21px;
+
+            border:
+                1px solid #dbeafe;
+
+            border-radius:19px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #f8fbff,
+                    #eff6ff
+                );
+        }
+
+        .receipt-email-header{
+            display:flex;
+            align-items:center;
+            gap:12px;
+
+            margin-bottom:18px;
+        }
+
+        .receipt-email-icon{
+            flex:0 0 45px;
+
+            width:45px;
+            height:45px;
+
+            display:grid;
+            place-items:center;
+
+            color:var(--primary);
+
+            border-radius:14px;
+
+            background:white;
+
+            box-shadow:
+                0 8px 20px rgba(0,87,255,.10);
+        }
+
+        .receipt-email-header h3{
+            margin:0 0 3px;
+
+            color:#0f172a;
+
+            font-size:.95rem;
+            font-weight:900;
+        }
+
+        .receipt-email-header p{
+            margin:0;
+
+            color:var(--muted);
+
+            font-size:.77rem;
+        }
+
+        .receipt-label{
+            color:#334155;
+            font-size:.79rem;
+            font-weight:850;
+        }
+
+        .email-input-wrapper{
+            position:relative;
+        }
+
+        .email-input-wrapper > i{
+            position:absolute;
+            top:50%;
+            left:15px;
+            z-index:2;
+
+            color:var(--muted);
+
+            transform:
+                translateY(-50%);
+        }
+
+        .email-input-wrapper .form-control{
+            min-height:52px;
+            padding-left:43px;
+
+            border:
+                1px solid #cbd5e1;
+
+            border-radius:14px;
+        }
+
+        .send-email-option{
+            min-height:52px;
+
+            display:flex;
+            align-items:center;
+            gap:10px;
+
+            padding:12px 14px;
+
+            color:#334155;
+
+            border:
+                1px solid #bfdbfe;
+
+            border-radius:14px;
+
+            background:white;
+
+            font-size:.78rem;
+            font-weight:800;
+
+            cursor:pointer;
+        }
+
+        .send-email-option input{
+            position:absolute;
+            opacity:0;
+        }
+
+        .send-email-check{
+            flex:0 0 22px;
+
+            width:22px;
+            height:22px;
+
+            display:grid;
+            place-items:center;
+
+            color:transparent;
+
+            border:
+                2px solid #cbd5e1;
+
+            border-radius:7px;
+
+            transition:.2s ease;
+        }
+
+        .send-email-option input:checked + .send-email-check{
+            color:white;
+
+            border-color:
+                var(--primary);
+
+            background:
+                var(--primary);
+        }
+
+        .payment-confirmation{
+            display:flex;
+            align-items:flex-start;
+            gap:12px;
+
+            margin-top:20px;
+            padding:17px;
+
+            border:
+                1px solid #d1fae5;
+
+            border-radius:16px;
+
+            background:#f0fdf4;
+
+            cursor:pointer;
+        }
+
+        .payment-confirmation input{
+            position:absolute;
+            opacity:0;
+        }
+
+        .confirmation-checkbox{
+            flex:0 0 24px;
+
+            width:24px;
+            height:24px;
+
+            display:grid;
+            place-items:center;
+
+            margin-top:2px;
+
+            color:transparent;
+
+            border:
+                2px solid #86efac;
+
+            border-radius:8px;
+
+            background:white;
+
+            transition:.2s ease;
+        }
+
+        .payment-confirmation input:checked + .confirmation-checkbox{
+            color:white;
+            border-color:#059669;
+            background:#059669;
+        }
+
+        .confirmation-text strong{
+            display:block;
+
+            margin-bottom:3px;
+
+            color:#065f46;
+
+            font-size:.84rem;
+            font-weight:900;
+        }
+
+        .confirmation-text small{
+            display:block;
+
+            color:#047857;
+
+            font-size:.75rem;
+            line-height:1.5;
+        }
+
+
+        /* =====================================================
+           BOUTONS
+        ====================================================== */
+
+        .payment-actions{
+            display:grid;
+
+            grid-template-columns:
+                minmax(180px,.75fr)
+                minmax(240px,1.25fr);
+
+            gap:14px;
+
+            margin-top:26px;
+        }
+
+        .btn-payment-cancel,
+        .btn-payment-save{
+            min-height:54px;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:9px;
+
+            border:none;
+            border-radius:17px;
+
+            font-weight:950;
+            text-decoration:none;
+
+            transition:.25s ease;
+        }
+
+        .btn-payment-cancel{
+            color:var(--primary);
+            background:#eef4ff;
+        }
+
+        .btn-payment-cancel:hover{
+            color:var(--primary-dark);
+
+            background:#dce9ff;
+
+            transform:
+                translateY(-2px);
+        }
+
+        .btn-payment-save{
+            color:white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary),
+                    var(--primary-dark)
+                );
+
+            box-shadow:
+                0 14px 30px rgba(0,87,255,.23);
+        }
+
+        .btn-payment-save:hover{
+            color:white;
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 18px 36px rgba(0,87,255,.28);
+        }
+
+        .btn-payment-save:disabled{
+            opacity:.7;
+            cursor:not-allowed;
+            transform:none;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ====================================================== */
+
+        @media(max-width:1050px){
+
+            .payment-layout{
+                grid-template-columns:1fr;
+            }
+
+            .payment-sidebar{
+                position:relative;
+                top:0;
+                min-height:auto;
+            }
+
+        }
+
+        @media(max-width:768px){
+
+            .payment-page{
+                padding:18px 10px;
+            }
+
+            .payment-sidebar,
+            .payment-form-card{
+                padding:22px;
+                border-radius:24px;
+            }
+
+            .payment-sidebar h1{
+                font-size:28px;
+            }
+
+            .payment-form-header{
+                align-items:flex-start;
+                flex-direction:column;
+            }
+
+            .payment-section,
+            .payment-signature-section{
+                padding:18px;
+                border-radius:20px;
+            }
+
+            .payment-actions{
+                grid-template-columns:1fr;
+            }
+
+        }
+
+        @media(max-width:600px){
+
+            .signature-section-header,
+            .signature-card-header,
+            .signature-card-footer{
+                align-items:flex-start;
+                flex-direction:column;
+            }
+
+            .signature-canvas-container{
+                height:190px;
+            }
+
+            .btn-clear-signature{
+                width:100%;
+                justify-content:center;
+            }
+
+        }
+
+        @media(max-width:500px){
+
+            .payment-page{
+                padding:12px 8px;
+            }
+
+            .payment-sidebar,
+            .payment-form-card{
+                padding:18px;
+                border-radius:20px;
+            }
+
+            .payment-form-title{
+                align-items:flex-start;
+            }
+
+            .payment-form-title-icon{
+                width:50px;
+                height:50px;
+                flex-basis:50px;
+            }
+
+            .payment-form-title h2{
+                font-size:21px;
+            }
+
+            .commission-row{
+                align-items:flex-start;
+                flex-direction:column;
+                gap:7px;
+            }
+
+            .payment-back{
+                width:100%;
+                justify-content:center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="payment-page">
+
+    <div class="payment-container">
+
+
+        <!-- =====================================================
+             MESSAGES DJANGO
+        ====================================================== -->
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="payment-alert payment-alert-{{ message.tags|default:'info' }}">
+
+                    {% if message.tags == "success" %}
+
+                        <i class="fa-solid fa-circle-check"></i>
+
+                    {% elif message.tags == "error" or message.tags == "danger" %}
+
+                        <i class="fa-solid fa-circle-exclamation"></i>
+
+                    {% elif message.tags == "warning" %}
+
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+
+                    {% else %}
+
+                        <i class="fa-solid fa-circle-info"></i>
+
+                    {% endif %}
+
+                    <span>
+                        {{ message }}
+                    </span>
+
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        <div class="payment-layout">
+
+
+            <!-- =================================================
+                 PANNEAU GAUCHE
+            ================================================== -->
+
+            <aside class="payment-sidebar">
+
+                <div class="payment-sidebar-content">
+
+                    <a
+                        href="{% url 'espace_employe' %}"
+                        class="payment-back"
+                    >
+                        <i class="fa-solid fa-arrow-left"></i>
+
+                        Retour à mon espace
+                    </a>
+
+
+                    <div class="payment-main-icon">
+
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+
+                    </div>
+
+
+                    <h1>
+                        Nouveau paiement
+                    </h1>
+
+
+                    <p class="payment-sidebar-description">
+
+                        Enregistrez le paiement reçu sur place,
+                        faites signer le locataire et envoyez-lui
+                        son reçu par courriel.
+
+                    </p>
+
+
+                    <div class="employee-card">
+
+                        <div class="employee-avatar">
+
+                            <i class="fa-solid fa-user-tie"></i>
+
+                        </div>
+
+                        <div>
+
+                            <small>
+                                Paiement enregistré par
+                            </small>
+
+                            <strong>
+
+                                {{ employe.prenom }}
+                                {{ employe.nom }}
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="payment-feature">
+
+                        <div class="payment-feature-icon">
+
+                            <i class="fa-solid fa-user-check"></i>
+
+                        </div>
+
+                        Locataire et bâtiment
+
+                    </div>
+
+
+                    <div class="payment-feature">
+
+                        <div class="payment-feature-icon">
+
+                            <i class="fa-solid fa-percent"></i>
+
+                        </div>
+
+                        Commission agence 10 %
+
+                    </div>
+
+
+                    <div class="payment-feature">
+
+                        <div class="payment-feature-icon">
+
+                            <i class="fa-solid fa-building-user"></i>
+
+                        </div>
+
+                        Part propriétaire 90 %
+
+                    </div>
+
+
+                    <div class="payment-feature">
+
+                        <div class="payment-feature-icon">
+
+                            <i class="fa-solid fa-file-signature"></i>
+
+                        </div>
+
+                        Deux signatures numériques
+
+                    </div>
+
+
+                    <div class="payment-feature">
+
+                        <div class="payment-feature-icon">
+
+                            <i class="fa-solid fa-envelope"></i>
+
+                        </div>
+
+                        Reçu envoyé par courriel
+
+                    </div>
+
+                </div>
+
+            </aside>
+
+
+            <!-- =================================================
+                 FORMULAIRE
+            ================================================== -->
+
+            <main class="payment-form-card">
+
+
+                <div class="payment-form-header">
+
+                    <div class="payment-form-title">
+
+                        <div class="payment-form-title-icon">
+
+                            <i class="fa-solid fa-receipt"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Enregistrer un paiement
+                            </h2>
+
+                            <p>
+                                Les champs avec un astérisque sont obligatoires.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <span class="secure-badge">
+
+                        <i class="fa-solid fa-shield-halved"></i>
+
+                        Formulaire sécurisé
+
+                    </span>
+
+                </div>
+
+
+                <form
+                    method="POST"
+                    enctype="multipart/form-data"
+                    id="paymentForm"
+                >
+
+                    {% csrf_token %}
+
+
+                    <!-- =========================================
+                         1. LOCATION
+                    ========================================== -->
+
+                    <section class="payment-section">
+
+                        <div class="payment-section-header">
+
+                            <div class="payment-section-icon">
+
+                                <i class="fa-solid fa-building"></i>
+
+                            </div>
+
+                            <div>
+
+                                <h3>
+                                    Location concernée
+                                </h3>
+
+                                <p>
+                                    Sélectionnez le locataire et son bâtiment.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="row">
+
+
+                            <div class="col-md-6 mb-3">
+
+                                <label
+                                    for="locataireSelect"
+                                    class="form-label"
+                                >
+
+                                    Locataire
+
+                                    <span class="required-star">
+                                        *
+                                    </span>
+
+                                </label>
+
+
+                                <select
+                                    name="locataire"
+                                    id="locataireSelect"
+                                    class="form-select"
+                                    required
+                                >
+
+                                    <option value="">
+
+                                        Sélectionner un locataire
+
+                                    </option>
+
+
+                                    {% for locataire_item in locataires %}
+
+                                        <option
+                                            value="{{ locataire_item.id }}"
+
+                                            data-nom="{{ locataire_item.prenom }} {{ locataire_item.nom }}"
+
+                                            data-email="{{ locataire_item.email|default:'' }}"
+
+                                            {% if request.POST.locataire == locataire_item.id|stringformat:"s" %}
+                                                selected
+                                            {% endif %}
+                                        >
+
+                                            {{ locataire_item.prenom }}
+
+                                            {{ locataire_item.nom }}
+
+
+                                            {% if locataire_item.telephone %}
+
+                                                — {{ locataire_item.telephone }}
+
+                                            {% endif %}
+
+                                        </option>
+
+
+                                    {% empty %}
+
+                                        <option
+                                            value=""
+                                            disabled
+                                        >
+
+                                            Aucun locataire disponible
+
+                                        </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="col-md-6 mb-3">
+
+                                <label
+                                    for="batimentSelect"
+                                    class="form-label"
+                                >
+
+                                    Bâtiment / propriétaire
+
+                                    <span class="required-star">
+                                        *
+                                    </span>
+
+                                </label>
+
+
+                                <select
+                                    name="batiment"
+                                    id="batimentSelect"
+                                    class="form-select"
+                                    required
+                                >
+
+                                    <option value="">
+
+                                        Sélectionner un bâtiment
+
+                                    </option>
+
+
+                                    {% for batiment_item in batiments %}
+
+                                        <option
+                                            value="{{ batiment_item.id }}"
+
+                                            {% if request.POST.batiment == batiment_item.id|stringformat:"s" %}
+                                                selected
+                                            {% endif %}
+                                        >
+
+                                            {{ batiment_item.nom }}
+
+
+                                            {% if batiment_item.proprietaire %}
+
+                                                —
+
+                                                {{ batiment_item.proprietaire.prenom }}
+
+                                                {{ batiment_item.proprietaire.nom }}
+
+                                            {% endif %}
+
+                                        </option>
+
+
+                                    {% empty %}
+
+                                        <option
+                                            value=""
+                                            disabled
+                                        >
+
+                                            Aucun bâtiment disponible
+
+                                        </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="col-md-6 mb-3">
+
+                                <label
+                                    for="numeroAppartement"
+                                    class="form-label"
+                                >
+
+                                    Appartement / chambre
+
+                                </label>
+
+
+                                <input
+                                    type="text"
+                                    name="numero_appartement"
+                                    id="numeroAppartement"
+                                    class="form-control"
+                                    value="{{ request.POST.numero_appartement|default:'' }}"
+                                    placeholder="Exemple : Appartement A1"
+                                >
+
+                            </div>
+
+
+                            <div class="col-md-6 mb-3">
+
+                                <label
+                                    for="dateDebut"
+                                    class="form-label"
+                                >
+
+                                    Date de début de la location
+
+                                    <span class="required-star">
+                                        *
+                                    </span>
+
+                                </label>
+
+
+                                <input
+                                    type="date"
+                                    name="date_debut"
+                                    id="dateDebut"
+                                    class="form-control"
+                                    value="{{ request.POST.date_debut|default:'' }}"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =========================================
+                         2. PAIEMENT
+                    ========================================== -->
+
+                    <section class="payment-section">
+
+                        <div class="payment-section-header">
+
+                            <div class="payment-section-icon">
+
+                                <i class="fa-solid fa-coins"></i>
+
+                            </div>
+
+                            <div>
+
+                                <h3>
+                                    Paiement et commission
+                                </h3>
+
+                                <p>
+                                    Saisissez le montant et les informations du versement.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="row">
+
+
+                            <div class="col-md-6 mb-3">
+
+                                <label
+                                    for="montant"
+                                    class="form-label"
+                                >
+
+                                    Montant payé
+
+                                    <span class="required-star">
+                                        *
+                                    </span>
+
+                                </label>
+
+
+                                <div class="input-group">
+
+                                    <input
+                                        type="number"
+                                        name="montant"
+                                        id="montant"
+                                        class="form-control"
+                                        value="{{ request.POST.montant|default:'' }}"
+                                        min="1"
+                                        step="0.01"
+                                        placeholder="Exemple : 50000"
+                                        required
+                                    >
+
+                                    <span class="input-group-text">
+
+                                        FCFA
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-6 mb-3">
+
+                                <label
+                                    for="mois"
+                                    class="form-label"
+                                >
+
+                                    Mois concerné
+
+                                    <span class="required-star">
+                                        *
+                                    </span>
+
+                                </label>
+
+
+                                <input
+                                    type="text"
+                                    name="mois"
+                                    id="mois"
+                                    class="form-control"
+                                    value="{{ request.POST.mois|default:'' }}"
+                                    placeholder="Exemple : Juillet 2026"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="col-md-6 mb-3">
+
+                                <label
+                                    for="modePaiement"
+                                    class="form-label"
+                                >
+
+                                    Mode de paiement
+
+                                    <span class="required-star">
+                                        *
+                                    </span>
+
+                                </label>
+
+
+                                <select
+                                    name="mode_paiement"
+                                    id="modePaiement"
+                                    class="form-select"
+                                    required
+                                >
+
+                                    <option
+                                        value="espece"
+
+                                        {% if not request.POST.mode_paiement or request.POST.mode_paiement == "espece" %}
+                                            selected
+                                        {% endif %}
+                                    >
+
+                                        Espèces
+
+                                    </option>
+
+
+                                    <option
+                                        value="virement"
+
+                                        {% if request.POST.mode_paiement == "virement" %}
+                                            selected
+                                        {% endif %}
+                                    >
+
+                                        Virement bancaire
+
+                                    </option>
+
+
+                                    <option
+                                        value="cheque"
+
+                                        {% if request.POST.mode_paiement == "cheque" %}
+                                            selected
+                                        {% endif %}
+                                    >
+
+                                        Chèque
+
+                                    </option>
+
+
+                                    <option
+                                        value="orange_money"
+
+                                        {% if request.POST.mode_paiement == "orange_money" %}
+                                            selected
+                                        {% endif %}
+                                    >
+
+                                        Orange Money
+
+                                    </option>
+
+
+                                    <option
+                                        value="moov_money"
+
+                                        {% if request.POST.mode_paiement == "moov_money" %}
+                                            selected
+                                        {% endif %}
+                                    >
+
+                                        Moov Money
+
+                                    </option>
+
+
+                                    <option
+                                        value="wave"
+
+                                        {% if request.POST.mode_paiement == "wave" %}
+                                            selected
+                                        {% endif %}
+                                    >
+
+                                        Wave
+
+                                    </option>
+
+
+                                    <option
+                                        value="carte"
+
+                                        {% if request.POST.mode_paiement == "carte" %}
+                                            selected
+                                        {% endif %}
+                                    >
+
+                                        Carte bancaire
+
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="col-md-6 mb-3">
+
+                                <label
+                                    for="statut"
+                                    class="form-label"
+                                >
+
+                                    Statut
+
+                                    <span class="required-star">
+                                        *
+                                    </span>
+
+                                </label>
+
+
+                                <select
+                                    name="statut"
+                                    id="statut"
+                                    class="form-select"
+                                    required
+                                >
+
+                                    <option
+                                        value="paye"
+
+                                        {% if not request.POST.statut or request.POST.statut == "paye" %}
+                                            selected
+                                        {% endif %}
+                                    >
+
+                                        Payé
+
+                                    </option>
+
+
+                                    <option
+                                        value="attente"
+
+                                        {% if request.POST.statut == "attente" %}
+                                            selected
+                                        {% endif %}
+                                    >
+
+                                        En attente
+
+                                    </option>
+
+
+                                    <option
+                                        value="retard"
+
+                                        {% if request.POST.statut == "retard" %}
+                                            selected
+                                        {% endif %}
+                                    >
+
+                                        En retard
+
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- RÉPARTITION -->
+
+                        <div class="commission-card">
+
+                            <div class="commission-header">
+
+                                <div>
+
+                                    <i class="fa-solid fa-chart-pie me-2"></i>
+
+                                    Répartition automatique
+
+                                </div>
+
+                                <span>
+                                    10 % / 90 %
+                                </span>
+
+                            </div>
+
+
+                            <div class="commission-row">
+
+                                <div class="commission-label">
+
+                                    <span class="commission-dot dot-total"></span>
+
+                                    Montant total payé
+
+                                </div>
+
+                                <div
+                                    class="commission-value"
+                                    id="totalPreview"
+                                >
+
+                                    0 FCFA
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="commission-row">
+
+                                <div class="commission-label">
+
+                                    <span class="commission-dot dot-agency"></span>
+
+                                    Commission de l’agence — 10 %
+
+                                </div>
+
+                                <div
+                                    class="commission-value agency"
+                                    id="agencePreview"
+                                >
+
+                                    0 FCFA
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="commission-row">
+
+                                <div class="commission-label">
+
+                                    <span class="commission-dot dot-owner"></span>
+
+                                    Montant du propriétaire — 90 %
+
+                                </div>
+
+                                <div
+                                    class="commission-value owner"
+                                    id="ownerPreview"
+                                >
+
+                                    0 FCFA
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =========================================
+                         3. REÇU ET JUSTIFICATIF
+                    ========================================== -->
+
+                    <section class="payment-section">
+
+                        <div class="payment-section-header">
+
+                            <div class="payment-section-icon">
+
+                                <i class="fa-solid fa-file-invoice"></i>
+
+                            </div>
+
+                            <div>
+
+                                <h3>
+                                    Reçu et justificatif
+                                </h3>
+
+                                <p>
+                                    Ajoutez les informations nécessaires au reçu.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="row">
+
+
+                            <div class="col-md-6 mb-3">
+
+                                <label
+                                    for="numeroRecu"
+                                    class="form-label"
+                                >
+
+                                    Numéro de reçu
+
+                                    <span class="required-star">
+                                        *
+                                    </span>
+
+                                </label>
+
+
+                                <input
+                                    type="text"
+                                    name="numero_recu"
+                                    id="numeroRecu"
+                                    class="form-control"
+                                    value="{{ request.POST.numero_recu|default:'' }}"
+                                    placeholder="Exemple : REC-2026-001"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+
+                                    Employé responsable
+
+                                </label>
+
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    value="{{ employe.prenom }} {{ employe.nom }}"
+                                    readonly
+                                >
+
+                            </div>
+
+
+                            <div class="col-md-12 mb-3">
+
+                                <label
+                                    for="justificatif"
+                                    class="form-label"
+                                >
+
+                                    Justificatif
+
+                                </label>
+
+
+                                <input
+                                    type="file"
+                                    name="justificatif"
+                                    id="justificatif"
+                                    class="form-control"
+                                    accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                >
+
+
+                                <small class="field-help">
+
+                                    Formats acceptés :
+                                    JPG, JPEG, PNG, WEBP ou PDF.
+
+                                </small>
+
+                            </div>
+
+
+                            <div class="col-md-12">
+
+                                <label
+                                    for="commentaire"
+                                    class="form-label"
+                                >
+
+                                    Commentaire
+
+                                </label>
+
+
+                                <textarea
+                                    name="commentaire"
+                                    id="commentaire"
+                                    class="form-control"
+                                    rows="4"
+                                    placeholder="Ajouter une remarque ou une note interne..."
+                                >{{ request.POST.commentaire|default:'' }}</textarea>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =========================================
+                         4. SIGNATURES ET COURRIEL
+                    ========================================== -->
+
+                    <section class="payment-signature-section">
+
+
+                        <div class="signature-section-header">
+
+                            <div class="signature-header-icon">
+
+                                <i class="fa-solid fa-file-signature"></i>
+
+                            </div>
+
+                            <div>
+
+                                <span class="signature-eyebrow">
+
+                                    Paiement effectué sur place
+
+                                </span>
+
+
+                                <h2>
+
+                                    Validation et signatures
+
+                                </h2>
+
+
+                                <p>
+
+                                    L’employé et le locataire signent pour confirmer
+                                    que le paiement a bien été effectué.
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="signature-information">
+
+                            <div class="signature-information-icon">
+
+                                <i class="fa-solid fa-circle-info"></i>
+
+                            </div>
+
+                            <div>
+
+                                <strong>
+
+                                    Comment procéder ?
+
+                                </strong>
+
+
+                                <p>
+
+                                    Le locataire signe directement avec son doigt
+                                    sur le téléphone ou la tablette de l’employé.
+                                    Les deux signatures seront liées au paiement.
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="signature-error-message"
+                            id="signatureErrorMessage"
+                            role="alert"
+                        >
+
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+
+
+                            <span>
+
+                                La signature de l’employé et celle du
+                                locataire sont obligatoires.
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="row g-4">
+
+
+                            <!-- SIGNATURE EMPLOYÉ -->
+
+                            <div class="col-lg-6">
+
+                                <article class="signature-card">
+
+
+                                    <div class="signature-card-header">
+
+                                        <div class="signature-person">
+
+                                            <div class="signature-avatar employee">
+
+                                                <i class="fa-solid fa-user-tie"></i>
+
+                                            </div>
+
+                                            <div>
+
+                                                <span class="signature-role">
+
+                                                    Employé responsable
+
+                                                </span>
+
+
+                                                <strong>
+
+                                                    {{ employe.prenom }}
+
+                                                    {{ employe.nom }}
+
+                                                </strong>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <span
+                                            class="signature-status"
+                                            id="statusSignatureEmploye"
+                                        >
+
+                                            <i class="fa-regular fa-pen-to-square"></i>
+
+                                            À signer
+
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="signature-canvas-container">
+
+                                        <canvas
+                                            id="signatureEmployeCanvas"
+                                            class="signature-canvas"
+                                            aria-label="Zone de signature de l’employé"
+                                        ></canvas>
+
+
+                                        <div
+                                            class="signature-placeholder"
+                                            id="placeholderSignatureEmploye"
+                                        >
+
+                                            <i class="fa-solid fa-signature"></i>
+
+
+                                            <span>
+
+                                                Signez ici avec votre doigt
+                                                ou votre souris
+
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="signature-card-footer">
+
+                                        <span>
+
+                                            <i class="fa-solid fa-hand-pointer"></i>
+
+                                            Signature de l’employé
+
+                                        </span>
+
+
+                                        <button
+                                            type="button"
+                                            class="btn-clear-signature"
+                                            id="clearSignatureEmploye"
+                                        >
+
+                                            <i class="fa-solid fa-eraser"></i>
+
+                                            Effacer
+
+                                        </button>
+
+                                    </div>
+
+
+                                    <input
+                                        type="hidden"
+                                        name="signature_employe"
+                                        id="signatureEmployeInput"
+                                        value="{{ request.POST.signature_employe|default:'' }}"
+                                    >
+
+                                </article>
+
+                            </div>
+
+
+                            <!-- SIGNATURE LOCATAIRE -->
+
+                            <div class="col-lg-6">
+
+                                <article class="signature-card">
+
+
+                                    <div class="signature-card-header">
+
+                                        <div class="signature-person">
+
+                                            <div class="signature-avatar tenant">
+
+                                                <i class="fa-solid fa-house-user"></i>
+
+                                            </div>
+
+                                            <div>
+
+                                                <span class="signature-role">
+
+                                                    Locataire
+
+                                                </span>
+
+
+                                                <strong id="selectedTenantName">
+
+                                                    Locataire concerné
+
+                                                </strong>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <span
+                                            class="signature-status"
+                                            id="statusSignatureLocataire"
+                                        >
+
+                                            <i class="fa-regular fa-pen-to-square"></i>
+
+                                            À signer
+
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="signature-canvas-container">
+
+                                        <canvas
+                                            id="signatureLocataireCanvas"
+                                            class="signature-canvas"
+                                            aria-label="Zone de signature du locataire"
+                                        ></canvas>
+
+
+                                        <div
+                                            class="signature-placeholder"
+                                            id="placeholderSignatureLocataire"
+                                        >
+
+                                            <i class="fa-solid fa-signature"></i>
+
+
+                                            <span>
+
+                                                Le locataire doit signer
+                                                dans cette zone
+
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="signature-card-footer">
+
+                                        <span>
+
+                                            <i class="fa-solid fa-hand-pointer"></i>
+
+                                            Signature du locataire
+
+                                        </span>
+
+
+                                        <button
+                                            type="button"
+                                            class="btn-clear-signature"
+                                            id="clearSignatureLocataire"
+                                        >
+
+                                            <i class="fa-solid fa-eraser"></i>
+
+                                            Effacer
+
+                                        </button>
+
+                                    </div>
+
+
+                                    <input
+                                        type="hidden"
+                                        name="signature_locataire"
+                                        id="signatureLocataireInput"
+                                        value="{{ request.POST.signature_locataire|default:'' }}"
+                                    >
+
+                                </article>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- COURRIEL -->
+
+                        <div class="receipt-email-card">
+
+
+                            <div class="receipt-email-header">
+
+                                <div class="receipt-email-icon">
+
+                                    <i class="fa-solid fa-envelope-circle-check"></i>
+
+                                </div>
+
+                                <div>
+
+                                    <h3>
+
+                                        Envoyer le reçu au locataire
+
+                                    </h3>
+
+
+                                    <p>
+
+                                        Le courriel sera rempli automatiquement
+                                        lorsqu’il est enregistré dans le dossier
+                                        du locataire.
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="row align-items-end">
+
+
+                                <div class="col-lg-8 mb-3 mb-lg-0">
+
+                                    <label
+                                        for="emailLocataire"
+                                        class="form-label receipt-label"
+                                    >
+
+                                        Adresse courriel du locataire
+
+                                    </label>
+
+
+                                    <div class="email-input-wrapper">
+
+                                        <i class="fa-solid fa-envelope"></i>
+
+
+                                        <input
+                                            type="email"
+                                            name="email_locataire"
+                                            id="emailLocataire"
+                                            class="form-control"
+                                            value="{{ request.POST.email_locataire|default:'' }}"
+                                            placeholder="exemple@courriel.com"
+                                        >
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="col-lg-4">
+
+                                    <label class="send-email-option">
+
+                                        <input
+                                            type="checkbox"
+                                            name="envoyer_recu_email"
+                                            id="envoyerRecuEmail"
+                                            value="1"
+
+                                            {% if request.POST.envoyer_recu_email %}
+                                                checked
+                                            {% endif %}
+                                        >
+
+
+                                        <span class="send-email-check">
+
+                                            <i class="fa-solid fa-check"></i>
+
+                                        </span>
+
+
+                                        <span>
+
+                                            Envoyer le reçu après
+                                            l’enregistrement
+
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- CONFIRMATION -->
+
+                        <label class="payment-confirmation">
+
+                            <input
+                                type="checkbox"
+                                name="confirmation_paiement"
+                                id="confirmationPaiement"
+                                value="1"
+                                required
+
+                                {% if request.POST.confirmation_paiement %}
+                                    checked
+                                {% endif %}
+                            >
+
+
+                            <span class="confirmation-checkbox">
+
+                                <i class="fa-solid fa-check"></i>
+
+                            </span>
+
+
+                            <span class="confirmation-text">
+
+                                <strong>
+
+                                    Confirmation du paiement
+
+                                </strong>
+
+
+                                <small>
+
+                                    L’employé et le locataire confirment
+                                    que les informations sont exactes et
+                                    que le paiement a bien été effectué.
+
+                                </small>
+
+                            </span>
+
+                        </label>
+
+                    </section>
+
+
+                    <!-- =========================================
+                         BOUTONS
+                    ========================================== -->
+
+                    <div class="payment-actions">
+
+
+                        <a
+                            href="{% url 'espace_employe' %}"
+                            class="btn-payment-cancel"
+                        >
+
+                            <i class="fa-solid fa-xmark"></i>
+
+                            Annuler
+
+                        </a>
+
+
+                        <button
+                            type="submit"
+                            class="btn-payment-save"
+                            id="submitButton"
+                        >
+
+                            <i class="fa-solid fa-floppy-disk"></i>
+
+
+                            <span>
+
+                                Enregistrer et générer le reçu
+
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </main>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
+
+
+        /* =====================================================
+           ÉLÉMENTS
+        ====================================================== */
+
+        const paymentForm =
+            document.getElementById("paymentForm");
+
+        const submitButton =
+            document.getElementById("submitButton");
+
+        const montantInput =
+            document.getElementById("montant");
+
+        const totalPreview =
+            document.getElementById("totalPreview");
+
+        const agencePreview =
+            document.getElementById("agencePreview");
+
+        const ownerPreview =
+            document.getElementById("ownerPreview");
+
+        const locataireSelect =
+            document.getElementById("locataireSelect");
+
+        const selectedTenantName =
+            document.getElementById("selectedTenantName");
+
+        const emailLocataire =
+            document.getElementById("emailLocataire");
+
+        const envoyerRecuEmail =
+            document.getElementById("envoyerRecuEmail");
+
+        const signatureErrorMessage =
+            document.getElementById(
+                "signatureErrorMessage"
+            );
+
+
+        /* =====================================================
+           CALCUL DES COMMISSIONS
+        ====================================================== */
+
+        function formatMoney(value){
+
+            return new Intl.NumberFormat(
+                "fr-FR",
+                {
+                    minimumFractionDigits:0,
+                    maximumFractionDigits:2
+                }
+            ).format(value) + " FCFA";
+
+        }
+
+
+        function updateCommission(){
+
+            const montant =
+                parseFloat(
+                    montantInput?.value
+                ) || 0;
+
+
+            if(totalPreview){
+
+                totalPreview.textContent =
+                    formatMoney(
+                        montant
+                    );
+
+            }
+
+
+            if(agencePreview){
+
+                agencePreview.textContent =
+                    formatMoney(
+                        montant * 0.10
+                    );
+
+            }
+
+
+            if(ownerPreview){
+
+                ownerPreview.textContent =
+                    formatMoney(
+                        montant * 0.90
+                    );
+
+            }
+
+        }
+
+
+        if(montantInput){
+
+            montantInput.addEventListener(
+                "input",
+                updateCommission
+            );
+
+            updateCommission();
+
+        }
+
+
+        /* =====================================================
+           NOM ET COURRIEL DU LOCATAIRE
+        ====================================================== */
+
+        const emailPoste =
+
+            "{{ request.POST.email_locataire|default:''|escapejs }}";
+
+
+        function updateTenantInformation(
+            conserverEmailPoste
+        ){
+
+            if(!locataireSelect){
+                return;
+            }
+
+
+            const option =
+
+                locataireSelect.options[
+                    locataireSelect.selectedIndex
+                ];
+
+
+            const nom =
+
+                option?.dataset?.nom || "";
+
+
+            const email =
+
+                option?.dataset?.email || "";
+
+
+            if(selectedTenantName){
+
+                selectedTenantName.textContent =
+
+                    nom || "Locataire concerné";
+
+            }
+
+
+            if(emailLocataire){
+
+                if(
+                    conserverEmailPoste
+                    &&
+                    emailPoste
+                ){
+
+                    emailLocataire.value =
+                        emailPoste;
+
+                }else{
+
+                    emailLocataire.value =
+                        email;
+
+                }
+
+            }
+
+        }
+
+
+        if(locataireSelect){
+
+            locataireSelect.addEventListener(
+                "change",
+                function(){
+
+                    updateTenantInformation(
+                        false
+                    );
+
+                }
+            );
+
+
+            updateTenantInformation(
+                true
+            );
+
+        }
+
+
+        /* =====================================================
+           SIGNATURE NUMÉRIQUE
+        ====================================================== */
+
+        function createSignaturePad(config){
+
+
+            const canvas =
+
+                document.getElementById(
+                    config.canvasId
+                );
+
+
+            const hiddenInput =
+
+                document.getElementById(
+                    config.inputId
+                );
+
+
+            const clearButton =
+
+                document.getElementById(
+                    config.clearId
+                );
+
+
+            const placeholder =
+
+                document.getElementById(
+                    config.placeholderId
+                );
+
+
+            const status =
+
+                document.getElementById(
+                    config.statusId
+                );
+
+
+            if(
+                !canvas
+                ||
+                !hiddenInput
+                ||
+                !placeholder
+                ||
+                !status
+            ){
+
+                return null;
+
+            }
+
+
+            const context =
+
+                canvas.getContext("2d");
+
+
+            let drawing = false;
+
+            let hasSignature = false;
+
+            let savedData =
+
+                hiddenInput.value || "";
+
+
+            function configureContext(){
+
+                context.lineWidth = 2.4;
+
+                context.lineCap = "round";
+
+                context.lineJoin = "round";
+
+                context.strokeStyle =
+                    "#071a3d";
+
+            }
+
+
+            function updateStatus(){
+
+                if(hasSignature){
+
+                    placeholder.classList.add(
+                        "hidden"
+                    );
+
+                    status.classList.add(
+                        "signed"
+                    );
+
+                    status.innerHTML = `
+
+                        <i class="fa-solid fa-circle-check"></i>
+
+                        Signé
+
+                    `;
+
+                }else{
+
+                    placeholder.classList.remove(
+                        "hidden"
+                    );
+
+                    status.classList.remove(
+                        "signed"
+                    );
+
+                    status.innerHTML = `
+
+                        <i class="fa-regular fa-pen-to-square"></i>
+
+                        À signer
+
+                    `;
+
+                }
+
+            }
+
+
+            function drawSavedImage(dataUrl){
+
+                if(
+                    !dataUrl
+                    ||
+                    !dataUrl.startsWith(
+                        "data:image"
+                    )
+                ){
+
+                    return;
+
+                }
+
+
+                const image =
+                    new Image();
+
+
+                image.onload =
+                    function(){
+
+
+                        const rectangle =
+
+                            canvas.getBoundingClientRect();
+
+
+                        context.clearRect(
+                            0,
+                            0,
+                            canvas.width,
+                            canvas.height
+                        );
+
+
+                        context.drawImage(
+                            image,
+                            0,
+                            0,
+                            rectangle.width,
+                            rectangle.height
+                        );
+
+
+                        hasSignature = true;
+
+                        savedData =
+                            dataUrl;
+
+                        hiddenInput.value =
+                            dataUrl;
+
+
+                        updateStatus();
+
+                    };
+
+
+                image.src =
+                    dataUrl;
+
+            }
+
+
+            function resizeCanvas(){
+
+                const imageBeforeResize =
+
+                    hasSignature
+
+                        ? canvas.toDataURL(
+                            "image/png"
+                        )
+
+                        : savedData;
+
+
+                const rectangle =
+
+                    canvas.getBoundingClientRect();
+
+
+                const ratio =
+
+                    Math.max(
+                        window.devicePixelRatio || 1,
+                        1
+                    );
+
+
+                canvas.width =
+
+                    Math.max(
+                        1,
+                        Math.round(
+                            rectangle.width * ratio
+                        )
+                    );
+
+
+                canvas.height =
+
+                    Math.max(
+                        1,
+                        Math.round(
+                            rectangle.height * ratio
+                        )
+                    );
+
+
+                context.setTransform(
+                    ratio,
+                    0,
+                    0,
+                    ratio,
+                    0,
+                    0
+                );
+
+
+                configureContext();
+
+
+                if(
+                    imageBeforeResize
+                    &&
+                    imageBeforeResize.startsWith(
+                        "data:image"
+                    )
+                ){
+
+                    drawSavedImage(
+                        imageBeforeResize
+                    );
+
+                }
+
+            }
+
+
+            function getPoint(event){
+
+                const rectangle =
+
+                    canvas.getBoundingClientRect();
+
+
+                return {
+
+                    x:
+                        event.clientX
+                        -
+                        rectangle.left,
+
+                    y:
+                        event.clientY
+                        -
+                        rectangle.top
+
+                };
+
+            }
+
+
+            function startDrawing(event){
+
+                event.preventDefault();
+
+
+                drawing = true;
+
+                hasSignature = true;
+
+
+                const point =
+
+                    getPoint(event);
+
+
+                context.beginPath();
+
+
+                context.moveTo(
+                    point.x,
+                    point.y
+                );
+
+
+                try{
+
+                    canvas.setPointerCapture(
+                        event.pointerId
+                    );
+
+                }catch(error){
+
+                    // Aucun traitement nécessaire.
+
+                }
+
+
+                updateStatus();
+
+            }
+
+
+            function draw(event){
+
+                if(!drawing){
+                    return;
+                }
+
+
+                event.preventDefault();
+
+
+                const point =
+
+                    getPoint(event);
+
+
+                context.lineTo(
+                    point.x,
+                    point.y
+                );
+
+
+                context.stroke();
+
+            }
+
+
+            function stopDrawing(event){
+
+                if(!drawing){
+                    return;
+                }
+
+
+                drawing = false;
+
+
+                context.closePath();
+
+
+                try{
+
+                    canvas.releasePointerCapture(
+                        event.pointerId
+                    );
+
+                }catch(error){
+
+                    // Le pointeur peut déjà être libéré.
+
+                }
+
+
+                saveSignature();
+
+            }
+
+
+            function saveSignature(){
+
+                if(hasSignature){
+
+                    savedData =
+
+                        canvas.toDataURL(
+                            "image/png"
+                        );
+
+
+                    hiddenInput.value =
+                        savedData;
+
+                }else{
+
+                    savedData = "";
+
+                    hiddenInput.value = "";
+
+                }
+
+            }
+
+
+            function clearSignature(){
+
+                context.clearRect(
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
+
+
+                drawing = false;
+
+                hasSignature = false;
+
+                savedData = "";
+
+                hiddenInput.value = "";
+
+
+                updateStatus();
+
+            }
+
+
+            canvas.addEventListener(
+                "pointerdown",
+                startDrawing
+            );
+
+
+            canvas.addEventListener(
+                "pointermove",
+                draw
+            );
+
+
+            canvas.addEventListener(
+                "pointerup",
+                stopDrawing
+            );
+
+
+            canvas.addEventListener(
+                "pointercancel",
+                stopDrawing
+            );
+
+
+            if(clearButton){
+
+                clearButton.addEventListener(
+                    "click",
+                    clearSignature
+                );
+
+            }
+
+
+            resizeCanvas();
+
+            updateStatus();
+
+
+            if(
+                savedData.startsWith(
+                    "data:image"
+                )
+            ){
+
+                drawSavedImage(
+                    savedData
+                );
+
+            }
+
+
+            return {
+
+                isSigned:
+                    function(){
+
+                        return hasSignature;
+
+                    },
+
+
+                save:
+                    function(){
+
+                        saveSignature();
+
+                    },
+
+
+                resize:
+                    function(){
+
+                        resizeCanvas();
+
+                    }
+
+            };
+
+        }
+
+
+        const employeeSignature =
+
+            createSignaturePad({
+
+                canvasId:
+                    "signatureEmployeCanvas",
+
+                inputId:
+                    "signatureEmployeInput",
+
+                clearId:
+                    "clearSignatureEmploye",
+
+                placeholderId:
+                    "placeholderSignatureEmploye",
+
+                statusId:
+                    "statusSignatureEmploye"
+
+            });
+
+
+        const tenantSignature =
+
+            createSignaturePad({
+
+                canvasId:
+                    "signatureLocataireCanvas",
+
+                inputId:
+                    "signatureLocataireInput",
+
+                clearId:
+                    "clearSignatureLocataire",
+
+                placeholderId:
+                    "placeholderSignatureLocataire",
+
+                statusId:
+                    "statusSignatureLocataire"
+
+            });
+
+
+        let resizeTimer = null;
+
+
+        window.addEventListener(
+            "resize",
+            function(){
+
+                clearTimeout(
+                    resizeTimer
+                );
+
+
+                resizeTimer = setTimeout(
+                    function(){
+
+                        employeeSignature?.resize();
+
+                        tenantSignature?.resize();
+
+                    },
+                    180
+                );
+
+            }
+        );
+
+
+        /* =====================================================
+           VALIDATION DU FORMULAIRE
+        ====================================================== */
+
+        if(paymentForm){
+
+            paymentForm.addEventListener(
+                "submit",
+                function(event){
+
+
+                    signatureErrorMessage
+                        ?.classList
+                        .remove(
+                            "show"
+                        );
+
+
+                    const employeeSigned =
+
+                        employeeSignature
+                            ?.isSigned()
+                        === true;
+
+
+                    const tenantSigned =
+
+                        tenantSignature
+                            ?.isSigned()
+                        === true;
+
+
+                    if(
+                        !employeeSigned
+                        ||
+                        !tenantSigned
+                    ){
+
+                        event.preventDefault();
+
+
+                        signatureErrorMessage
+                            ?.classList
+                            .add(
+                                "show"
+                            );
+
+
+                        signatureErrorMessage
+                            ?.scrollIntoView({
+
+                                behavior:
+                                    "smooth",
+
+                                block:
+                                    "center"
+
+                            });
+
+
+                        return;
+
+                    }
+
+
+                    if(
+                        envoyerRecuEmail
+                            ?.checked
+                        &&
+                        !emailLocataire
+                            ?.value
+                            .trim()
+                    ){
+
+                        event.preventDefault();
+
+
+                        emailLocataire
+                            .setCustomValidity(
+
+                                "Veuillez saisir le courriel du locataire."
+
+                            );
+
+
+                        emailLocataire
+                            .reportValidity();
+
+
+                        emailLocataire
+                            .focus();
+
+
+                        return;
+
+                    }
+
+
+                    if(emailLocataire){
+
+                        emailLocataire
+                            .setCustomValidity(
+                                ""
+                            );
+
+                    }
+
+
+                    if(
+                        !paymentForm
+                            .checkValidity()
+                    ){
+
+                        event.preventDefault();
+
+
+                        paymentForm
+                            .reportValidity();
+
+
+                        return;
+
+                    }
+
+
+                    employeeSignature.save();
+
+                    tenantSignature.save();
+
+
+                    if(submitButton){
+
+                        submitButton.disabled =
+                            true;
+
+
+                        submitButton.innerHTML = `
+
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+
+                            <span>
+
+                                Enregistrement...
+
+                            </span>
+
+                        `;
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        if(emailLocataire){
+
+            emailLocataire.addEventListener(
+                "input",
+                function(){
+
+                    emailLocataire
+                        .setCustomValidity(
+                            ""
+                        );
+
+                }
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>

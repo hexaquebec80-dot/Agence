@@ -1,0 +1,1322 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    .construction-form-page {
+        min-height: 100vh;
+        padding: 28px;
+        background:
+            radial-gradient(
+                circle at top right,
+                rgba(0, 87, 255, 0.08),
+                transparent 28%
+            ),
+            #f6f8fc;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    .construction-header {
+        max-width: 1100px;
+        margin: 0 auto 24px;
+        padding: 28px 30px;
+        border-radius: 24px;
+        background:
+            linear-gradient(
+                135deg,
+                #071a3d 0%,
+                #0b2d69 50%,
+                #0057ff 100%
+            );
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        box-shadow:
+            0 20px 50px rgba(7, 26, 61, 0.18);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .construction-header::before {
+        content: "";
+        position: absolute;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+        top: -120px;
+        right: -60px;
+    }
+
+    .construction-header::after {
+        content: "";
+        position: absolute;
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+        bottom: -80px;
+        right: 180px;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 17px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .header-icon {
+        width: 62px;
+        height: 62px;
+        min-width: 62px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.20);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 27px;
+        backdrop-filter: blur(8px);
+    }
+
+    .header-text h1 {
+        margin: 0 0 6px;
+        font-size: 27px;
+        line-height: 1.2;
+        font-weight: 800;
+        letter-spacing: -0.4px;
+    }
+
+    .header-text p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.78);
+    }
+
+    .back-button {
+        position: relative;
+        z-index: 2;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        padding: 12px 16px;
+        border-radius: 13px;
+        background: rgba(255, 255, 255, 0.13);
+        border: 1px solid rgba(255, 255, 255, 0.20);
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+        transition: 0.25s ease;
+        backdrop-filter: blur(8px);
+        white-space: nowrap;
+    }
+
+    .back-button:hover {
+        background: #ffffff;
+        color: #0057ff;
+        transform: translateY(-2px);
+    }
+
+    /* =========================
+       MESSAGES DJANGO
+    ========================= */
+
+    .messages-wrapper {
+        max-width: 1100px;
+        margin: 0 auto 20px;
+    }
+
+    .alert-pro {
+        padding: 14px 17px;
+        border-radius: 14px;
+        margin-bottom: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .alert-pro.success {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+
+    .alert-pro.error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .alert-pro.warning {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+    }
+
+    .alert-pro.info {
+        background: #dbeafe;
+        color: #1e40af;
+        border: 1px solid #bfdbfe;
+    }
+
+    /* =========================
+       LAYOUT
+    ========================= */
+
+    .construction-layout {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 300px;
+        gap: 22px;
+        align-items: start;
+    }
+
+    /* =========================
+       FORM CARD
+    ========================= */
+
+    .form-card {
+        background: #ffffff;
+        border: 1px solid #e7edf6;
+        border-radius: 24px;
+        box-shadow:
+            0 16px 45px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+    }
+
+    .form-card-header {
+        padding: 23px 26px;
+        border-bottom: 1px solid #edf1f7;
+        background:
+            linear-gradient(
+                180deg,
+                #ffffff 0%,
+                #fbfcff 100%
+            );
+        display: flex;
+        align-items: center;
+        gap: 13px;
+    }
+
+    .section-icon {
+        width: 43px;
+        height: 43px;
+        min-width: 43px;
+        border-radius: 13px;
+        background: #eaf1ff;
+        color: #0057ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+    }
+
+    .form-card-header h2 {
+        margin: 0 0 4px;
+        color: #071a3d;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .form-card-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .form-body {
+        padding: 27px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        color: #334155;
+        font-size: 13px;
+        font-weight: 750;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .form-label i {
+        color: #0057ff;
+        font-size: 12px;
+    }
+
+    .required {
+        color: #dc2626;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        top: 50%;
+        left: 15px;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 14px;
+        pointer-events: none;
+        transition: 0.2s ease;
+    }
+
+    .form-control-pro {
+        width: 100%;
+        height: 49px;
+        padding: 0 15px;
+        border: 1px solid #dbe3ef;
+        border-radius: 14px;
+        background: #fbfcff;
+        color: #0f172a;
+        font-size: 14px;
+        outline: none;
+        transition: 0.22s ease;
+    }
+
+    .form-control-pro.with-icon {
+        padding-left: 43px;
+    }
+
+    .form-control-pro:hover {
+        border-color: #bdc9da;
+        background: #ffffff;
+    }
+
+    .form-control-pro:focus {
+        background: #ffffff;
+        border-color: #0057ff;
+        box-shadow:
+            0 0 0 4px rgba(0, 87, 255, 0.09);
+    }
+
+    .input-wrapper:focus-within .input-icon {
+        color: #0057ff;
+    }
+
+    select.form-control-pro {
+        cursor: pointer;
+    }
+
+    textarea.form-control-pro {
+        min-height: 130px;
+        height: auto;
+        padding: 14px 15px;
+        resize: vertical;
+        line-height: 1.6;
+        font-family: inherit;
+    }
+
+    .field-help {
+        margin-top: -2px;
+        color: #94a3b8;
+        font-size: 11px;
+        line-height: 1.5;
+    }
+
+    /* =========================
+       BUDGET BOX
+    ========================= */
+
+    .budget-group {
+        position: relative;
+    }
+
+    .currency-badge {
+        position: absolute;
+        top: 50%;
+        right: 11px;
+        transform: translateY(-50%);
+        min-width: 34px;
+        height: 30px;
+        padding: 0 9px;
+        border-radius: 9px;
+        background: #eaf1ff;
+        color: #0057ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 800;
+        pointer-events: none;
+    }
+
+    .budget-input {
+        padding-right: 55px;
+    }
+
+    /* =========================
+       ACTIONS
+    ========================= */
+
+    .form-actions {
+        margin-top: 28px;
+        padding-top: 23px;
+        border-top: 1px solid #edf1f7;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .btn-cancel {
+        min-height: 46px;
+        padding: 0 18px;
+        border-radius: 13px;
+        background: #f1f5f9;
+        color: #475569;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 750;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: 0.22s ease;
+    }
+
+    .btn-cancel:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    .btn-save {
+        min-height: 46px;
+        padding: 0 21px;
+        border: none;
+        border-radius: 13px;
+        background:
+            linear-gradient(
+                135deg,
+                #071a3d,
+                #0057ff
+            );
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        cursor: pointer;
+        transition: 0.25s ease;
+        box-shadow:
+            0 10px 24px rgba(0, 87, 255, 0.20);
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow:
+            0 14px 30px rgba(0, 87, 255, 0.27);
+    }
+
+    .btn-save:active {
+        transform: translateY(0);
+    }
+
+    /* =========================
+       SIDEBAR
+    ========================= */
+
+    .info-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .info-card {
+        background: #ffffff;
+        border: 1px solid #e7edf6;
+        border-radius: 20px;
+        padding: 21px;
+        box-shadow:
+            0 12px 35px rgba(15, 23, 42, 0.06);
+    }
+
+    .info-card-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        color: #071a3d;
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+    .info-card-title i {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: #eaf1ff;
+        color: #0057ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .info-card p {
+        margin: 0;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .process-list {
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+    }
+
+    .process-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 11px;
+    }
+
+    .process-number {
+        width: 29px;
+        height: 29px;
+        min-width: 29px;
+        border-radius: 9px;
+        background: #071a3d;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .process-text strong {
+        display: block;
+        margin-bottom: 2px;
+        color: #334155;
+        font-size: 12px;
+    }
+
+    .process-text span {
+        color: #94a3b8;
+        font-size: 11px;
+        line-height: 1.5;
+    }
+
+    .budget-note {
+        background:
+            linear-gradient(
+                135deg,
+                #071a3d,
+                #0b2d69
+            );
+        color: #ffffff;
+        border: none;
+    }
+
+    .budget-note .info-card-title {
+        color: #ffffff;
+    }
+
+    .budget-note .info-card-title i {
+        background: rgba(255, 255, 255, 0.13);
+        color: #ffffff;
+    }
+
+    .budget-note p {
+        color: rgba(255, 255, 255, 0.74);
+    }
+
+    /* =========================
+       RESPONSIVE TABLET
+    ========================= */
+
+    @media (max-width: 950px) {
+        .construction-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .info-sidebar {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .budget-note {
+            grid-column: 1 / -1;
+        }
+    }
+
+    /* =========================
+       RESPONSIVE MOBILE
+    ========================= */
+
+    @media (max-width: 700px) {
+        .construction-form-page {
+            padding: 14px;
+        }
+
+        .construction-header {
+            padding: 22px;
+            border-radius: 19px;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .header-left {
+            align-items: flex-start;
+        }
+
+        .header-icon {
+            width: 52px;
+            height: 52px;
+            min-width: 52px;
+            border-radius: 15px;
+            font-size: 22px;
+        }
+
+        .header-text h1 {
+            font-size: 21px;
+        }
+
+        .header-text p {
+            font-size: 12px;
+        }
+
+        .back-button {
+            width: 100%;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group.full-width {
+            grid-column: auto;
+        }
+
+        .form-card {
+            border-radius: 19px;
+        }
+
+        .form-card-header {
+            padding: 20px;
+        }
+
+        .form-body {
+            padding: 20px;
+        }
+
+        .info-sidebar {
+            grid-template-columns: 1fr;
+        }
+
+        .budget-note {
+            grid-column: auto;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+        }
+
+        .btn-cancel,
+        .btn-save {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 420px) {
+        .construction-form-page {
+            padding: 10px;
+        }
+
+        .construction-header {
+            padding: 18px;
+        }
+
+        .header-left {
+            gap: 12px;
+        }
+
+        .header-icon {
+            width: 46px;
+            height: 46px;
+            min-width: 46px;
+        }
+
+        .header-text h1 {
+            font-size: 19px;
+        }
+
+        .form-body {
+            padding: 17px;
+        }
+    }
+</style>
+
+<div class="construction-form-page">
+
+```
+<!-- =========================
+     HEADER
+========================== -->
+<div class="construction-header">
+
+    <div class="header-left">
+
+        <div class="header-icon">
+            <i class="fa-solid fa-helmet-safety"></i>
+        </div>
+
+        <div class="header-text">
+            <h1>Nouvelle construction</h1>
+
+            <p>
+                Créez un nouveau projet de construction
+                et définissez son budget global.
+            </p>
+        </div>
+
+    </div>
+
+    <a href="{% url 'constructions' %}"
+       class="back-button">
+
+        <i class="fa-solid fa-arrow-left"></i>
+        Retour aux constructions
+    </a>
+
+</div>
+
+
+<!-- =========================
+     MESSAGES DJANGO
+========================== -->
+{% if messages %}
+    <div class="messages-wrapper">
+
+        {% for message in messages %}
+            <div class="alert-pro {{ message.tags }}">
+
+                {% if message.tags == "success" %}
+                    <i class="fa-solid fa-circle-check"></i>
+
+                {% elif message.tags == "error" %}
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                {% elif message.tags == "warning" %}
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+
+                {% else %}
+                    <i class="fa-solid fa-circle-info"></i>
+                {% endif %}
+
+                <span>
+                    {{ message }}
+                </span>
+
+            </div>
+        {% endfor %}
+
+    </div>
+{% endif %}
+
+
+<!-- =========================
+     LAYOUT PRINCIPAL
+========================== -->
+<div class="construction-layout">
+
+
+    <!-- =====================
+         FORMULAIRE
+    ====================== -->
+    <div class="form-card">
+
+        <div class="form-card-header">
+
+            <div class="section-icon">
+                <i class="fa-solid fa-building-circle-check"></i>
+            </div>
+
+            <div>
+                <h2>Informations du projet</h2>
+
+                <p>
+                    Renseignez les informations principales
+                    de la nouvelle construction.
+                </p>
+            </div>
+
+        </div>
+
+
+        <form method="POST"
+              class="form-body"
+              id="constructionForm">
+
+            {% csrf_token %}
+
+
+            <div class="form-grid">
+
+
+                <!-- NOM -->
+                <div class="form-group">
+
+                    <label class="form-label"
+                           for="nom">
+
+                        <i class="fa-solid fa-signature"></i>
+
+                        Nom de la construction
+
+                        <span class="required">*</span>
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="fa-solid fa-helmet-safety input-icon"></i>
+
+                        <input
+                            type="text"
+                            id="nom"
+                            name="nom"
+                            class="form-control-pro with-icon"
+                            placeholder="Ex : Résidence Horizon"
+                            value="{{ request.POST.nom|default:'' }}"
+                            required
+                            maxlength="150"
+                        >
+
+                    </div>
+
+                    <div class="field-help">
+                        Nom permettant d’identifier facilement le projet.
+                    </div>
+
+                </div>
+
+
+                <!-- BATIMENT -->
+                <div class="form-group">
+
+                    <label class="form-label"
+                           for="batiment">
+
+                        <i class="fa-solid fa-building"></i>
+                        Bâtiment associé
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="fa-solid fa-city input-icon"></i>
+
+                        <select
+                            id="batiment"
+                            name="batiment"
+                            class="form-control-pro with-icon"
+                        >
+
+                            <option value="">
+                                Aucun bâtiment associé
+                            </option>
+
+                            {% for batiment in batiments %}
+
+                                <option
+                                    value="{{ batiment.id }}"
+                                    {% if request.POST.batiment == batiment.id|stringformat:"s" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ batiment.nom }}
+
+                                    {% if batiment.code_batiment %}
+                                        — {{ batiment.code_batiment }}
+                                    {% endif %}
+                                </option>
+
+                            {% empty %}
+
+                                <option value="" disabled>
+                                    Aucun bâtiment disponible
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <div class="field-help">
+                        Facultatif : vous pouvez créer un projet indépendant.
+                    </div>
+
+                </div>
+
+
+                <!-- BUDGET -->
+                <div class="form-group">
+
+                    <label class="form-label"
+                           for="budget_total">
+
+                        <i class="fa-solid fa-wallet"></i>
+                        Budget total
+                    </label>
+
+                    <div class="input-wrapper budget-group">
+
+                        <i class="fa-solid fa-coins input-icon"></i>
+
+                        <input
+                            type="number"
+                            id="budget_total"
+                            name="budget_total"
+                            class="form-control-pro with-icon budget-input"
+                            placeholder="0.00"
+                            value="{{ request.POST.budget_total|default:'0' }}"
+                            step="0.01"
+                            min="0"
+                        >
+
+                        <span class="currency-badge">
+                            $
+                        </span>
+
+                    </div>
+
+                    <div class="field-help">
+                        Budget global prévu pour l’ensemble du projet.
+                    </div>
+
+                </div>
+
+
+                <!-- DATE DEBUT -->
+                <div class="form-group">
+
+                    <label class="form-label"
+                           for="date_debut">
+
+                        <i class="fa-solid fa-calendar-day"></i>
+                        Date de début
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="fa-solid fa-calendar input-icon"></i>
+
+                        <input
+                            type="date"
+                            id="date_debut"
+                            name="date_debut"
+                            class="form-control-pro with-icon"
+                            value="{{ request.POST.date_debut|default:'' }}"
+                        >
+
+                    </div>
+
+                    <div class="field-help">
+                        Date réelle ou prévue du démarrage.
+                    </div>
+
+                </div>
+
+
+                <!-- DATE FIN PREVUE -->
+                <div class="form-group">
+
+                    <label class="form-label"
+                           for="date_fin_prevue">
+
+                        <i class="fa-solid fa-calendar-check"></i>
+                        Date de fin prévue
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="fa-solid fa-flag-checkered input-icon"></i>
+
+                        <input
+                            type="date"
+                            id="date_fin_prevue"
+                            name="date_fin_prevue"
+                            class="form-control-pro with-icon"
+                            value="{{ request.POST.date_fin_prevue|default:'' }}"
+                        >
+
+                    </div>
+
+                    <div class="field-help">
+                        Échéance estimée pour la fin du projet.
+                    </div>
+
+                </div>
+
+
+                <!-- ETAT INITIAL VISUEL -->
+                <div class="form-group">
+
+                    <label class="form-label">
+
+                        <i class="fa-solid fa-toggle-on"></i>
+                        État du projet
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="fa-solid fa-circle-check input-icon"></i>
+
+                        <input
+                            type="text"
+                            class="form-control-pro with-icon"
+                            value="Actif"
+                            readonly
+                        >
+
+                    </div>
+
+                    <div class="field-help">
+                        La nouvelle construction sera créée comme active.
+                    </div>
+
+                </div>
+
+
+                <!-- DESCRIPTION -->
+                <div class="form-group full-width">
+
+                    <label class="form-label"
+                           for="description">
+
+                        <i class="fa-solid fa-align-left"></i>
+                        Description du projet
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        class="form-control-pro"
+                        placeholder="Décrivez le projet, les objectifs, les travaux prévus, les particularités techniques..."
+                        maxlength="3000"
+                    >{{ request.POST.description|default:'' }}</textarea>
+
+                    <div class="field-help">
+                        Ajoutez les informations utiles pour le suivi du projet.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+            <div class="form-actions">
+
+                <a href="{% url 'constructions' %}"
+                   class="btn-cancel">
+
+                    <i class="fa-solid fa-xmark"></i>
+                    Annuler
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="btn-save"
+                    id="submitBtn"
+                >
+
+                    <i class="fa-solid fa-floppy-disk"></i>
+
+                    <span>
+                        Enregistrer la construction
+                    </span>
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- =====================
+         SIDEBAR
+    ====================== -->
+    <aside class="info-sidebar">
+
+
+        <!-- CONSEIL -->
+        <div class="info-card">
+
+            <div class="info-card-title">
+
+                <i class="fa-solid fa-lightbulb"></i>
+
+                <span>
+                    Conseil de gestion
+                </span>
+
+            </div>
+
+            <p>
+                Définissez un budget global réaliste.
+                Après la création du projet, vous pourrez
+                ajouter plusieurs étapes avec leur propre
+                budget prévu, montant dépensé et statut.
+            </p>
+
+        </div>
+
+
+        <!-- PROCESSUS -->
+        <div class="info-card">
+
+            <div class="info-card-title">
+
+                <i class="fa-solid fa-list-check"></i>
+
+                <span>
+                    Fonctionnement
+                </span>
+
+            </div>
+
+
+            <div class="process-list">
+
+                <div class="process-item">
+
+                    <div class="process-number">
+                        1
+                    </div>
+
+                    <div class="process-text">
+                        <strong>
+                            Créer le projet
+                        </strong>
+
+                        <span>
+                            Nom, bâtiment, budget et dates.
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="process-item">
+
+                    <div class="process-number">
+                        2
+                    </div>
+
+                    <div class="process-text">
+                        <strong>
+                            Ajouter les étapes
+                        </strong>
+
+                        <span>
+                            Fondation, toiture, électricité, etc.
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="process-item">
+
+                    <div class="process-number">
+                        3
+                    </div>
+
+                    <div class="process-text">
+                        <strong>
+                            Suivre les dépenses
+                        </strong>
+
+                        <span>
+                            Comparez budget prévu et montant réel.
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="process-item">
+
+                    <div class="process-number">
+                        4
+                    </div>
+
+                    <div class="process-text">
+                        <strong>
+                            Vérifier les statuts
+                        </strong>
+
+                        <span>
+                            En attente, en cours, terminé ou bloqué.
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- BUDGET NOTE -->
+        <div class="info-card budget-note">
+
+            <div class="info-card-title">
+
+                <i class="fa-solid fa-chart-line"></i>
+
+                <span>
+                    Suivi financier
+                </span>
+
+            </div>
+
+            <p>
+                Le total dépensé sera calculé automatiquement
+                à partir des montants enregistrés dans chaque
+                étape de construction.
+            </p>
+
+        </div>
+
+    </aside>
+
+</div>
+```
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const form = document.getElementById("constructionForm");
+        const submitBtn = document.getElementById("submitBtn");
+
+        const dateDebut = document.getElementById("date_debut");
+        const dateFin = document.getElementById("date_fin_prevue");
+
+        const budgetInput = document.getElementById("budget_total");
+
+
+        /*
+        ============================
+        VERIFICATION DES DATES
+        ============================
+        */
+        function verifierDates() {
+
+            if (
+                dateDebut.value &&
+                dateFin.value &&
+                dateFin.value < dateDebut.value
+            ) {
+                dateFin.setCustomValidity(
+                    "La date de fin prévue doit être postérieure à la date de début."
+                );
+            } else {
+                dateFin.setCustomValidity("");
+            }
+        }
+
+        dateDebut.addEventListener(
+            "change",
+            verifierDates
+        );
+
+        dateFin.addEventListener(
+            "change",
+            verifierDates
+        );
+
+
+        /*
+        ============================
+        VERIFICATION BUDGET
+        ============================
+        */
+        budgetInput.addEventListener(
+            "input",
+            function () {
+
+                const valeur = parseFloat(
+                    budgetInput.value || "0"
+                );
+
+                if (valeur < 0) {
+                    budgetInput.value = "0";
+                }
+
+            }
+        );
+
+
+        /*
+        ============================
+        SOUMISSION
+        ============================
+        */
+        form.addEventListener(
+            "submit",
+            function () {
+
+                verifierDates();
+
+                if (!form.checkValidity()) {
+                    return;
+                }
+
+                submitBtn.disabled = true;
+
+                submitBtn.innerHTML = `
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <span>Enregistrement...</span>
+                `;
+
+            }
+        );
+
+    });
+</script>
+
+{% endblock %}

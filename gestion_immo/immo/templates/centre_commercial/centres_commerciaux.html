@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>Centres commerciaux | Hexa Immo</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        :root{
+            --navy:#071a3d;
+            --navy-soft:#102a5a;
+            --blue:#0057ff;
+            --blue-soft:#eaf1ff;
+            --green:#16a34a;
+            --green-soft:#eaf9ef;
+            --orange:#ea8b16;
+            --orange-soft:#fff5e7;
+            --red:#dc2626;
+            --red-soft:#fff0f0;
+            --purple:#7c3aed;
+            --purple-soft:#f2ebff;
+            --background:#f3f6fb;
+            --white:#ffffff;
+            --text:#0f172a;
+            --muted:#64748b;
+            --border:#e2e8f0;
+        }
+
+        *{
+            box-sizing:border-box;
+        }
+
+        body{
+            min-height:100vh;
+            margin:0;
+            color:var(--text);
+            background:
+                radial-gradient(
+                    circle at 0 0,
+                    rgba(0,87,255,.08),
+                    transparent 28%
+                ),
+                var(--background);
+            font-family:
+                "Segoe UI",
+                Arial,
+                sans-serif;
+        }
+
+        a{
+            text-decoration:none;
+        }
+
+        .page{
+            width:100%;
+            max-width:1450px;
+            margin:auto;
+            padding:28px;
+        }
+
+        /* =====================================================
+           EN-TÊTE
+        ===================================================== */
+
+        .hero{
+            position:relative;
+            overflow:hidden;
+
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:25px;
+
+            min-height:210px;
+            margin-bottom:24px;
+            padding:35px;
+
+            border-radius:28px;
+            color:white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--navy),
+                    #123f89 55%,
+                    var(--blue)
+                );
+
+            box-shadow:
+                0 22px 55px rgba(7,26,61,.20);
+        }
+
+        .hero::before{
+            content:"";
+            position:absolute;
+            width:280px;
+            height:280px;
+            top:-180px;
+            right:-70px;
+            border:55px solid rgba(255,255,255,.08);
+            border-radius:50%;
+        }
+
+        .hero::after{
+            content:"";
+            position:absolute;
+            width:180px;
+            height:180px;
+            right:25%;
+            bottom:-135px;
+            border-radius:50%;
+            background:rgba(255,255,255,.06);
+        }
+
+        .hero-content,
+        .hero-actions{
+            position:relative;
+            z-index:2;
+        }
+
+        .hero-label{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+
+            margin-bottom:13px;
+            padding:8px 13px;
+
+            border:1px solid rgba(255,255,255,.18);
+            border-radius:999px;
+
+            background:rgba(255,255,255,.10);
+
+            font-size:11px;
+            font-weight:800;
+            text-transform:uppercase;
+            letter-spacing:.05em;
+        }
+
+        .hero h1{
+            margin:0 0 10px;
+            font-size:36px;
+            font-weight:900;
+            letter-spacing:-1px;
+        }
+
+        .hero p{
+            max-width:700px;
+            margin:0;
+            color:rgba(255,255,255,.75);
+            line-height:1.7;
+        }
+
+        .hero-actions{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            flex-wrap:wrap;
+        }
+
+        .btn-pro{
+            min-height:50px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:9px;
+
+            padding:13px 18px;
+            border-radius:15px;
+
+            font-size:13px;
+            font-weight:900;
+
+            transition:
+                transform .25s ease,
+                box-shadow .25s ease;
+        }
+
+        .btn-pro:hover{
+            transform:translateY(-2px);
+        }
+
+        .btn-primary-pro{
+            color:var(--navy);
+            background:white;
+            box-shadow:0 13px 28px rgba(0,0,0,.15);
+        }
+
+        .btn-back-pro{
+            color:white;
+            border:1px solid rgba(255,255,255,.20);
+            background:rgba(255,255,255,.10);
+        }
+
+        /* =====================================================
+           MESSAGES
+        ===================================================== */
+
+        .message{
+            display:flex;
+            align-items:center;
+            gap:12px;
+
+            margin-bottom:18px;
+            padding:14px 17px;
+
+            border-radius:16px;
+
+            font-size:13px;
+            font-weight:700;
+        }
+
+        .message.success{
+            color:#126535;
+            border:1px solid #bfe9cd;
+            background:#ecfdf3;
+        }
+
+        .message.error{
+            color:#a51d2d;
+            border:1px solid #ffcbd1;
+            background:#fff1f2;
+        }
+
+        .message.warning{
+            color:#93520d;
+            border:1px solid #f6d59d;
+            background:#fff8e9;
+        }
+
+        /* =====================================================
+           STATISTIQUES
+        ===================================================== */
+
+        .stats-grid{
+            display:grid;
+            grid-template-columns:repeat(4,minmax(0,1fr));
+            gap:16px;
+            margin-bottom:23px;
+        }
+
+        .stat-card{
+            display:flex;
+            align-items:center;
+            gap:15px;
+
+            min-height:120px;
+            padding:20px;
+
+            border:1px solid var(--border);
+            border-radius:22px;
+
+            background:white;
+            box-shadow:
+                0 12px 34px rgba(15,23,42,.07);
+        }
+
+        .stat-icon{
+            flex:0 0 50px;
+            width:50px;
+            height:50px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:16px;
+
+            font-size:19px;
+        }
+
+        .stat-icon.blue{
+            color:var(--blue);
+            background:var(--blue-soft);
+        }
+
+        .stat-icon.purple{
+            color:var(--purple);
+            background:var(--purple-soft);
+        }
+
+        .stat-icon.green{
+            color:var(--green);
+            background:var(--green-soft);
+        }
+
+        .stat-icon.orange{
+            color:var(--orange);
+            background:var(--orange-soft);
+        }
+
+        .stat-content small{
+            display:block;
+            margin-bottom:5px;
+            color:var(--muted);
+            font-size:10px;
+            font-weight:800;
+            text-transform:uppercase;
+            letter-spacing:.05em;
+        }
+
+        .stat-content strong{
+            display:block;
+            color:var(--navy);
+            font-size:27px;
+            font-weight:900;
+        }
+
+        /* =====================================================
+           RECHERCHE ET FILTRES
+        ===================================================== */
+
+        .filter-card{
+            margin-bottom:23px;
+            padding:19px;
+
+            border:1px solid var(--border);
+            border-radius:21px;
+
+            background:white;
+            box-shadow:
+                0 12px 34px rgba(15,23,42,.06);
+        }
+
+        .filter-form{
+            display:grid;
+            grid-template-columns:minmax(250px,1fr) 220px 180px auto;
+            gap:12px;
+            align-items:center;
+        }
+
+        .search-group{
+            position:relative;
+        }
+
+        .search-group i{
+            position:absolute;
+            top:50%;
+            left:16px;
+            color:#94a3b8;
+            transform:translateY(-50%);
+        }
+
+        .form-control,
+        .form-select{
+            min-height:50px;
+            border:1px solid var(--border);
+            border-radius:14px;
+            font-weight:600;
+        }
+
+        .search-group .form-control{
+            padding-left:45px;
+        }
+
+        .form-control:focus,
+        .form-select:focus{
+            border-color:var(--blue);
+            box-shadow:0 0 0 4px rgba(0,87,255,.10);
+        }
+
+        .btn-filter{
+            min-height:50px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+
+            padding:12px 18px;
+            border:0;
+            border-radius:14px;
+
+            color:white;
+            background:linear-gradient(135deg,var(--navy),var(--blue));
+
+            font-weight:900;
+            cursor:pointer;
+        }
+
+        .btn-reset{
+            min-height:50px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+
+            width:50px;
+
+            border:1px solid var(--border);
+            border-radius:14px;
+
+            color:#64748b;
+            background:white;
+        }
+
+        /* =====================================================
+           TITRE DE SECTION
+        ===================================================== */
+
+        .section-header{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:15px;
+
+            margin-bottom:16px;
+        }
+
+        .section-title{
+            display:flex;
+            align-items:center;
+            gap:11px;
+        }
+
+        .section-icon{
+            width:42px;
+            height:42px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:14px;
+            color:var(--blue);
+            background:var(--blue-soft);
+        }
+
+        .section-title h2{
+            margin:0;
+            color:var(--navy);
+            font-size:20px;
+            font-weight:900;
+        }
+
+        .section-title p{
+            margin:3px 0 0;
+            color:var(--muted);
+            font-size:12px;
+        }
+
+        .result-badge{
+            padding:8px 12px;
+            border-radius:999px;
+            color:#475569;
+            background:#e9eef5;
+            font-size:11px;
+            font-weight:800;
+        }
+
+        /* =====================================================
+           CARTES DES CENTRES
+        ===================================================== */
+
+        .centres-grid{
+            display:grid;
+            grid-template-columns:repeat(3,minmax(0,1fr));
+            gap:18px;
+        }
+
+        .centre-card{
+            position:relative;
+            overflow:hidden;
+
+            display:flex;
+            flex-direction:column;
+
+            min-height:360px;
+
+            border:1px solid var(--border);
+            border-radius:24px;
+
+            background:white;
+            box-shadow:
+                0 15px 38px rgba(15,23,42,.07);
+
+            transition:
+                transform .25s ease,
+                box-shadow .25s ease;
+        }
+
+        .centre-card:hover{
+            transform:translateY(-5px);
+            box-shadow:
+                0 22px 48px rgba(15,23,42,.12);
+        }
+
+        .centre-top{
+            position:relative;
+
+            min-height:130px;
+            padding:22px;
+
+            color:white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--navy),
+                    #1555ad
+                );
+        }
+
+        .centre-top::after{
+            content:"";
+            position:absolute;
+            width:120px;
+            height:120px;
+            right:-45px;
+            bottom:-65px;
+            border-radius:50%;
+            background:rgba(255,255,255,.08);
+        }
+
+        .centre-top-row{
+            position:relative;
+            z-index:2;
+
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:12px;
+        }
+
+        .centre-main{
+            display:flex;
+            align-items:flex-start;
+            gap:13px;
+            min-width:0;
+        }
+
+        .centre-icon{
+            flex:0 0 48px;
+            width:48px;
+            height:48px;
+
+            display:grid;
+            place-items:center;
+
+            border:1px solid rgba(255,255,255,.18);
+            border-radius:15px;
+
+            background:rgba(255,255,255,.12);
+
+            font-size:18px;
+        }
+
+        .centre-name{
+            min-width:0;
+        }
+
+        .centre-name small{
+            display:block;
+            margin-bottom:5px;
+            color:rgba(255,255,255,.65);
+            font-size:9px;
+            font-weight:800;
+            text-transform:uppercase;
+        }
+
+        .centre-name h3{
+            margin:0;
+            overflow:hidden;
+            color:white;
+            font-size:18px;
+            font-weight:900;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+
+        .centre-code{
+            margin-top:5px;
+            color:rgba(255,255,255,.67);
+            font-size:10px;
+            font-weight:700;
+        }
+
+        .status-badge{
+            flex-shrink:0;
+
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+
+            padding:7px 10px;
+            border-radius:999px;
+
+            font-size:9px;
+            font-weight:900;
+            text-transform:uppercase;
+        }
+
+        .status-badge.active{
+            color:#d9ffe6;
+            background:rgba(34,197,94,.22);
+        }
+
+        .status-badge.inactive{
+            color:#ffe1e1;
+            background:rgba(239,68,68,.20);
+        }
+
+        .status-dot{
+            width:7px;
+            height:7px;
+            border-radius:50%;
+            background:currentColor;
+        }
+
+        .centre-content{
+            flex:1;
+            display:flex;
+            flex-direction:column;
+            padding:20px;
+        }
+
+        .location{
+            display:flex;
+            align-items:flex-start;
+            gap:10px;
+
+            min-height:48px;
+            margin-bottom:17px;
+
+            color:#526177;
+            font-size:12px;
+            line-height:1.6;
+        }
+
+        .location i{
+            margin-top:3px;
+            color:var(--blue);
+        }
+
+        .mini-stats{
+            display:grid;
+            grid-template-columns:repeat(3,minmax(0,1fr));
+            gap:9px;
+
+            margin-bottom:18px;
+        }
+
+        .mini-stat{
+            padding:12px 8px;
+            border-radius:14px;
+            text-align:center;
+        }
+
+        .mini-stat.total{
+            color:#23446e;
+            background:#edf4ff;
+        }
+
+        .mini-stat.free{
+            color:#126536;
+            background:#ecfdf3;
+        }
+
+        .mini-stat.busy{
+            color:#984d12;
+            background:#fff4e6;
+        }
+
+        .mini-stat strong{
+            display:block;
+            font-size:19px;
+            font-weight:900;
+        }
+
+        .mini-stat span{
+            display:block;
+            margin-top:2px;
+            font-size:8px;
+            font-weight:800;
+            text-transform:uppercase;
+        }
+
+        .centre-info{
+            display:grid;
+            gap:10px;
+            margin-bottom:19px;
+        }
+
+        .info-row{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:10px;
+
+            padding-bottom:9px;
+            border-bottom:1px dashed #e5eaf0;
+
+            font-size:11px;
+        }
+
+        .info-row:last-child{
+            border-bottom:0;
+        }
+
+        .info-label{
+            display:flex;
+            align-items:center;
+            gap:7px;
+            color:var(--muted);
+            font-weight:700;
+        }
+
+        .info-value{
+            max-width:55%;
+            overflow:hidden;
+            color:var(--navy);
+            font-weight:800;
+            text-align:right;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+
+        .centre-actions{
+    display:grid;
+    grid-template-columns:1fr auto auto;
+    gap:10px;
+    margin-top:auto;
+}
+
+.btn-delete{
+    min-width:45px;
+    height:45px;
+
+    display:grid;
+    place-items:center;
+
+    border:1px solid #fecaca;
+    border-radius:13px;
+
+    color:var(--red);
+    background:var(--red-soft);
+
+    cursor:pointer;
+
+    transition:
+        transform .2s ease,
+        background .2s ease,
+        box-shadow .2s ease;
+}
+
+.btn-delete:hover{
+    color:white;
+    background:var(--red);
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 10px 22px rgba(220,38,38,.22);
+}
+        .btn-detail{
+            min-height:45px;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+
+            padding:11px 15px;
+            border-radius:13px;
+
+            color:white;
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--navy),
+                    var(--blue)
+                );
+
+            font-size:11px;
+            font-weight:900;
+        }
+
+        .btn-local{
+            min-width:45px;
+            height:45px;
+
+            display:grid;
+            place-items:center;
+
+            border:1px solid #c9ead4;
+            border-radius:13px;
+
+            color:var(--green);
+            background:var(--green-soft);
+        }
+
+        /* =====================================================
+           ÉTAT VIDE
+        ===================================================== */
+
+        .empty-state{
+            grid-column:1 / -1;
+
+            padding:65px 25px;
+
+            border:1px dashed #cbd5e1;
+            border-radius:25px;
+
+            background:white;
+            text-align:center;
+        }
+
+        .empty-icon{
+            width:75px;
+            height:75px;
+
+            display:grid;
+            place-items:center;
+
+            margin:0 auto 17px;
+
+            border-radius:23px;
+
+            color:var(--blue);
+            background:var(--blue-soft);
+
+            font-size:27px;
+        }
+
+        .empty-state h3{
+            margin:0 0 8px;
+            color:var(--navy);
+            font-size:20px;
+            font-weight:900;
+        }
+
+        .empty-state p{
+            max-width:520px;
+            margin:0 auto 20px;
+            color:var(--muted);
+            line-height:1.7;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media(max-width:1150px){
+            .stats-grid{
+                grid-template-columns:repeat(2,minmax(0,1fr));
+            }
+
+            .centres-grid{
+                grid-template-columns:repeat(2,minmax(0,1fr));
+            }
+
+            .filter-form{
+                grid-template-columns:1fr 1fr;
+            }
+        }
+
+        @media(max-width:760px){
+            .page{
+                padding:15px;
+            }
+
+            .hero{
+                align-items:flex-start;
+                flex-direction:column;
+                padding:26px 22px;
+                border-radius:23px;
+            }
+
+            .hero h1{
+                font-size:28px;
+            }
+
+            .hero-actions{
+                width:100%;
+            }
+
+            .btn-pro{
+                flex:1;
+            }
+
+            .stats-grid,
+            .centres-grid,
+            .filter-form{
+                grid-template-columns:1fr;
+            }
+
+            .btn-filter,
+            .btn-reset{
+                width:100%;
+            }
+
+            .section-header{
+                align-items:flex-start;
+                flex-direction:column;
+            }
+        }
+
+        @media(max-width:450px){
+            .stats-grid{
+                gap:11px;
+            }
+
+            .stat-card{
+                min-height:100px;
+                padding:16px;
+            }
+
+            .centre-card{
+                min-height:auto;
+            }
+
+            .mini-stats{
+                grid-template-columns:1fr;
+            }
+
+            .hero-actions{
+                flex-direction:column;
+            }
+
+            .btn-pro{
+                width:100%;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+<main class="page">
+
+    <!-- =====================================================
+         EN-TÊTE
+    ====================================================== -->
+
+    <header class="hero">
+
+        <div class="hero-content">
+
+            <div class="hero-label">
+                <i class="fa-solid fa-store"></i>
+                Gestion des espaces commerciaux
+            </div>
+
+            <h1>
+                Centres commerciaux
+            </h1>
+
+            <p>
+                Gérez les centres, marchés, stations, boutiques,
+                restaurants, bureaux et autres espaces commerciaux
+                de votre agence immobilière.
+            </p>
+
+        </div>
+
+        <div class="hero-actions">
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="btn-pro btn-back-pro"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+                Tableau de bord
+            </a>
+
+            <a
+                href="{% url 'ajouter_centre_commercial' %}"
+                class="btn-pro btn-primary-pro"
+            >
+                <i class="fa-solid fa-plus"></i>
+                Ajouter un centre
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         MESSAGES DJANGO
+    ====================================================== -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="message {{ message.tags }}">
+
+                {% if message.tags == "success" %}
+                    <i class="fa-solid fa-circle-check"></i>
+                {% elif message.tags == "error" %}
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                {% else %}
+                    <i class="fa-solid fa-circle-info"></i>
+                {% endif %}
+
+                <span>
+                    {{ message }}
+                </span>
+
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         STATISTIQUES
+    ====================================================== -->
+
+    <section class="stats-grid">
+
+        <article class="stat-card">
+
+            <div class="stat-icon blue">
+                <i class="fa-solid fa-city"></i>
+            </div>
+
+            <div class="stat-content">
+                <small>Centres enregistrés</small>
+                <strong>{{ total_centres|default:0 }}</strong>
+            </div>
+
+        </article>
+
+
+        <article class="stat-card">
+
+            <div class="stat-icon purple">
+                <i class="fa-solid fa-store"></i>
+            </div>
+
+            <div class="stat-content">
+                <small>Total des locaux</small>
+                <strong>{{ total_locaux|default:0 }}</strong>
+            </div>
+
+        </article>
+
+
+        <article class="stat-card">
+
+            <div class="stat-icon green">
+                <i class="fa-solid fa-door-open"></i>
+            </div>
+
+            <div class="stat-content">
+                <small>Locaux libres</small>
+                <strong>{{ total_locaux_libres|default:0 }}</strong>
+            </div>
+
+        </article>
+
+
+        <article class="stat-card">
+
+            <div class="stat-icon orange">
+                <i class="fa-solid fa-user-lock"></i>
+            </div>
+
+            <div class="stat-content">
+                <small>Locaux occupés</small>
+                <strong>{{ total_locaux_occupes|default:0 }}</strong>
+            </div>
+
+        </article>
+
+    </section>
+
+
+    <!-- =====================================================
+         RECHERCHE ET FILTRES
+    ====================================================== -->
+
+    <section class="filter-card">
+
+        <form
+            method="GET"
+            class="filter-form"
+        >
+
+            <div class="search-group">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="search"
+                    name="q"
+                    value="{{ recherche }}"
+                    class="form-control"
+                    placeholder="Rechercher un centre, une ville, un code..."
+                >
+
+            </div>
+
+
+            <select
+                name="type"
+                class="form-select"
+            >
+
+                <option value="">
+                    Tous les types
+                </option>
+
+                {% for valeur, libelle in types_centres %}
+
+                    <option
+                        value="{{ valeur }}"
+                        {% if type_selectionne == valeur %}selected{% endif %}
+                    >
+                        {{ libelle }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <select
+                name="statut"
+                class="form-select"
+            >
+
+                <option value="">
+                    Tous les statuts
+                </option>
+
+                <option
+                    value="actifs"
+                    {% if statut_selectionne == "actifs" %}selected{% endif %}
+                >
+                    Centres actifs
+                </option>
+
+                <option
+                    value="inactifs"
+                    {% if statut_selectionne == "inactifs" %}selected{% endif %}
+                >
+                    Centres inactifs
+                </option>
+
+            </select>
+
+
+            <div class="d-flex gap-2">
+
+                <button
+                    type="submit"
+                    class="btn-filter"
+                >
+                    <i class="fa-solid fa-filter"></i>
+                    Filtrer
+                </button>
+
+                <a
+                    href="{% url 'centres_commerciaux' %}"
+                    class="btn-reset"
+                    title="Réinitialiser"
+                >
+                    <i class="fa-solid fa-rotate-left"></i>
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- =====================================================
+         LISTE
+    ====================================================== -->
+
+    <section>
+
+        <div class="section-header">
+
+            <div class="section-title">
+
+                <div class="section-icon">
+                    <i class="fa-solid fa-building-circle-check"></i>
+                </div>
+
+                <div>
+                    <h2>Liste des centres</h2>
+
+                    <p>
+                        Consultez les locaux libres, occupés et réservés.
+                    </p>
+                </div>
+
+            </div>
+
+            <span class="result-badge">
+                {{ total_resultats|default:0 }} résultat(s)
+            </span>
+
+        </div>
+
+
+        <div class="centres-grid">
+
+            {% for centre in centres %}
+
+                <article class="centre-card">
+
+                    <div class="centre-top">
+
+                        <div class="centre-top-row">
+
+                            <div class="centre-main">
+
+                                <div class="centre-icon">
+
+                                    {% if centre.type_centre == "marche" %}
+                                        <i class="fa-solid fa-basket-shopping"></i>
+                                    {% elif centre.type_centre == "gare" %}
+                                        <i class="fa-solid fa-bus-simple"></i>
+                                    {% elif centre.type_centre == "station" %}
+                                        <i class="fa-solid fa-gas-pump"></i>
+                                    {% elif centre.type_centre == "galerie" %}
+                                        <i class="fa-solid fa-shop-lock"></i>
+                                    {% else %}
+                                        <i class="fa-solid fa-store"></i>
+                                    {% endif %}
+
+                                </div>
+
+                                <div class="centre-name">
+
+                                    <small>
+                                        {{ centre.get_type_centre_display }}
+                                    </small>
+
+                                    <h3 title="{{ centre.nom }}">
+                                        {{ centre.nom }}
+                                    </h3>
+
+                                    <div class="centre-code">
+                                        Code : {{ centre.code }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            {% if centre.actif %}
+
+                                <span class="status-badge active">
+                                    <span class="status-dot"></span>
+                                    Actif
+                                </span>
+
+                            {% else %}
+
+                                <span class="status-badge inactive">
+                                    <span class="status-dot"></span>
+                                    Inactif
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="centre-content">
+
+                        <div class="location">
+
+                            <i class="fa-solid fa-location-dot"></i>
+
+                            <span>
+                                {{ centre.adresse }}
+
+                                {% if centre.quartier %}
+                                    · {{ centre.quartier }}
+                                {% endif %}
+
+                                · {{ centre.ville }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="mini-stats">
+
+                            <div class="mini-stat total">
+                                <strong>{{ centre.total_locaux|default:0 }}</strong>
+                                <span>Total</span>
+                            </div>
+
+                            <div class="mini-stat free">
+                                <strong>{{ centre.locaux_libres|default:0 }}</strong>
+                                <span>Libres</span>
+                            </div>
+
+                            <div class="mini-stat busy">
+                                <strong>{{ centre.locaux_occupes|default:0 }}</strong>
+                                <span>Occupés</span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="centre-info">
+
+                            <div class="info-row">
+
+                                <span class="info-label">
+                                    <i class="fa-solid fa-user-tie"></i>
+                                    Propriétaire
+                                </span>
+
+                                <span class="info-value">
+
+                                    {% if centre.proprietaire %}
+
+                                        {{ centre.proprietaire.prenom }}
+                                        {{ centre.proprietaire.nom }}
+
+                                    {% else %}
+
+                                        Non associé
+
+                                    {% endif %}
+
+                                </span>
+
+                            </div>
+
+
+                            <div class="info-row">
+
+                                <span class="info-label">
+                                    <i class="fa-solid fa-building"></i>
+                                    Bâtiment
+                                </span>
+
+                                <span class="info-value">
+
+                                    {% if centre.batiment %}
+
+                                        {{ centre.batiment.nom }}
+
+                                    {% else %}
+
+                                        Aucun bâtiment
+
+                                    {% endif %}
+
+                                </span>
+
+                            </div>
+
+
+                            <div class="info-row">
+
+                                <span class="info-label">
+                                    <i class="fa-solid fa-bookmark"></i>
+                                    Réservés
+                                </span>
+
+                                <span class="info-value">
+                                    {{ centre.locaux_reserves|default:0 }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+<div class="centre-actions">
+
+    <a
+        href="{% url 'detail_centre_commercial' centre.id %}"
+        class="btn-detail"
+    >
+        <i class="fa-solid fa-eye"></i>
+        Voir le centre
+    </a>
+
+    {% if centre.actif %}
+
+        <a
+            href="{% url 'ajouter_local_commercial' centre.id %}"
+            class="btn-local"
+            title="Ajouter un local"
+        >
+            <i class="fa-solid fa-plus"></i>
+        </a>
+
+    {% endif %}
+
+    <form
+        method="POST"
+        action="{% url 'supprimer_centre_commercial' centre.id %}"
+        onsubmit="return confirmerSuppressionCentre(this);"
+    >
+        {% csrf_token %}
+
+        <button
+            type="submit"
+            class="btn-delete"
+            title="Supprimer le centre"
+            aria-label="Supprimer le centre {{ centre.nom }}"
+        >
+            <i class="fa-solid fa-trash-can"></i>
+        </button>
+
+    </form>
+
+</div>
+
+
+
+                        
+                    </div>
+
+                </article>
+
+            {% empty %}
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        <i class="fa-solid fa-store-slash"></i>
+                    </div>
+
+                    <h3>
+                        Aucun centre commercial
+                    </h3>
+
+                    <p>
+                        Aucun centre ne correspond à votre recherche.
+                        Commencez par enregistrer votre premier centre,
+                        marché, immeuble ou station commerciale.
+                    </p>
+
+                    <a
+                        href="{% url 'ajouter_centre_commercial' %}"
+                        class="btn-pro btn-primary-pro"
+                        style="background:linear-gradient(135deg,#071a3d,#0057ff);color:white;"
+                    >
+                        <i class="fa-solid fa-plus"></i>
+                        Ajouter un centre
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+</main>
+<script>
+    function confirmerSuppressionCentre(formulaire) {
+        const confirmation = window.confirm(
+            "Êtes-vous sûr de vouloir supprimer ce centre commercial ?\n\n" +
+            "Cette action est définitive et ne peut pas être annulée."
+        );
+
+        if (!confirmation) {
+            return false;
+        }
+
+        const bouton = formulaire.querySelector(".btn-delete");
+
+        if (bouton) {
+            bouton.disabled = true;
+            bouton.innerHTML =
+                '<i class="fa-solid fa-spinner fa-spin"></i>';
+        }
+
+        return true;
+    }
+</script>
+</body>
+</html>

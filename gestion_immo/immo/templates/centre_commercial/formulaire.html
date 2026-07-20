@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <meta
+        name="theme-color"
+        content="#071a3d"
+    >
+
+    <title>{{ titre|default:"Formulaire" }}</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        /* =========================================================
+           VARIABLES
+        ========================================================= */
+
+        :root{
+            --primary:#0057ff;
+            --primary-dark:#003db8;
+            --primary-soft:#edf4ff;
+
+            --navy:#071a3d;
+            --navy-light:#102d63;
+
+            --success:#059669;
+            --danger:#dc2626;
+            --warning:#f59e0b;
+
+            --text:#0f172a;
+            --text-soft:#64748b;
+            --text-light:#94a3b8;
+
+            --border:#e2e8f0;
+            --background:#f4f7fc;
+            --white:#ffffff;
+
+            --shadow:
+                0 22px 60px rgba(15,23,42,.10);
+        }
+
+
+        /* =========================================================
+           BASE
+        ========================================================= */
+
+        *{
+            box-sizing:border-box;
+        }
+
+        html{
+            scroll-behavior:smooth;
+        }
+
+        body{
+            margin:0;
+            min-height:100vh;
+
+            color:var(--text);
+
+            font-family:
+                Inter,
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(0,87,255,.10),
+                    transparent 35%
+                ),
+                radial-gradient(
+                    circle at bottom right,
+                    rgba(7,26,61,.08),
+                    transparent 35%
+                ),
+                var(--background);
+        }
+
+        button,
+        input,
+        select,
+        textarea{
+            font:inherit;
+        }
+
+
+        /* =========================================================
+           DÉCORATION DE FOND
+        ========================================================= */
+
+        .background-decoration{
+            position:fixed;
+            inset:0;
+            z-index:-1;
+            overflow:hidden;
+            pointer-events:none;
+        }
+
+        .background-decoration::before,
+        .background-decoration::after{
+            content:"";
+            position:absolute;
+            border-radius:50%;
+            filter:blur(10px);
+        }
+
+        .background-decoration::before{
+            width:420px;
+            height:420px;
+            top:-190px;
+            right:-150px;
+
+            background:
+                rgba(0,87,255,.09);
+        }
+
+        .background-decoration::after{
+            width:360px;
+            height:360px;
+            bottom:-180px;
+            left:-130px;
+
+            background:
+                rgba(7,26,61,.08);
+        }
+
+
+        /* =========================================================
+           CONTENEUR PRINCIPAL
+        ========================================================= */
+
+        .page-wrapper{
+            width:100%;
+            min-height:100vh;
+
+            display:flex;
+            align-items:flex-start;
+            justify-content:center;
+
+            padding:48px 20px;
+        }
+
+        .page-container{
+            width:100%;
+            max-width:980px;
+        }
+
+
+        /* =========================================================
+           FIL D’ARIANE
+        ========================================================= */
+
+        .breadcrumb-bar{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:16px;
+
+            margin-bottom:18px;
+        }
+
+        .breadcrumb-content{
+            display:flex;
+            align-items:center;
+            flex-wrap:wrap;
+            gap:9px;
+
+            color:var(--text-soft);
+            font-size:.89rem;
+            font-weight:700;
+        }
+
+        .breadcrumb-content i{
+            color:var(--text-light);
+            font-size:.70rem;
+        }
+
+        .breadcrumb-home{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+
+            color:var(--primary);
+            text-decoration:none;
+        }
+
+        .breadcrumb-home:hover{
+            color:var(--primary-dark);
+        }
+
+        .secure-badge{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+
+            padding:8px 12px;
+
+            color:#047857;
+            background:#ecfdf5;
+            border:1px solid #a7f3d0;
+            border-radius:999px;
+
+            font-size:.79rem;
+            font-weight:800;
+        }
+
+
+        /* =========================================================
+           HERO
+        ========================================================= */
+
+        .hero{
+            position:relative;
+            overflow:hidden;
+
+            padding:38px;
+            margin-bottom:22px;
+
+            color:var(--white);
+
+            border:1px solid rgba(255,255,255,.12);
+            border-radius:30px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--navy) 0%,
+                    var(--navy-light) 45%,
+                    var(--primary) 100%
+                );
+
+            box-shadow:
+                0 26px 70px rgba(7,26,61,.22);
+        }
+
+        .hero::before{
+            content:"";
+            position:absolute;
+
+            width:270px;
+            height:270px;
+
+            top:-130px;
+            right:-80px;
+
+            border-radius:50%;
+
+            background:
+                rgba(255,255,255,.10);
+        }
+
+        .hero::after{
+            content:"";
+            position:absolute;
+
+            width:160px;
+            height:160px;
+
+            bottom:-100px;
+            right:150px;
+
+            border-radius:50%;
+
+            background:
+                rgba(255,255,255,.06);
+        }
+
+        .hero-content{
+            position:relative;
+            z-index:2;
+
+            display:flex;
+            align-items:center;
+            gap:22px;
+        }
+
+        .hero-icon{
+            flex:0 0 70px;
+
+            width:70px;
+            height:70px;
+
+            display:grid;
+            place-items:center;
+
+            border:1px solid rgba(255,255,255,.18);
+            border-radius:22px;
+
+            background:
+                rgba(255,255,255,.13);
+
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,.18);
+
+            backdrop-filter:blur(12px);
+
+            font-size:27px;
+        }
+
+        .hero-text{
+            min-width:0;
+        }
+
+        .hero-label{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+
+            margin-bottom:9px;
+
+            color:rgba(255,255,255,.78);
+
+            font-size:.78rem;
+            font-weight:900;
+            letter-spacing:.11em;
+            text-transform:uppercase;
+        }
+
+        .hero h1{
+            margin:0 0 9px;
+
+            color:var(--white);
+
+            font-size:clamp(1.65rem,4vw,2.45rem);
+            font-weight:950;
+            line-height:1.12;
+            letter-spacing:-.04em;
+        }
+
+        .hero p{
+            max-width:680px;
+            margin:0;
+
+            color:rgba(255,255,255,.78);
+
+            font-size:1rem;
+            line-height:1.7;
+        }
+
+
+        /* =========================================================
+           CARTE DU FORMULAIRE
+        ========================================================= */
+
+        .form-card{
+            overflow:hidden;
+
+            border:1px solid rgba(226,232,240,.95);
+            border-radius:30px;
+
+            background:
+                rgba(255,255,255,.96);
+
+            box-shadow:var(--shadow);
+
+            backdrop-filter:blur(18px);
+        }
+
+        .form-card-header{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:20px;
+
+            padding:27px 30px;
+
+            border-bottom:1px solid var(--border);
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #ffffff,
+                    #fbfdff
+                );
+        }
+
+        .form-card-title{
+            display:flex;
+            align-items:center;
+            gap:14px;
+        }
+
+        .form-card-title-icon{
+            flex:0 0 45px;
+
+            width:45px;
+            height:45px;
+
+            display:grid;
+            place-items:center;
+
+            color:var(--primary);
+
+            border:1px solid #dbeafe;
+            border-radius:14px;
+
+            background:var(--primary-soft);
+
+            font-size:17px;
+        }
+
+        .form-card-title h2{
+            margin:0 0 3px;
+
+            color:var(--text);
+
+            font-size:1.05rem;
+            font-weight:900;
+        }
+
+        .form-card-title p{
+            margin:0;
+
+            color:var(--text-soft);
+
+            font-size:.84rem;
+        }
+
+        .required-message{
+            display:flex;
+            align-items:center;
+            gap:7px;
+
+            color:var(--text-soft);
+
+            font-size:.78rem;
+            font-weight:700;
+        }
+
+        .required-message span{
+            color:var(--danger);
+            font-size:1rem;
+            font-weight:900;
+        }
+
+
+        /* =========================================================
+           CORPS DU FORMULAIRE
+        ========================================================= */
+
+        .form-body{
+            padding:32px 30px 14px;
+        }
+
+        .form-grid{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:22px;
+        }
+
+        .form-group{
+            min-width:0;
+        }
+
+        .form-group.full-width{
+            grid-column:1 / -1;
+        }
+
+        .field-label{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:10px;
+
+            margin-bottom:9px;
+
+            color:#24324b;
+
+            font-size:.89rem;
+            font-weight:850;
+        }
+
+        .field-label-main{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+        }
+
+        .field-required{
+            color:var(--danger);
+            font-weight:950;
+        }
+
+        .optional-label{
+            color:var(--text-light);
+            font-size:.72rem;
+            font-weight:700;
+        }
+
+
+        /* =========================================================
+           CHAMPS DJANGO
+        ========================================================= */
+
+        .field-wrapper input:not([type="checkbox"]):not([type="radio"]),
+        .field-wrapper select,
+        .field-wrapper textarea{
+            width:100%;
+            min-height:54px;
+
+            padding:13px 15px;
+
+            color:var(--text);
+
+            border:1.5px solid var(--border);
+            border-radius:15px;
+            outline:none;
+
+            background:#fbfdff;
+
+            font-size:.94rem;
+            font-weight:600;
+
+            transition:
+                border-color .20s ease,
+                box-shadow .20s ease,
+                background .20s ease,
+                transform .20s ease;
+        }
+
+        .field-wrapper textarea{
+            min-height:135px;
+            resize:vertical;
+            line-height:1.6;
+        }
+
+        .field-wrapper select{
+            cursor:pointer;
+        }
+
+        .field-wrapper input::placeholder,
+        .field-wrapper textarea::placeholder{
+            color:#a0aec0;
+            font-weight:500;
+        }
+
+        .field-wrapper input:not([type="checkbox"]):not([type="radio"]):hover,
+        .field-wrapper select:hover,
+        .field-wrapper textarea:hover{
+            border-color:#cbd5e1;
+            background:#ffffff;
+        }
+
+        .field-wrapper input:not([type="checkbox"]):not([type="radio"]):focus,
+        .field-wrapper select:focus,
+        .field-wrapper textarea:focus{
+            border-color:var(--primary);
+
+            background:#ffffff;
+
+            box-shadow:
+                0 0 0 4px rgba(0,87,255,.10),
+                0 8px 24px rgba(15,23,42,.06);
+        }
+
+        .field-wrapper input[type="file"]{
+            padding:8px;
+            cursor:pointer;
+        }
+
+        .field-wrapper input[type="file"]::file-selector-button{
+            min-height:38px;
+
+            margin-right:12px;
+            padding:8px 14px;
+
+            color:var(--primary);
+
+            border:0;
+            border-radius:10px;
+
+            background:var(--primary-soft);
+
+            font-weight:850;
+            cursor:pointer;
+
+            transition:
+                background .2s ease,
+                color .2s ease;
+        }
+
+        .field-wrapper input[type="file"]::file-selector-button:hover{
+            color:white;
+            background:var(--primary);
+        }
+
+
+        /* =========================================================
+           CHECKBOX
+        ========================================================= */
+
+        .checkbox-field{
+            min-height:58px;
+
+            display:flex;
+            align-items:center;
+
+            padding:14px 16px;
+
+            border:1.5px solid var(--border);
+            border-radius:15px;
+
+            background:#fbfdff;
+        }
+
+        .checkbox-content{
+            display:flex;
+            align-items:center;
+            gap:11px;
+        }
+
+        .checkbox-content input[type="checkbox"]{
+            width:20px;
+            height:20px;
+
+            flex:0 0 20px;
+
+            margin:0;
+
+            accent-color:var(--primary);
+            cursor:pointer;
+        }
+
+        .checkbox-content label{
+            margin:0;
+
+            color:#24324b;
+
+            font-size:.91rem;
+            font-weight:800;
+
+            cursor:pointer;
+        }
+
+
+        /* =========================================================
+           TEXTE D’AIDE ET ERREURS
+        ========================================================= */
+
+        .help-text{
+            display:flex;
+            align-items:flex-start;
+            gap:7px;
+
+            margin-top:8px;
+
+            color:var(--text-soft);
+
+            font-size:.77rem;
+            line-height:1.45;
+        }
+
+        .help-text i{
+            margin-top:3px;
+            color:var(--primary);
+        }
+
+        .field-errors{
+            margin:8px 0 0;
+            padding:0;
+
+            list-style:none;
+        }
+
+        .field-errors li{
+            display:flex;
+            align-items:flex-start;
+            gap:7px;
+
+            margin-top:5px;
+
+            color:var(--danger);
+
+            font-size:.78rem;
+            font-weight:750;
+        }
+
+        .field-errors li::before{
+            content:"\f06a";
+
+            margin-top:2px;
+
+            font-family:"Font Awesome 6 Free";
+            font-weight:900;
+        }
+
+        .field-wrapper.has-error input,
+        .field-wrapper.has-error select,
+        .field-wrapper.has-error textarea{
+            border-color:#fca5a5;
+            background:#fffafa;
+        }
+
+        .form-alert{
+            display:flex;
+            align-items:flex-start;
+            gap:13px;
+
+            margin-bottom:25px;
+            padding:16px 18px;
+
+            color:#991b1b;
+
+            border:1px solid #fecaca;
+            border-radius:16px;
+
+            background:#fef2f2;
+        }
+
+        .form-alert-icon{
+            flex:0 0 36px;
+
+            width:36px;
+            height:36px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:11px;
+
+            background:#fee2e2;
+        }
+
+        .form-alert strong{
+            display:block;
+            margin-bottom:3px;
+            font-size:.90rem;
+        }
+
+        .form-alert ul{
+            margin:6px 0 0;
+            padding-left:18px;
+            font-size:.82rem;
+        }
+
+
+        /* =========================================================
+           PIED DU FORMULAIRE
+        ========================================================= */
+
+        .form-footer{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:18px;
+
+            padding:24px 30px;
+
+            border-top:1px solid var(--border);
+
+            background:#fbfdff;
+        }
+
+        .footer-info{
+            display:flex;
+            align-items:center;
+            gap:9px;
+
+            color:var(--text-soft);
+
+            font-size:.79rem;
+            font-weight:650;
+        }
+
+        .footer-info i{
+            color:var(--success);
+        }
+
+        .actions{
+            display:flex;
+            align-items:center;
+            gap:12px;
+        }
+
+        .btn-back,
+        .btn-save{
+            min-height:52px;
+
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:9px;
+
+            padding:12px 21px;
+
+            border-radius:15px;
+
+            font-size:.89rem;
+            font-weight:900;
+            text-decoration:none;
+
+            cursor:pointer;
+
+            transition:
+                transform .20s ease,
+                box-shadow .20s ease,
+                border-color .20s ease,
+                background .20s ease;
+        }
+
+        .btn-back{
+            color:#475569;
+
+            border:1.5px solid var(--border);
+
+            background:white;
+        }
+
+        .btn-back:hover{
+            color:var(--text);
+
+            border-color:#cbd5e1;
+
+            background:#f8fafc;
+
+            transform:translateY(-2px);
+        }
+
+        .btn-save{
+            min-width:180px;
+
+            color:white;
+
+            border:0;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary),
+                    var(--primary-dark)
+                );
+
+            box-shadow:
+                0 12px 25px rgba(0,87,255,.23);
+        }
+
+        .btn-save:hover{
+            color:white;
+
+            transform:translateY(-2px);
+
+            box-shadow:
+                0 17px 32px rgba(0,87,255,.30);
+        }
+
+        .btn-save:active,
+        .btn-back:active{
+            transform:translateY(0);
+        }
+
+        .btn-save:disabled{
+            cursor:not-allowed;
+            opacity:.70;
+            transform:none;
+        }
+
+        .spinner{
+            width:17px;
+            height:17px;
+
+            display:none;
+
+            border:2px solid rgba(255,255,255,.35);
+            border-top-color:white;
+            border-radius:50%;
+
+            animation:spinnerRotation .7s linear infinite;
+        }
+
+        .btn-save.loading .spinner{
+            display:block;
+        }
+
+        .btn-save.loading .save-icon{
+            display:none;
+        }
+
+        @keyframes spinnerRotation{
+            to{
+                transform:rotate(360deg);
+            }
+        }
+
+
+        /* =========================================================
+           RESPONSIVE TABLETTE
+        ========================================================= */
+
+        @media(max-width:800px){
+
+            .page-wrapper{
+                padding:28px 15px;
+            }
+
+            .hero{
+                padding:30px 25px;
+                border-radius:25px;
+            }
+
+            .hero-content{
+                align-items:flex-start;
+            }
+
+            .form-card{
+                border-radius:25px;
+            }
+
+            .form-grid{
+                grid-template-columns:1fr;
+            }
+
+            .form-group.full-width{
+                grid-column:auto;
+            }
+
+            .form-footer{
+                align-items:flex-start;
+                flex-direction:column;
+            }
+
+            .actions{
+                width:100%;
+            }
+
+            .btn-back,
+            .btn-save{
+                flex:1;
+            }
+
+        }
+
+
+        /* =========================================================
+           RESPONSIVE MOBILE
+        ========================================================= */
+
+        @media(max-width:580px){
+
+            .page-wrapper{
+                padding:18px 10px;
+            }
+
+            .breadcrumb-bar{
+                align-items:flex-start;
+                flex-direction:column;
+            }
+
+            .secure-badge{
+                display:none;
+            }
+
+            .hero{
+                padding:25px 20px;
+                margin-bottom:15px;
+                border-radius:22px;
+            }
+
+            .hero-content{
+                flex-direction:column;
+                gap:16px;
+            }
+
+            .hero-icon{
+                width:58px;
+                height:58px;
+                flex-basis:58px;
+
+                border-radius:18px;
+
+                font-size:22px;
+            }
+
+            .hero h1{
+                font-size:1.65rem;
+            }
+
+            .hero p{
+                font-size:.91rem;
+            }
+
+            .form-card{
+                border-radius:22px;
+            }
+
+            .form-card-header{
+                align-items:flex-start;
+                padding:21px 18px;
+            }
+
+            .required-message{
+                display:none;
+            }
+
+            .form-body{
+                padding:24px 18px 8px;
+            }
+
+            .form-grid{
+                gap:19px;
+            }
+
+            .form-footer{
+                padding:20px 18px;
+            }
+
+            .footer-info{
+                display:none;
+            }
+
+            .actions{
+                flex-direction:column-reverse;
+            }
+
+            .btn-back,
+            .btn-save{
+                width:100%;
+                min-width:0;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="background-decoration"></div>
+
+
+<main class="page-wrapper">
+
+    <div class="page-container">
+
+
+        <!-- =====================================================
+             FIL D’ARIANE
+        ====================================================== -->
+
+        <div class="breadcrumb-bar">
+
+            <div class="breadcrumb-content">
+
+                <a
+                    href="javascript:void(0)"
+                    onclick="history.back()"
+                    class="breadcrumb-home"
+                >
+                    <i class="fa-solid fa-house"></i>
+                    Tableau de bord
+                </a>
+
+                <i class="fa-solid fa-chevron-right"></i>
+
+                <span>
+                    {{ titre|default:"Formulaire" }}
+                </span>
+
+            </div>
+
+            <div class="secure-badge">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+                Formulaire sécurisé
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             HERO
+        ====================================================== -->
+
+        <header class="hero">
+
+            <div class="hero-content">
+
+                <div class="hero-icon">
+
+                    <i class="fa-solid {{ icone|default:'fa-pen-to-square' }}"></i>
+
+                </div>
+
+                <div class="hero-text">
+
+                    <span class="hero-label">
+
+                        <i class="fa-solid fa-sparkles"></i>
+
+                        Gestion administrative
+
+                    </span>
+
+                    <h1>
+                        {{ titre|default:"Nouveau formulaire" }}
+                    </h1>
+
+                    <p>
+                        {{ description|default:"Veuillez remplir les informations demandées, puis enregistrer le formulaire." }}
+                    </p>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =====================================================
+             FORMULAIRE
+        ====================================================== -->
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+            class="form-card"
+            id="mainForm"
+            novalidate
+        >
+
+            {% csrf_token %}
+
+
+            <!-- EN-TÊTE DU FORMULAIRE -->
+
+            <div class="form-card-header">
+
+                <div class="form-card-title">
+
+                    <div class="form-card-title-icon">
+
+                        <i class="fa-solid fa-rectangle-list"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Informations à renseigner
+                        </h2>
+
+                        <p>
+                            Vérifiez les informations avant l’enregistrement.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="required-message">
+
+                    <span>*</span>
+
+                    Champs obligatoires
+
+                </div>
+
+            </div>
+
+
+            <!-- CORPS DU FORMULAIRE -->
+
+            <div class="form-body">
+
+
+                <!-- ERREURS GÉNÉRALES -->
+
+                {% if formulaire.non_field_errors %}
+
+                    <div class="form-alert">
+
+                        <div class="form-alert-icon">
+
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Le formulaire contient des erreurs
+                            </strong>
+
+                            {{ formulaire.non_field_errors }}
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+
+                <div class="form-grid">
+
+
+                    {% for field in formulaire %}
+
+
+                        {% if field.field.widget.input_type == "hidden" %}
+
+                            {{ field }}
+
+
+                        {% elif field.field.widget.input_type == "checkbox" %}
+
+
+                            <!-- CHAMP CHECKBOX -->
+
+                            <div class="form-group">
+
+                                <div class="checkbox-field">
+
+                                    <div class="checkbox-content">
+
+                                        {{ field }}
+
+                                        <label for="{{ field.id_for_label }}">
+
+                                            {{ field.label }}
+
+                                        </label>
+
+                                    </div>
+
+                                </div>
+
+                                {% if field.help_text %}
+
+                                    <div class="help-text">
+
+                                        <i class="fa-solid fa-circle-info"></i>
+
+                                        <span>
+                                            {{ field.help_text|safe }}
+                                        </span>
+
+                                    </div>
+
+                                {% endif %}
+
+                                {% if field.errors %}
+
+                                    <ul class="field-errors">
+
+                                        {% for error in field.errors %}
+
+                                            <li>{{ error }}</li>
+
+                                        {% endfor %}
+
+                                    </ul>
+
+                                {% endif %}
+
+                            </div>
+
+
+                        {% else %}
+
+
+                            <!-- CHAMP STANDARD -->
+
+                            <div
+                                class="
+                                    form-group
+
+                                    {% if field.field.widget.input_type == 'textarea' %}
+                                        full-width
+                                    {% endif %}
+
+                                    {% if field.errors %}
+                                        has-error
+                                    {% endif %}
+                                "
+                            >
+
+                                <label
+                                    for="{{ field.id_for_label }}"
+                                    class="field-label"
+                                >
+
+                                    <span class="field-label-main">
+
+                                        {{ field.label }}
+
+                                        {% if field.field.required %}
+
+                                            <span class="field-required">*</span>
+
+                                        {% endif %}
+
+                                    </span>
+
+                                    {% if not field.field.required %}
+
+                                        <span class="optional-label">
+                                            Facultatif
+                                        </span>
+
+                                    {% endif %}
+
+                                </label>
+
+
+                                <div
+                                    class="
+                                        field-wrapper
+
+                                        {% if field.errors %}
+                                            has-error
+                                        {% endif %}
+                                    "
+                                >
+
+                                    {{ field }}
+
+                                </div>
+
+
+                                {% if field.help_text %}
+
+                                    <div class="help-text">
+
+                                        <i class="fa-solid fa-circle-info"></i>
+
+                                        <span>
+                                            {{ field.help_text|safe }}
+                                        </span>
+
+                                    </div>
+
+                                {% endif %}
+
+
+                                {% if field.errors %}
+
+                                    <ul class="field-errors">
+
+                                        {% for error in field.errors %}
+
+                                            <li>{{ error }}</li>
+
+                                        {% endfor %}
+
+                                    </ul>
+
+                                {% endif %}
+
+                            </div>
+
+
+                        {% endif %}
+
+
+                    {% endfor %}
+
+
+                </div>
+
+            </div>
+
+
+            <!-- PIED DU FORMULAIRE -->
+
+            <div class="form-footer">
+
+                <div class="footer-info">
+
+                    <i class="fa-solid fa-lock"></i>
+
+                    Vos informations sont enregistrées de manière sécurisée.
+
+                </div>
+
+                <div class="actions">
+
+                    <button
+                        type="button"
+                        class="btn-back"
+                        onclick="history.back()"
+                    >
+
+                        <i class="fa-solid fa-arrow-left"></i>
+
+                        Retour
+
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn-save"
+                        id="submitButton"
+                    >
+
+                        <span class="spinner"></span>
+
+                        <i class="fa-solid fa-floppy-disk save-icon"></i>
+
+                        <span id="submitText">
+                            Enregistrer
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</main>
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function(){
+
+        const form = document.getElementById("mainForm");
+        const submitButton = document.getElementById("submitButton");
+        const submitText = document.getElementById("submitText");
+
+        if(form && submitButton){
+
+            form.addEventListener("submit", function(){
+
+                submitButton.disabled = true;
+                submitButton.classList.add("loading");
+
+                if(submitText){
+                    submitText.textContent = "Enregistrement...";
+                }
+
+            });
+
+        }
+
+
+        /*
+        ==========================================================
+        AJOUT AUTOMATIQUE DES CLASSES AUX CHAMPS DJANGO
+        ==========================================================
+        */
+
+        const formFields = document.querySelectorAll(
+            ".field-wrapper input, " +
+            ".field-wrapper select, " +
+            ".field-wrapper textarea"
+        );
+
+        formFields.forEach(function(field){
+
+            if(
+                field.type !== "checkbox" &&
+                field.type !== "radio"
+            ){
+                field.classList.add("form-control");
+            }
+
+            if(field.tagName === "SELECT"){
+                field.classList.remove("form-control");
+                field.classList.add("form-select");
+            }
+
+        });
+
+    });
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+.edit-hero{
+    background:linear-gradient(135deg,#071a3d,#0057ff);
+    color:white;
+    border-radius:28px;
+    padding:28px;
+    margin-bottom:25px;
+    box-shadow:0 20px 50px rgba(0,87,255,.22);
+}
+
+.form-box{
+    background:white;
+    border:1px solid #e4ecf8;
+    border-radius:26px;
+    padding:28px;
+    box-shadow:0 15px 45px rgba(15,23,42,.08);
+}
+
+.input-icon{
+    position:relative;
+}
+
+.input-icon i{
+    position:absolute;
+    left:17px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#0057ff;
+}
+
+.input-icon input,
+.input-icon select{
+    padding-left:48px;
+    height:56px;
+    border-radius:18px;
+}
+
+.form-label{
+    color:#071a3d;
+}
+
+textarea{
+    border-radius:18px!important;
+}
+</style>
+
+<div class="edit-hero d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+        <h2 class="fw-bold mb-1">
+            <i class="fa-solid fa-pen-to-square"></i>
+            Modifier le bâtiment
+        </h2>
+        <p class="mb-0 opacity-75">{{ batiment.nom }}</p>
+    </div>
+
+    <a href="{% url 'batiments' %}" class="btn btn-light rounded-4 px-4">
+        <i class="fa-solid fa-arrow-left"></i>
+        Retour
+    </a>
+</div>
+
+<div class="form-box">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} rounded-4">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Code bâtiment</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-barcode"></i>
+                    <input type="text" name="code_batiment"
+                           value="{{ batiment.code_batiment }}"
+                           class="form-control form-control-lg" required>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <label class="form-label fw-bold">Nom du bâtiment</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-building"></i>
+                    <input type="text" name="nom"
+                           value="{{ batiment.nom }}"
+                           class="form-control form-control-lg" required>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Propriétaire</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <select name="proprietaire" class="form-select form-select-lg" required>
+                        {% for p in proprietaires %}
+                            <option value="{{ p.id }}" {% if p.id == batiment.proprietaire.id %}selected{% endif %}>
+                                {{ p.nom }} {{ p.prenom }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Ville</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-city"></i>
+                    <input type="text" name="ville"
+                           value="{{ batiment.ville }}"
+                           class="form-control form-control-lg" required>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label fw-bold">Adresse complète</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <input type="text" name="adresse"
+                           value="{{ batiment.adresse }}"
+                           class="form-control form-control-lg" required>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Nombre de logements</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-door-open"></i>
+                    <input type="number" name="nombre_logements"
+                           value="{{ batiment.nombre_logements }}"
+                           min="1"
+                           class="form-control form-control-lg">
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Statut</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <select name="actif" class="form-select form-select-lg">
+                        <option value="True" {% if batiment.actif %}selected{% endif %}>Actif</option>
+                        <option value="False" {% if not batiment.actif %}selected{% endif %}>Inactif</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label fw-bold">Description</label>
+                <textarea name="description" rows="5" class="form-control">{{ batiment.description }}</textarea>
+            </div>
+
+        </div>
+
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-end gap-3 flex-wrap">
+            <a href="{% url 'batiments' %}" class="btn btn-light btn-lg rounded-4">
+                Annuler
+            </a>
+
+            <button type="submit" class="btn btn-primary btn-lg rounded-4 px-5">
+                <i class="fa-solid fa-floppy-disk"></i>
+                Enregistrer
+            </button>
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}

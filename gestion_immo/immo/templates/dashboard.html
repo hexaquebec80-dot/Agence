@@ -1,0 +1,633 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Hexa Immo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+<style>
+:root{
+    --blue:#0057ff;
+    --dark:#061b3f;
+    --dark2:#003b9b;
+    --bg:#f6f9ff;
+    --text:#071a3d;
+    --muted:#6b7a99;
+    --card:#ffffff;
+}
+
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    background:var(--bg);
+    font-family:'Segoe UI',sans-serif;
+    color:var(--text);
+}
+
+.layout{
+    display:flex;
+    min-height:100vh;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:270px;
+    height:100vh;
+    position:fixed;
+    left:0;
+    top:0;
+    padding:26px 18px;
+    background:linear-gradient(180deg,#031b46,#0057ff);
+    color:white;
+    overflow-y:auto;
+    z-index:1000;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    margin-bottom:35px;
+}
+
+.brand-logo{
+    width:54px;
+    height:54px;
+    border-radius:18px;
+    background:white;
+    color:var(--blue);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:28px;
+    box-shadow:0 15px 35px rgba(0,0,0,.25);
+}
+
+.brand h4{
+    margin:0;
+    font-size:22px;
+    font-weight:900;
+}
+
+.brand span{
+    font-size:13px;
+    opacity:.85;
+}
+
+.menu-title{
+    font-size:12px;
+    text-transform:uppercase;
+    color:#b9d4ff;
+    margin:24px 10px 10px;
+}
+
+.nav-link-pro{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:13px 15px;
+    border-radius:13px;
+    color:white;
+    text-decoration:none;
+    font-weight:600;
+    margin-bottom:8px;
+    transition:.25s;
+}
+
+.nav-link-pro i{
+    width:22px;
+    text-align:center;
+}
+
+.nav-link-pro:hover,
+.nav-link-pro.active{
+    background:rgba(255,255,255,.18);
+    transform:translateX(4px);
+    color:white;
+}
+
+.help-box{
+    margin-top:30px;
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:18px;
+    padding:16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.help-box i{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:white;
+    color:var(--blue);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:20px;
+}
+
+/* MAIN */
+.main{
+    margin-left:270px;
+    width:calc(100% - 270px);
+    padding:22px 30px;
+}
+
+.topbar{
+    height:78px;
+    background:white;
+    border-radius:22px;
+    box-shadow:0 10px 35px rgba(15,23,42,.08);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 24px;
+    margin-bottom:28px;
+}
+
+.top-left{
+    display:flex;
+    align-items:center;
+    gap:22px;
+}
+
+.menu-btn{
+    border:none;
+    background:#eef4ff;
+    color:var(--blue);
+    width:46px;
+    height:46px;
+    border-radius:14px;
+    font-size:20px;
+}
+
+.topbar h2{
+    margin:0;
+    font-size:24px;
+    font-weight:900;
+    color:var(--text);
+}
+
+.search-box{
+    width:310px;
+    position:relative;
+}
+
+.search-box input{
+    height:46px;
+    border-radius:14px;
+    border:1px solid #dbe5f5;
+    padding-left:42px;
+}
+
+.search-box i{
+    position:absolute;
+    top:14px;
+    left:15px;
+    color:#7183a6;
+}
+
+.user-box{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:#f7faff;
+    border:1px solid #e1e9f8;
+    padding:8px 14px;
+    border-radius:18px;
+}
+
+.avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#d9e8ff,#ffffff);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    color:var(--blue);
+}
+
+.card-modern{
+    background:white;
+    border-radius:24px;
+    border:1px solid #e4ecf8;
+    padding:25px;
+    box-shadow:0 15px 45px rgba(15,23,42,.07);
+}
+
+.card-modern:hover{
+    box-shadow:0 18px 50px rgba(15,23,42,.1);
+}
+
+.stat-icon{
+    width:66px;
+    height:66px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#0057ff,#4f8cff);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:26px;
+}
+
+.stat-number{
+    font-size:32px;
+    font-weight:900;
+    color:var(--text);
+}
+
+/* TABLE PRO */
+.table{
+    margin-bottom:0;
+}
+
+.table thead th{
+    font-size:12px;
+    text-transform:uppercase;
+    color:#4d638a;
+    background:#f8fbff;
+    border-bottom:1px solid #e5edf8;
+    padding:18px;
+}
+
+.table tbody td{
+    padding:18px;
+    vertical-align:middle;
+    border-bottom:1px solid #edf2fb;
+}
+
+.btn-primary{
+    background:linear-gradient(135deg,#0057ff,#0047d9);
+    border:none;
+    box-shadow:0 10px 25px rgba(0,87,255,.28);
+}
+
+.btn-primary:hover{
+    background:linear-gradient(135deg,#0047d9,#003bb5);
+}
+
+.form-control,
+.form-select{
+    border-radius:15px;
+    border:1px solid #dbe5f5;
+}
+
+.form-control:focus,
+.form-select:focus{
+    border-color:var(--blue);
+    box-shadow:0 0 0 4px rgba(0,87,255,.12);
+}
+
+.overlay{
+    display:none;
+}
+
+/* MOBILE */
+@media(max-width:992px){
+    .sidebar{
+        left:-280px;
+        transition:.35s;
+    }
+
+    .sidebar.active{
+        left:0;
+    }
+
+    .main{
+        margin-left:0;
+        width:100%;
+        padding:16px;
+    }
+
+    .overlay.active{
+        display:block;
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,.45);
+        z-index:900;
+    }
+
+    .search-box{
+        display:none;
+    }
+
+    .topbar{
+        height:auto;
+        padding:16px;
+        gap:15px;
+    }
+
+    .topbar h2{
+        font-size:19px;
+    }
+}
+
+.help-box{
+    width:100%;
+    min-width:0;
+
+    display:flex;
+    align-items:center;
+    gap:11px;
+
+    margin-top:24px;
+    padding:13px;
+
+    border:1px solid rgba(255,255,255,.22);
+    border-radius:16px;
+
+    color:white;
+    background:rgba(255,255,255,.13);
+
+    text-decoration:none;
+    cursor:pointer;
+
+    overflow:hidden;
+
+    transition:
+        transform .25s ease,
+        background .25s ease,
+        box-shadow .25s ease;
+}
+
+.help-box:hover{
+    color:white;
+    background:rgba(255,255,255,.21);
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 12px 28px rgba(0,0,0,.16);
+}
+
+.help-icon{
+    flex:0 0 42px;
+
+    width:42px;
+    height:42px;
+
+    display:grid;
+    place-items:center;
+
+    border-radius:13px;
+
+    color:var(--blue);
+    background:white;
+
+    font-size:18px;
+}
+
+.help-icon i{
+    width:auto !important;
+    height:auto !important;
+
+    display:block !important;
+
+    color:inherit !important;
+    background:transparent !important;
+
+    border-radius:0 !important;
+
+    font-size:18px !important;
+}
+
+.help-content{
+    flex:1;
+    min-width:0;
+
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+}
+
+.help-content strong{
+    display:block;
+
+    overflow:hidden;
+
+    color:white;
+
+    font-size:12px;
+    font-weight:900;
+
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.help-content small{
+    display:block;
+
+    overflow:hidden;
+
+    color:rgba(255,255,255,.72);
+
+    font-size:8px;
+    font-weight:700;
+
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.help-arrow{
+    flex:0 0 auto;
+
+    width:auto !important;
+    height:auto !important;
+
+    display:block !important;
+
+    color:rgba(255,255,255,.78) !important;
+    background:transparent !important;
+
+    border-radius:0 !important;
+
+    font-size:11px !important;
+
+    transition:transform .25s ease;
+}
+
+.help-box:hover .help-arrow{
+    transform:translateX(3px);
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="layout">
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="brand">
+        <div class="brand-logo">
+            <i class="fa-solid fa-house"></i>
+        </div>
+        <div>
+            <h4>Hexa Immo</h4>
+            <span>Gestion Immobilière</span>
+        </div>
+    </div>
+
+    <div class="menu-title">Menu</div>
+
+    <a href="{% url 'dashboard' %}" class="nav-link-pro">
+        <i class="fa-solid fa-border-all"></i>
+        Tableau de bord
+    </a>
+
+    <a href="{% url 'proprietaires' %}" class="nav-link-pro">
+        <i class="fa-solid fa-users"></i>
+        Propriétaires
+    </a>
+
+    <a href="{% url 'batiments' %}" class="nav-link-pro">
+    <i class="fa-solid fa-building"></i>
+    Bâtiments
+</a>
+
+<a href="{% url 'employes' %}" class="nav-link-pro">
+    <i class="fa-solid fa-user-group"></i>
+    Agents & Secrétaires
+</a>
+
+    <a href="{% url 'locataires' %}" class="nav-link-pro">
+        <i class="fa-solid fa-user"></i>
+        Locataires
+    </a>
+
+    <a href="{% url 'locations' %}" class="nav-link-pro">
+        <i class="fa-solid fa-file-contract"></i>
+        Locations
+    </a>
+
+    <a href="{% url 'paiements' %}" class="nav-link-pro">
+        <i class="fa-solid fa-credit-card"></i>
+        Paiements
+    </a>
+
+    <a href="{% url 'versements' %}" class="nav-link-pro">
+        <i class="fa-solid fa-money-bill-transfer"></i>
+        Versements
+    </a>
+
+    <a href="{% url 'rapports' %}" class="nav-link-pro">
+        <i class="fa-solid fa-chart-column"></i>
+        Rapports
+    </a>
+
+
+    
+<a href="{% url 'constructions' %}"
+   class="nav-link-pro {% if request.resolver_match.url_name == 'constructions' or request.resolver_match.url_name == 'ajouter_construction' or request.resolver_match.url_name == 'detail_construction' or request.resolver_match.url_name == 'ajouter_etat_construction' or request.resolver_match.url_name == 'modifier_etat_construction' %}active{% endif %}">
+
+    <i class="fa-solid fa-helmet-safety"></i>
+    <span>Constructions</span>
+</a>
+
+<a href="{% url 'terrains' %}"
+   class="nav-link-pro {% if request.resolver_match.url_name == 'terrains' or request.resolver_match.url_name == 'ajouter_terrain' or request.resolver_match.url_name == 'detail_terrain' %}active{% endif %}">
+
+    <i class="fa-solid fa-map-location-dot"></i>
+    <span>Terrain vente / achat</span>
+</a>
+
+
+<a
+    href="{% url 'centres_commerciaux' %}"
+    class="nav-link-pro {% if request.resolver_match.url_name == 'centres_commerciaux' or request.resolver_match.url_name == 'ajouter_centre_commercial' or request.resolver_match.url_name == 'detail_centre_commercial' or request.resolver_match.url_name == 'ajouter_local_commercial' or request.resolver_match.url_name == 'occuper_local_commercial' or request.resolver_match.url_name == 'detail_contrat_commercial' %}active{% endif %}"
+>
+    <i class="fa-solid fa-store"></i>
+
+    <span>
+        Centres commerciaux
+    </span>
+</a>
+
+
+    <div class="menu-title">Paramètres</div>
+
+    <a href="#" class="nav-link-pro">
+        <i class="fa-solid fa-key"></i>
+        Mot de passe
+    </a>
+
+    <a href="{% url 'logout' %}" class="nav-link-pro">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Déconnexion
+    </a>
+
+ <a
+    href="{% url 'support' %}"
+    class="help-box"
+    aria-label="Contacter le support"
+>
+    <span class="help-icon">
+        <i class="fa-solid fa-headset"></i>
+    </span>
+
+    <span class="help-content">
+        <strong>Besoin d’aide ?</strong>
+        <small>Contactez le support</small>
+    </span>
+
+    <i class="fa-solid fa-chevron-right help-arrow"></i>
+</a>
+
+<main class="main">
+
+    <div class="topbar">
+
+        <div class="top-left">
+            <button class="menu-btn" onclick="toggleSidebar()">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <h2>Gestion immobilière</h2>
+        </div>
+
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" class="form-control" placeholder="Rechercher...">
+        </div>
+
+        <div class="user-box">
+            <div class="avatar">
+                {{ request.user.username|slice:":1"|upper }}
+            </div>
+            <div>
+                <strong>{{ request.user.username }}</strong><br>
+                <small class="text-muted">Administrateur</small>
+            </div>
+        </div>
+
+    </div>
+
+    {% block content %}
+    {% endblock %}
+
+</main>
+
+</div>
+
+<script>
+function toggleSidebar(){
+    document.getElementById("sidebar").classList.toggle("active");
+    document.getElementById("overlay").classList.toggle("active");
+}
+</script>
+
+</body>
+</html>

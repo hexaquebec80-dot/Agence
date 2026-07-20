@@ -1,0 +1,1961 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <meta
+        name="theme-color"
+        content="#071a3d"
+    >
+
+    <meta
+        name="description"
+        content="Connexion sécurisée à l’application de gestion immobilière Hexa Immo, conçue par HexaQuébec Canada."
+    >
+
+    <title>Connexion | Hexa Immo</title>
+
+    <!-- Google Fonts -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        :root{
+            --navy:#071a3d;
+            --navy-dark:#031027;
+            --navy-light:#102d63;
+
+            --blue:#0057ff;
+            --blue-dark:#0042c4;
+            --blue-soft:#eaf1ff;
+
+            --gold:#d4af37;
+            --gold-light:#fff1a8;
+            --gold-soft:#fff8dd;
+
+            --green:#16813d;
+            --green-soft:#e8f8ed;
+
+            --red:#b42331;
+            --red-soft:#fff0f2;
+
+            --white:#ffffff;
+            --background:#eef3fb;
+            --surface:#ffffff;
+
+            --text:#0f172a;
+            --muted:#64748b;
+            --border:#e2e8f0;
+
+            --shadow:
+                0 35px 100px rgba(0,0,0,.35);
+        }
+
+        *{
+            box-sizing:border-box;
+        }
+
+        html{
+            scroll-behavior:smooth;
+        }
+
+        body{
+            position:relative;
+
+            min-height:100vh;
+            margin:0;
+            overflow-x:hidden;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            padding:25px;
+
+            color:var(--text);
+
+            background:
+                radial-gradient(
+                    circle at 10% 10%,
+                    rgba(212,175,55,.24),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 90% 90%,
+                    rgba(0,87,255,.26),
+                    transparent 32%
+                ),
+                linear-gradient(
+                    135deg,
+                    #031027 0%,
+                    #071a3d 48%,
+                    #0c3374 100%
+                );
+
+            font-family:"Manrope","Segoe UI",Arial,sans-serif;
+            -webkit-font-smoothing:antialiased;
+        }
+
+        body::before,
+        body::after{
+            content:"";
+
+            position:fixed;
+            z-index:0;
+
+            border-radius:50%;
+            pointer-events:none;
+
+            filter:blur(2px);
+        }
+
+        body::before{
+            width:340px;
+            height:340px;
+
+            top:-190px;
+            left:-140px;
+
+            border:60px solid rgba(255,255,255,.035);
+        }
+
+        body::after{
+            width:290px;
+            height:290px;
+
+            right:-130px;
+            bottom:-160px;
+
+            border:55px solid rgba(255,255,255,.04);
+        }
+
+        a{
+            -webkit-tap-highlight-color:transparent;
+        }
+
+        button,
+        input{
+            font-family:inherit;
+        }
+
+        /* =====================================================
+           CONTENEUR PRINCIPAL
+        ===================================================== */
+
+        .login-wrapper{
+            position:relative;
+            z-index:2;
+
+            width:100%;
+            max-width:1180px;
+            min-height:690px;
+
+            display:grid;
+            grid-template-columns:minmax(0,1.08fr) minmax(420px,.92fr);
+
+            overflow:hidden;
+
+            border:1px solid rgba(255,255,255,.18);
+            border-radius:34px;
+
+            background:rgba(255,255,255,.10);
+
+            box-shadow:var(--shadow);
+
+            backdrop-filter:blur(20px);
+            -webkit-backdrop-filter:blur(20px);
+
+            animation:pageAppear .7s ease both;
+        }
+
+        @keyframes pageAppear{
+            from{
+                opacity:0;
+                transform:translateY(18px) scale(.985);
+            }
+
+            to{
+                opacity:1;
+                transform:none;
+            }
+        }
+
+        /* =====================================================
+           PARTIE GAUCHE
+        ===================================================== */
+
+        .login-left{
+            position:relative;
+            isolation:isolate;
+            overflow:hidden;
+
+            display:flex;
+            flex-direction:column;
+
+            padding:48px 52px;
+
+            color:white;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(3,16,39,.98),
+                    rgba(7,26,61,.92) 48%,
+                    rgba(0,87,255,.72)
+                );
+        }
+
+        .login-left::before{
+            content:"";
+
+            position:absolute;
+            z-index:-1;
+
+            width:360px;
+            height:360px;
+
+            top:-220px;
+            right:-150px;
+
+            border:65px solid rgba(255,255,255,.06);
+            border-radius:50%;
+        }
+
+        .login-left::after{
+            content:"";
+
+            position:absolute;
+            z-index:-1;
+
+            width:260px;
+            height:260px;
+
+            right:-80px;
+            bottom:-100px;
+
+            border-radius:50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(255,255,255,.12),
+                    rgba(255,255,255,.02) 65%,
+                    transparent 66%
+                );
+        }
+
+        /* =====================================================
+           MARQUE
+        ===================================================== */
+
+        .brand{
+            position:relative;
+            z-index:2;
+
+            display:flex;
+            align-items:center;
+            gap:15px;
+
+            margin-bottom:58px;
+        }
+
+        .brand-icon{
+            position:relative;
+
+            flex:0 0 60px;
+            width:60px;
+            height:60px;
+
+            display:grid;
+            place-items:center;
+
+            border:1px solid rgba(255,255,255,.28);
+            border-radius:19px;
+
+            color:var(--navy);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    var(--gold-light),
+                    var(--gold)
+                );
+
+            box-shadow:
+                0 15px 35px rgba(212,175,55,.30),
+                inset 0 1px 0 rgba(255,255,255,.65);
+
+            font-size:25px;
+            font-weight:900;
+        }
+
+        .brand-icon::after{
+            content:"";
+
+            position:absolute;
+
+            right:-4px;
+            bottom:-4px;
+
+            width:18px;
+            height:18px;
+
+            border:3px solid var(--navy);
+            border-radius:50%;
+
+            background:#34d66b;
+        }
+
+        .brand-text h2{
+            margin:0;
+
+            color:white;
+            font-size:24px;
+            font-weight:800;
+            letter-spacing:-.04em;
+        }
+
+        .brand-text span{
+            display:block;
+            margin-top:3px;
+
+            color:rgba(255,255,255,.67);
+            font-size:12px;
+            font-weight:600;
+        }
+
+        /* =====================================================
+           PRÉSENTATION
+        ===================================================== */
+
+        .hero-content{
+            position:relative;
+            z-index:2;
+        }
+
+        .hero-label{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+
+            margin-bottom:18px;
+            padding:8px 12px;
+
+            border:1px solid rgba(255,255,255,.17);
+            border-radius:999px;
+
+            color:rgba(255,255,255,.90);
+            background:rgba(255,255,255,.08);
+
+            font-size:10px;
+            font-weight:800;
+            letter-spacing:.08em;
+            text-transform:uppercase;
+
+            backdrop-filter:blur(10px);
+        }
+
+        .hero-label i{
+            color:var(--gold-light);
+        }
+
+        .hero-content h1{
+            max-width:610px;
+            margin:0;
+
+            color:white;
+            font-size:clamp(36px,4.5vw,55px);
+            font-weight:800;
+            letter-spacing:-.055em;
+            line-height:1.06;
+        }
+
+        .hero-content h1 span{
+            color:var(--gold-light);
+        }
+
+        .hero-content > p{
+            max-width:560px;
+            margin:20px 0 0;
+
+            color:rgba(255,255,255,.70);
+            font-size:14px;
+            line-height:1.8;
+        }
+
+        /* =====================================================
+           FONCTIONNALITÉS
+        ===================================================== */
+
+        .features{
+            display:grid;
+            gap:12px;
+
+            margin-top:31px;
+        }
+
+        .feature{
+            display:flex;
+            align-items:center;
+            gap:13px;
+
+            padding:12px 14px;
+
+            border:1px solid rgba(255,255,255,.09);
+            border-radius:15px;
+
+            color:rgba(255,255,255,.91);
+            background:rgba(255,255,255,.055);
+
+            font-size:12px;
+            font-weight:650;
+
+            transition:
+                transform .25s ease,
+                background .25s ease;
+        }
+
+        .feature:hover{
+            transform:translateX(4px);
+            background:rgba(255,255,255,.09);
+        }
+
+        .feature-icon{
+            flex:0 0 38px;
+            width:38px;
+            height:38px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:12px;
+
+            color:var(--gold-light);
+            background:rgba(255,255,255,.10);
+        }
+
+        /* =====================================================
+           ATTESTATION HEXAQUÉBEC
+        ===================================================== */
+
+        .developer-certificate{
+            position:relative;
+            z-index:2;
+
+            display:flex;
+            align-items:center;
+            gap:13px;
+
+            margin-top:auto;
+            padding-top:32px;
+        }
+
+        .certificate-icon{
+            position:relative;
+
+            flex:0 0 48px;
+            width:48px;
+            height:48px;
+
+            display:grid;
+            place-items:center;
+
+            border:1px solid rgba(255,255,255,.17);
+            border-radius:15px;
+
+            color:var(--gold-light);
+            background:rgba(255,255,255,.09);
+
+            font-size:20px;
+        }
+
+        .certificate-check{
+            position:absolute;
+
+            right:-4px;
+            bottom:-4px;
+
+            width:19px;
+            height:19px;
+
+            display:grid;
+            place-items:center;
+
+            border:3px solid var(--navy);
+            border-radius:50%;
+
+            color:white;
+            background:#22c55e;
+
+            font-size:7px;
+        }
+
+        .certificate-content{
+            min-width:0;
+        }
+
+        .certificate-content small{
+            display:block;
+
+            margin-bottom:3px;
+
+            color:rgba(255,255,255,.55);
+            font-size:9px;
+            font-weight:800;
+            letter-spacing:.07em;
+            text-transform:uppercase;
+        }
+
+        .certificate-content strong{
+            display:block;
+
+            color:white;
+            font-size:12px;
+            font-weight:800;
+        }
+
+        .certificate-content a{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+
+            margin-top:5px;
+
+            color:var(--gold-light);
+            font-size:10px;
+            font-weight:700;
+            text-decoration:none;
+        }
+
+        .certificate-content a:hover{
+            text-decoration:underline;
+        }
+
+        /* =====================================================
+           PARTIE DROITE
+        ===================================================== */
+
+        .login-right{
+            position:relative;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            padding:48px 44px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #ffffff 0%,
+                    #f9fbff 100%
+                );
+        }
+
+        .login-card{
+            width:100%;
+            max-width:430px;
+        }
+
+        .mobile-brand{
+            display:none;
+            align-items:center;
+            gap:11px;
+
+            margin-bottom:27px;
+        }
+
+        .mobile-brand-icon{
+            width:45px;
+            height:45px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:14px;
+
+            color:white;
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--navy),
+                    var(--blue)
+                );
+
+            font-size:17px;
+            font-weight:900;
+        }
+
+        .mobile-brand strong{
+            display:block;
+
+            color:var(--navy);
+            font-size:16px;
+            font-weight:800;
+        }
+
+        .mobile-brand small{
+            display:block;
+
+            color:var(--muted);
+            font-size:10px;
+        }
+
+        /* =====================================================
+           BADGE DE SÉCURITÉ
+        ===================================================== */
+
+        .badge-secure{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+
+            margin-bottom:23px;
+            padding:9px 13px;
+
+            border:1px solid #cdebd7;
+            border-radius:999px;
+
+            color:#126b34;
+            background:var(--green-soft);
+
+            font-size:10px;
+            font-weight:800;
+            letter-spacing:.03em;
+            text-transform:uppercase;
+        }
+
+        .badge-secure .secure-dot{
+            width:7px;
+            height:7px;
+
+            border-radius:50%;
+            background:#22c55e;
+
+            box-shadow:0 0 0 4px rgba(34,197,94,.13);
+        }
+
+        .login-card h3{
+            margin:0;
+
+            color:var(--navy);
+            font-size:31px;
+            font-weight:800;
+            letter-spacing:-.045em;
+        }
+
+        .login-card .subtitle{
+            margin:10px 0 27px;
+
+            color:var(--muted);
+            font-size:13px;
+            line-height:1.65;
+        }
+
+        /* =====================================================
+           MESSAGE D’ERREUR
+        ===================================================== */
+
+        .error-alert{
+            display:flex;
+            align-items:flex-start;
+            gap:11px;
+
+            margin-bottom:20px;
+            padding:14px 15px;
+
+            border:1px solid #ffd4da;
+            border-radius:15px;
+
+            color:var(--red);
+            background:var(--red-soft);
+
+            font-size:12px;
+            font-weight:650;
+            line-height:1.5;
+        }
+
+        .error-alert i{
+            margin-top:2px;
+        }
+
+        /* =====================================================
+           FORMULAIRE
+        ===================================================== */
+
+        .form-group{
+            margin-bottom:18px;
+        }
+
+        .form-label{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:10px;
+
+            margin-bottom:8px;
+
+            color:#27344a;
+            font-size:12px;
+            font-weight:800;
+        }
+
+        .required-label{
+            color:#94a3b8;
+            font-size:9px;
+            font-weight:700;
+            text-transform:uppercase;
+        }
+
+        .input-group-modern{
+            position:relative;
+        }
+
+        .input-left-icon{
+            position:absolute;
+            z-index:2;
+
+            top:50%;
+            left:16px;
+
+            color:#94a3b8;
+            transform:translateY(-50%);
+
+            pointer-events:none;
+            transition:color .2s ease;
+        }
+
+        .form-control{
+            width:100%;
+            height:55px;
+
+            padding:12px 48px 12px 47px;
+
+            border:1px solid #dfe5ee;
+            border-radius:15px;
+
+            color:var(--text);
+            background:white;
+
+            font-size:13px;
+            font-weight:600;
+
+            outline:none;
+
+            transition:
+                border-color .2s ease,
+                box-shadow .2s ease,
+                background .2s ease;
+        }
+
+        .form-control::placeholder{
+            color:#a0aabc;
+            font-weight:500;
+        }
+
+        .form-control:hover{
+            border-color:#cbd5e1;
+        }
+
+        .form-control:focus{
+            border-color:var(--blue);
+            background:#ffffff;
+
+            box-shadow:
+                0 0 0 4px rgba(0,87,255,.10);
+        }
+
+        .input-group-modern:focus-within .input-left-icon{
+            color:var(--blue);
+        }
+
+        .password-toggle{
+            position:absolute;
+            z-index:3;
+
+            top:50%;
+            right:9px;
+
+            width:38px;
+            height:38px;
+
+            display:grid;
+            place-items:center;
+
+            padding:0;
+
+            border:0;
+            border-radius:11px;
+
+            color:#758195;
+            background:transparent;
+
+            transform:translateY(-50%);
+
+            cursor:pointer;
+
+            transition:
+                color .2s ease,
+                background .2s ease;
+        }
+
+        .password-toggle:hover{
+            color:var(--blue);
+            background:var(--blue-soft);
+        }
+
+        .password-toggle:focus-visible{
+            outline:3px solid rgba(0,87,255,.16);
+        }
+
+        /* =====================================================
+           AVERTISSEMENT MAJUSCULE
+        ===================================================== */
+
+        .caps-warning{
+            display:none;
+            align-items:center;
+            gap:7px;
+
+            margin-top:8px;
+
+            color:#a34c08;
+            font-size:10px;
+            font-weight:700;
+        }
+
+        .caps-warning.visible{
+            display:flex;
+        }
+
+        /* =====================================================
+           OPTIONS
+        ===================================================== */
+
+        .login-options{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+
+            margin:4px 0 19px;
+        }
+
+        .remember-option{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+
+            color:#56647a;
+            font-size:11px;
+            font-weight:650;
+            cursor:pointer;
+        }
+
+        .remember-option input{
+            width:17px;
+            height:17px;
+
+            accent-color:var(--blue);
+            cursor:pointer;
+        }
+
+        .authorized-only{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+
+            color:#8793a6;
+            font-size:9px;
+            font-weight:700;
+            text-transform:uppercase;
+        }
+
+        /* =====================================================
+           BOUTON CONNEXION
+        ===================================================== */
+
+        .btn-login{
+            position:relative;
+            overflow:hidden;
+
+            width:100%;
+            min-height:56px;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+
+            padding:13px 18px;
+
+            border:0;
+            border-radius:16px;
+
+            color:white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--navy),
+                    var(--blue)
+                );
+
+            box-shadow:
+                0 15px 32px rgba(0,87,255,.26);
+
+            font-size:13px;
+            font-weight:800;
+
+            cursor:pointer;
+
+            transition:
+                transform .25s ease,
+                box-shadow .25s ease,
+                opacity .25s ease;
+        }
+
+        .btn-login::before{
+            content:"";
+
+            position:absolute;
+
+            top:0;
+            left:-120%;
+
+            width:100%;
+            height:100%;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255,255,255,.22),
+                    transparent
+                );
+
+            transition:left .6s ease;
+        }
+
+        .btn-login:hover{
+            transform:translateY(-2px);
+
+            box-shadow:
+                0 20px 42px rgba(0,87,255,.34);
+        }
+
+        .btn-login:hover::before{
+            left:120%;
+        }
+
+        .btn-login:active{
+            transform:translateY(0);
+        }
+
+        .btn-login:disabled{
+            opacity:.72;
+            cursor:not-allowed;
+            transform:none;
+        }
+
+        .login-spinner{
+            display:none;
+
+            width:17px;
+            height:17px;
+
+            border:2px solid rgba(255,255,255,.35);
+            border-top-color:white;
+            border-radius:50%;
+
+            animation:spin .7s linear infinite;
+        }
+
+        .btn-login.loading .login-spinner{
+            display:block;
+        }
+
+        .btn-login.loading .login-arrow{
+            display:none;
+        }
+
+        @keyframes spin{
+            to{
+                transform:rotate(360deg);
+            }
+        }
+
+        /* =====================================================
+           MESSAGE DE SÉCURITÉ
+        ===================================================== */
+
+        .security-priority{
+            display:flex;
+            align-items:flex-start;
+            gap:11px;
+
+            margin-top:22px;
+            padding:14px;
+
+            border:1px solid #dce7ff;
+            border-radius:15px;
+
+            color:#23477f;
+            background:#f4f7ff;
+        }
+
+        .security-priority-icon{
+            flex:0 0 35px;
+            width:35px;
+            height:35px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:11px;
+
+            color:var(--blue);
+            background:var(--blue-soft);
+        }
+
+        .security-priority strong{
+            display:block;
+
+            margin-bottom:3px;
+
+            color:var(--navy);
+            font-size:11px;
+            font-weight:800;
+        }
+
+        .security-priority p{
+            margin:0;
+
+            color:#61718a;
+            font-size:10px;
+            line-height:1.55;
+        }
+
+        /* =====================================================
+           SIGNATURE HEXAQUÉBEC
+        ===================================================== */
+
+        .application-signature{
+            margin-top:22px;
+            padding-top:19px;
+
+            border-top:1px solid var(--border);
+
+            text-align:center;
+        }
+
+        .signature-badge{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+
+            margin-bottom:9px;
+            padding:7px 11px;
+
+            border:1px solid #eadb9d;
+            border-radius:999px;
+
+            color:#745c07;
+            background:var(--gold-soft);
+
+            font-size:9px;
+            font-weight:800;
+            letter-spacing:.04em;
+            text-transform:uppercase;
+        }
+
+        .signature-text{
+            margin:0;
+
+            color:#7b8798;
+            font-size:10px;
+            line-height:1.6;
+        }
+
+        .signature-text strong{
+            color:var(--navy);
+        }
+
+        .signature-email{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+
+            margin-top:7px;
+
+            color:var(--blue);
+            font-size:10px;
+            font-weight:700;
+            text-decoration:none;
+        }
+
+        .signature-email:hover{
+            text-decoration:underline;
+        }
+
+        /* =====================================================
+           RESPONSIVE TABLETTE
+        ===================================================== */
+
+        @media(max-width:980px){
+
+            body{
+                align-items:flex-start;
+            }
+
+            .login-wrapper{
+                max-width:700px;
+                min-height:auto;
+
+                grid-template-columns:1fr;
+            }
+
+            .login-left{
+                padding:35px;
+            }
+
+            .brand{
+                margin-bottom:35px;
+            }
+
+            .hero-content h1{
+                max-width:650px;
+                font-size:38px;
+            }
+
+            .features{
+                grid-template-columns:repeat(3,minmax(0,1fr));
+            }
+
+            .feature{
+                align-items:flex-start;
+                flex-direction:column;
+            }
+
+            .developer-certificate{
+                margin-top:30px;
+            }
+
+            .login-right{
+                padding:42px 35px;
+            }
+        }
+
+        /* =====================================================
+           RESPONSIVE MOBILE
+        ===================================================== */
+
+        @media(max-width:650px){
+
+            body{
+                padding:12px;
+            }
+
+            .login-wrapper{
+                border-radius:25px;
+            }
+
+            .login-left{
+                padding:25px 21px;
+            }
+
+            .brand{
+                margin-bottom:27px;
+            }
+
+            .brand-icon{
+                flex-basis:52px;
+                width:52px;
+                height:52px;
+
+                border-radius:16px;
+            }
+
+            .brand-text h2{
+                font-size:20px;
+            }
+
+            .hero-content h1{
+                font-size:30px;
+            }
+
+            .hero-content > p{
+                font-size:12px;
+            }
+
+            .features{
+                grid-template-columns:1fr;
+                gap:9px;
+            }
+
+            .feature{
+                align-items:center;
+                flex-direction:row;
+                padding:10px 12px;
+            }
+
+            .feature:nth-child(3){
+                display:none;
+            }
+
+            .developer-certificate{
+                margin-top:25px;
+                padding-top:23px;
+
+                border-top:1px solid rgba(255,255,255,.10);
+            }
+
+            .login-right{
+                padding:32px 21px;
+            }
+
+            .login-card h3{
+                font-size:27px;
+            }
+
+            .login-options{
+                align-items:flex-start;
+                flex-direction:column;
+            }
+        }
+
+        @media(max-width:400px){
+
+            .login-left{
+                padding:23px 18px;
+            }
+
+            .brand-text span{
+                font-size:10px;
+            }
+
+            .hero-content h1{
+                font-size:27px;
+            }
+
+            .login-right{
+                padding:29px 17px;
+            }
+        }
+
+        /* =====================================================
+           ACCESSIBILITÉ
+        ===================================================== */
+
+        @media(prefers-reduced-motion:reduce){
+
+            *,
+            *::before,
+            *::after{
+                animation-duration:.01ms !important;
+                animation-iteration-count:1 !important;
+                transition-duration:.01ms !important;
+                scroll-behavior:auto !important;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+<main class="login-wrapper">
+
+    <!-- =====================================================
+         PARTIE GAUCHE
+    ====================================================== -->
+
+    <section class="login-left">
+
+        <header class="brand">
+
+            <div class="brand-icon">
+                H
+            </div>
+
+            <div class="brand-text">
+
+                <h2>Hexa Immo</h2>
+
+                <span>
+                    Gestion immobilière intelligente
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <div class="hero-content">
+
+            <div class="hero-label">
+
+                <i class="fa-solid fa-building-shield"></i>
+
+                Plateforme professionnelle de gestion
+
+            </div>
+
+            <h1>
+                Gérez votre activité immobilière avec
+                <span>simplicité et précision.</span>
+            </h1>
+
+            <p>
+                Centralisez les bâtiments, les logements, les locataires,
+                les contrats, les paiements et les rapports dans une
+                application moderne conçue pour les professionnels.
+            </p>
+
+
+            <div class="features">
+
+                <div class="feature">
+
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+
+                    <span>
+                        Gestion des bâtiments et des logements
+                    </span>
+
+                </div>
+
+
+                <div class="feature">
+
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+
+                    <span>
+                        Suivi des locataires et des contrats
+                    </span>
+
+                </div>
+
+
+                <div class="feature">
+
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+
+                    <span>
+                        Paiements, dépenses et rapports financiers
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ATTESTATION HEXAQUÉBEC -->
+
+        <footer class="developer-certificate">
+
+            <div class="certificate-icon">
+
+                <i class="fa-solid fa-certificate"></i>
+
+                <span class="certificate-check">
+                    <i class="fa-solid fa-check"></i>
+                </span>
+
+            </div>
+
+            <div class="certificate-content">
+
+                <small>
+                    Attestation du développeur
+                </small>
+
+                <strong>
+                    Application créée par HexaQuébec Canada
+                </strong>
+
+                <a href="mailto:hexaquebec80@gmail.com">
+
+                    <i class="fa-solid fa-envelope"></i>
+
+                    hexaquebec80@gmail.com
+
+                </a>
+
+            </div>
+
+        </footer>
+
+    </section>
+
+
+    <!-- =====================================================
+         PARTIE DROITE
+    ====================================================== -->
+
+    <section class="login-right">
+
+        <div class="login-card">
+
+            <div class="mobile-brand">
+
+                <div class="mobile-brand-icon">
+                    H
+                </div>
+
+                <div>
+
+                    <strong>Hexa Immo</strong>
+
+                    <small>
+                        Application HexaQuébec Canada
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="badge-secure">
+
+                <span class="secure-dot"></span>
+
+                <i class="fa-solid fa-lock"></i>
+
+                Accès sécurisé
+
+            </div>
+
+
+            <h3>Bienvenue</h3>
+
+            <p class="subtitle">
+                Connectez-vous avec vos identifiants pour accéder
+                à votre espace immobilier.
+            </p>
+
+
+            <!-- MESSAGE D’ERREUR DJANGO -->
+
+            {% if error %}
+
+                <div
+                    class="error-alert"
+                    role="alert"
+                    aria-live="polite"
+                >
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                    <div>
+                        {{ error }}
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- FORMULAIRE -->
+
+            <form
+                method="POST"
+                id="loginForm"
+                novalidate
+            >
+
+                {% csrf_token %}
+
+
+                <!-- NOM D’UTILISATEUR -->
+
+                <div class="form-group">
+
+                    <label
+                        for="username"
+                        class="form-label"
+                    >
+
+                        <span>
+                            Nom d’utilisateur
+                        </span>
+
+                        <span class="required-label">
+                            Obligatoire
+                        </span>
+
+                    </label>
+
+                    <div class="input-group-modern">
+
+                        <i class="fa-solid fa-user input-left-icon"></i>
+
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            class="form-control"
+                            value="{{ request.POST.username|default:'' }}"
+                            placeholder="Entrez votre nom d’utilisateur"
+                            autocomplete="username"
+                            autocapitalize="none"
+                            spellcheck="false"
+                            required
+                            autofocus
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- MOT DE PASSE -->
+
+                <div class="form-group">
+
+                    <label
+                        for="password"
+                        class="form-label"
+                    >
+
+                        <span>
+                            Mot de passe
+                        </span>
+
+                        <span class="required-label">
+                            Obligatoire
+                        </span>
+
+                    </label>
+
+                    <div class="input-group-modern">
+
+                        <i class="fa-solid fa-key input-left-icon"></i>
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-control"
+                            placeholder="Entrez votre mot de passe"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            id="passwordToggle"
+                            class="password-toggle"
+                            aria-label="Afficher le mot de passe"
+                            aria-pressed="false"
+                        >
+
+                            <i
+                                id="eyeIcon"
+                                class="fa-solid fa-eye"
+                            ></i>
+
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        id="capsWarning"
+                        class="caps-warning"
+                        aria-live="polite"
+                    >
+
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+
+                        La touche Majuscule est activée.
+
+                    </div>
+
+                </div>
+
+
+                <!-- OPTIONS -->
+
+                <div class="login-options">
+
+                    <label class="remember-option">
+
+                        <input
+                            type="checkbox"
+                            id="rememberUsername"
+                        >
+
+                        Mémoriser mon nom d’utilisateur
+
+                    </label>
+
+                    <span class="authorized-only">
+
+                        <i class="fa-solid fa-user-shield"></i>
+
+                        Utilisateurs autorisés
+
+                    </span>
+
+                </div>
+
+
+                <!-- BOUTON -->
+
+                <button
+                    type="submit"
+                    id="loginButton"
+                    class="btn-login"
+                >
+
+                    <span class="login-spinner"></span>
+
+                    <span id="loginButtonText">
+                        Se connecter
+                    </span>
+
+                    <i class="fa-solid fa-arrow-right login-arrow"></i>
+
+                </button>
+
+            </form>
+
+
+            <!-- MESSAGE DE SÉCURITÉ -->
+
+            <div class="security-priority">
+
+                <div class="security-priority-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        La sécurité de vos données est notre priorité
+                    </strong>
+
+                    <p>
+                        Ne partagez jamais votre mot de passe et
+                        déconnectez-vous après chaque utilisation,
+                        particulièrement sur un appareil partagé.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- SIGNATURE -->
+
+            <footer class="application-signature">
+
+                <div class="signature-badge">
+
+                    <i class="fa-solid fa-certificate"></i>
+
+                    Application attestée
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                </div>
+
+                <p class="signature-text">
+
+                    Application conçue et développée par
+                    <strong>HexaQuébec Canada</strong>.
+
+                    <br>
+
+                    © <span id="currentYear"></span>
+                    Hexa Immo. Tous droits réservés.
+
+                </p>
+
+                <a
+                    href="mailto:hexaquebec80@gmail.com"
+                    class="signature-email"
+                >
+
+                    <i class="fa-solid fa-envelope"></i>
+
+                    hexaquebec80@gmail.com
+
+                </a>
+
+            </footer>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+    const loginForm =
+        document.getElementById("loginForm");
+
+    const usernameInput =
+        document.getElementById("username");
+
+    const passwordInput =
+        document.getElementById("password");
+
+    const passwordToggle =
+        document.getElementById("passwordToggle");
+
+    const eyeIcon =
+        document.getElementById("eyeIcon");
+
+    const capsWarning =
+        document.getElementById("capsWarning");
+
+    const rememberUsername =
+        document.getElementById("rememberUsername");
+
+    const loginButton =
+        document.getElementById("loginButton");
+
+    const loginButtonText =
+        document.getElementById("loginButtonText");
+
+    const currentYear =
+        document.getElementById("currentYear");
+
+
+    /* =====================================================
+       ANNÉE AUTOMATIQUE
+    ===================================================== */
+
+    if(currentYear){
+
+        currentYear.textContent =
+            new Date().getFullYear();
+    }
+
+
+    /* =====================================================
+       AFFICHER OU MASQUER LE MOT DE PASSE
+    ===================================================== */
+
+    function togglePassword(){
+
+        const passwordVisible =
+            passwordInput.type === "text";
+
+        passwordInput.type =
+            passwordVisible
+                ? "password"
+                : "text";
+
+        eyeIcon.classList.toggle(
+            "fa-eye",
+            passwordVisible
+        );
+
+        eyeIcon.classList.toggle(
+            "fa-eye-slash",
+            !passwordVisible
+        );
+
+        passwordToggle.setAttribute(
+            "aria-pressed",
+            String(!passwordVisible)
+        );
+
+        passwordToggle.setAttribute(
+            "aria-label",
+            passwordVisible
+                ? "Afficher le mot de passe"
+                : "Masquer le mot de passe"
+        );
+
+        passwordInput.focus();
+    }
+
+    if(passwordToggle && passwordInput){
+
+        passwordToggle.addEventListener(
+            "click",
+            togglePassword
+        );
+    }
+
+
+    /* =====================================================
+       DÉTECTION DE LA TOUCHE MAJUSCULE
+    ===================================================== */
+
+    function verifierMajuscule(event){
+
+        if(!capsWarning){
+            return;
+        }
+
+        const majusculeActive =
+            event.getModifierState &&
+            event.getModifierState("CapsLock");
+
+        capsWarning.classList.toggle(
+            "visible",
+            majusculeActive
+        );
+    }
+
+    if(passwordInput){
+
+        passwordInput.addEventListener(
+            "keyup",
+            verifierMajuscule
+        );
+
+        passwordInput.addEventListener(
+            "keydown",
+            verifierMajuscule
+        );
+
+        passwordInput.addEventListener(
+            "blur",
+            function(){
+
+                capsWarning.classList.remove(
+                    "visible"
+                );
+            }
+        );
+    }
+
+
+    /* =====================================================
+       MÉMORISER LE NOM D’UTILISATEUR
+       Le mot de passe n’est jamais enregistré ici.
+    ===================================================== */
+
+    const usernameSauvegarde =
+        localStorage.getItem(
+            "hexaImmoUsername"
+        );
+
+    if(
+        usernameSauvegarde &&
+        usernameInput &&
+        !usernameInput.value
+    ){
+
+        usernameInput.value =
+            usernameSauvegarde;
+
+        rememberUsername.checked = true;
+    }
+
+
+    /* =====================================================
+       VALIDATION ET CHARGEMENT
+    ===================================================== */
+
+    if(loginForm){
+
+        loginForm.addEventListener(
+            "submit",
+            function(event){
+
+                const username =
+                    usernameInput.value.trim();
+
+                const password =
+                    passwordInput.value;
+
+                usernameInput.value = username;
+
+                if(!username || !password){
+
+                    event.preventDefault();
+
+                    if(!username){
+
+                        usernameInput.focus();
+
+                    }else{
+
+                        passwordInput.focus();
+                    }
+
+                    return;
+                }
+
+
+                if(rememberUsername.checked){
+
+                    localStorage.setItem(
+                        "hexaImmoUsername",
+                        username
+                    );
+
+                }else{
+
+                    localStorage.removeItem(
+                        "hexaImmoUsername"
+                    );
+                }
+
+
+                loginButton.disabled = true;
+
+                loginButton.classList.add(
+                    "loading"
+                );
+
+                loginButtonText.textContent =
+                    "Connexion en cours...";
+            }
+        );
+    }
+
+});
+</script>
+
+</body>
+</html>

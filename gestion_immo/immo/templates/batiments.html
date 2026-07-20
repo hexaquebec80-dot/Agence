@@ -1,0 +1,332 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+.page-header{
+    background:white;
+    border-radius:22px;
+    padding:25px;
+    box-shadow:0 12px 30px rgba(15,23,42,.08);
+}
+
+.card-modern{
+    background:white;
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 12px 30px rgba(15,23,42,.08);
+}
+
+.stat-icon{
+    width:50px;
+    height:50px;
+    border-radius:16px;
+    background:#eff6ff;
+    color:#2563eb;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    margin-bottom:12px;
+}
+
+.stat-number{
+    font-size:30px;
+    font-weight:900;
+    color:#0f172a;
+}
+
+.card-modern p{
+    color:#64748b;
+    font-weight:700;
+    margin-bottom:5px;
+}
+
+.status-detail{
+    font-size:12px;
+    color:#64748b;
+    margin-top:5px;
+}
+
+.action-group{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.occupation-box{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:14px;
+    padding:10px;
+    margin-top:8px;
+}
+
+.occupation-title{
+    font-size:13px;
+    font-weight:900;
+    color:#1e40af;
+}
+
+.occupation-user{
+    font-size:13px;
+    color:#0f172a;
+    margin-top:5px;
+}
+
+.family-box{
+    font-size:12px;
+    color:#64748b;
+    margin-top:4px;
+}
+
+.table th{
+    color:#475569;
+    font-size:13px;
+    text-transform:uppercase;
+}
+
+@media(max-width:768px){
+    .page-header{
+        flex-direction:column;
+        align-items:flex-start !important;
+        gap:15px;
+    }
+}
+</style>
+
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold">
+            <i class="fa-solid fa-building text-primary"></i>
+            Gestion des bâtiments
+        </h2>
+        <p class="text-muted mb-0">Gestion complète du parc immobilier</p>
+    </div>
+
+    <a href="{% url 'ajouter_batiment' %}" class="btn btn-primary btn-lg rounded-4">
+        <i class="fa-solid fa-plus"></i> Ajouter bâtiment
+    </a>
+</div>
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-3">
+        <div class="card-modern">
+            <div class="stat-icon"><i class="fa-solid fa-building"></i></div>
+            <p>Total bâtiments</p>
+            <div class="stat-number">{{ total_batiments }}</div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card-modern">
+            <div class="stat-icon"><i class="fa-solid fa-house"></i></div>
+            <p>Total logements/chambres</p>
+            <div class="stat-number">{{ total_logements }}</div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card-modern">
+            <div class="stat-icon"><i class="fa-solid fa-key"></i></div>
+            <p>Occupés</p>
+            <div class="stat-number">{{ logements_occupes }}</div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card-modern">
+            <div class="stat-icon"><i class="fa-solid fa-door-open"></i></div>
+            <p>Disponibles</p>
+            <div class="stat-number">{{ logements_libres }}</div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card-modern mb-4">
+    <form method="GET">
+        <div class="input-group">
+            <input type="text"
+                   name="q"
+                   value="{{ q }}"
+                   class="form-control"
+                   placeholder="Rechercher un bâtiment, propriétaire, ville...">
+
+            <button class="btn btn-primary">
+                <i class="fa-solid fa-magnifying-glass"></i> Rechercher
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="card-modern">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Bâtiment</th>
+                    <th>Propriétaire</th>
+                    <th>Ville</th>
+                    <th>Adresse</th>
+                    <th>Occupation détaillée</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for b in batiments %}
+                <tr>
+                    <td>
+                        <span class="badge bg-primary">
+                            {{ b.code_batiment|default:b.id }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <strong>{{ b.nom }}</strong>
+                    </td>
+
+                    <td>
+                        {{ b.proprietaire.nom }} {{ b.proprietaire.prenom }}
+                    </td>
+
+                    <td>{{ b.ville|default:"-" }}</td>
+
+                    <td>{{ b.adresse|default:"-" }}</td>
+
+                    <td style="min-width:300px;">
+                        <strong>
+                            {{ b.chambres_occupees }}/{{ b.chambres_total }}
+                        </strong>
+
+                        <div class="status-detail">
+                            chambres/logements occupés
+                        </div>
+
+                        {% if b.details_occupation %}
+                            {% for d in b.details_occupation %}
+                                <div class="occupation-box">
+
+                                    <div class="occupation-title">
+                                        <i class="fa-solid fa-door-closed"></i>
+                                        {{ d.chambre.nom|default:"Chambre/Logement" }}
+                                        — N° {{ d.chambre.numero }}
+                                    </div>
+
+                                    <div class="mt-1">
+                                        <span class="badge bg-danger">Occupé</span>
+                                        <span class="badge bg-success">Bail actif</span>
+                                    </div>
+
+                                    <div class="occupation-user">
+                                        <i class="fa-solid fa-user text-success"></i>
+                                        <strong>Locataire :</strong>
+                                        {{ d.locataire.nom }} {{ d.locataire.prenom }}
+                                    </div>
+
+                                    {% if d.location.numero_appartement %}
+                                        <div class="family-box">
+                                            <i class="fa-solid fa-house"></i>
+                                            Appartement :
+                                            {{ d.location.numero_appartement }}
+                                        </div>
+                                    {% endif %}
+
+                                    {% if d.location.loyer %}
+                                        <div class="family-box">
+                                            <i class="fa-solid fa-dollar-sign"></i>
+                                            Loyer :
+                                            {{ d.location.loyer }} $
+                                        </div>
+                                    {% endif %}
+
+                                    {% if d.location.date_debut %}
+                                        <div class="family-box">
+                                            <i class="fa-solid fa-calendar"></i>
+                                            Bail actif depuis :
+                                            {{ d.location.date_debut|date:"d/m/Y" }}
+                                        </div>
+                                    {% endif %}
+
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="status-detail text-success fw-bold">
+                                <i class="fa-solid fa-circle-check"></i>
+                                Aucun locataire actif
+                            </div>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if b.chambres_total == 0 %}
+                            <span class="badge bg-secondary">Aucun logement</span>
+
+                        {% elif b.est_libre %}
+                            <span class="badge bg-success">Libre</span>
+
+                        {% elif b.est_totalement_occupe %}
+                            <span class="badge bg-danger">Tout occupé</span>
+
+                        {% elif b.est_partiellement_occupe %}
+                            <span class="badge bg-warning text-dark">Partiellement occupé</span>
+                        {% endif %}
+
+                        <div class="status-detail">
+                            {{ b.chambres_occupees }}/{{ b.chambres_total }} occupés
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="action-group">
+
+                            <a href="{% url 'detail_batiment' b.id %}"
+                               class="btn btn-sm btn-outline-primary"
+                               title="Voir détails">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+
+                            <a href="{% url 'ajouter_chambre' b.id %}"
+                               class="btn btn-sm btn-outline-success"
+                               title="Ajouter logement/chambre">
+                                <i class="fa-solid fa-door-open"></i>
+                            </a>
+
+                            <a href="{% url 'modifier_batiment' b.id %}"
+                               class="btn btn-sm btn-outline-warning"
+                               title="Modifier">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+
+                            <a href="{% url 'supprimer_batiment' b.id %}"
+                               class="btn btn-sm btn-outline-danger"
+                               title="Supprimer"
+                               onclick="return confirm('Voulez-vous vraiment supprimer ce bâtiment ?');">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+
+                        </div>
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-5">
+                        <i class="fa-solid fa-building fa-2x mb-3"></i>
+                        <br>
+                        Aucun bâtiment enregistré
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+{% endblock %}

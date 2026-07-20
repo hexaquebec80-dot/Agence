@@ -1,0 +1,1224 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+:root{
+    --primary:#0057ff;
+    --dark:#071a3d;
+    --soft:#f5f8ff;
+    --border:#e5ecf6;
+    --success:#16a34a;
+    --warning:#f59e0b;
+    --danger:#dc2626;
+    --purple:#7c3aed;
+}
+
+.payment-wrapper{
+    padding:10px;
+}
+
+/* =========================
+   HERO
+========================= */
+.payment-hero{
+    background:
+        radial-gradient(circle at top right,rgba(255,255,255,.25),transparent 30%),
+        linear-gradient(135deg,#071a3d,#0057ff);
+    color:white;
+    border-radius:30px;
+    padding:32px;
+    margin-bottom:26px;
+    box-shadow:0 22px 55px rgba(0,87,255,.25);
+    position:relative;
+    overflow:hidden;
+}
+
+.payment-hero::after{
+    content:"";
+    position:absolute;
+    width:220px;
+    height:220px;
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+    right:-60px;
+    bottom:-80px;
+}
+
+.hero-title{
+    display:flex;
+    align-items:center;
+    position:relative;
+    z-index:2;
+}
+
+.hero-icon{
+    width:58px;
+    height:58px;
+    border-radius:18px;
+    background:rgba(255,255,255,.18);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+    margin-right:16px;
+    flex-shrink:0;
+}
+
+.hero-title h2{
+    font-weight:900;
+    margin:0;
+}
+
+.hero-title p{
+    margin:4px 0 0;
+    opacity:.78;
+}
+
+.hero-actions{
+    position:relative;
+    z-index:2;
+}
+
+.btn-new-payment{
+    background:white;
+    color:#071a3d;
+    border:none;
+    border-radius:16px;
+    padding:13px 22px;
+    font-weight:800;
+    box-shadow:0 10px 25px rgba(0,0,0,.12);
+    transition:.25s;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+}
+
+.btn-new-payment:hover{
+    transform:translateY(-2px);
+    color:#0057ff;
+}
+
+.btn-dashboard{
+    background:#16a34a;
+    color:white;
+    border:none;
+    border-radius:16px;
+    padding:13px 22px;
+    font-weight:800;
+    text-decoration:none;
+    box-shadow:0 10px 25px rgba(22,163,74,.25);
+    transition:.25s;
+    display:inline-flex;
+    align-items:center;
+}
+
+.btn-dashboard:hover{
+    transform:translateY(-2px);
+    color:white;
+    background:#15803d;
+}
+
+/* =========================
+   STATS
+========================= */
+.stat-card{
+    background:white;
+    border-radius:24px;
+    padding:22px;
+    border:1px solid var(--border);
+    box-shadow:0 12px 35px rgba(15,23,42,.07);
+    height:100%;
+    transition:.25s;
+    position:relative;
+    overflow:hidden;
+}
+
+.stat-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 18px 42px rgba(15,23,42,.11);
+}
+
+.stat-card::after{
+    content:"";
+    position:absolute;
+    width:90px;
+    height:90px;
+    right:-25px;
+    top:-25px;
+    border-radius:50%;
+    background:#f1f6ff;
+}
+
+.stat-icon{
+    width:54px;
+    height:54px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    margin-bottom:14px;
+    position:relative;
+    z-index:2;
+}
+
+.stat-icon.green{
+    background:#dcfce7;
+    color:#16a34a;
+}
+
+.stat-icon.blue{
+    background:#dbeafe;
+    color:#0057ff;
+}
+
+.stat-icon.orange{
+    background:#fef3c7;
+    color:#f59e0b;
+}
+
+.stat-icon.red{
+    background:#fee2e2;
+    color:#dc2626;
+}
+
+.stat-icon.purple{
+    background:#ede9fe;
+    color:#7c3aed;
+}
+
+.stat-card h3{
+    font-weight:900;
+    font-size:26px;
+    margin:0;
+    color:#071a3d;
+    position:relative;
+    z-index:2;
+    word-break:break-word;
+}
+
+.stat-card small{
+    color:#64748b;
+    font-weight:700;
+    position:relative;
+    z-index:2;
+}
+
+.stat-detail{
+    display:block;
+    margin-top:7px;
+    font-size:12px;
+    color:#94a3b8;
+    position:relative;
+    z-index:2;
+}
+
+/* =========================
+   RÉPARTITION
+========================= */
+.distribution-card{
+    background:linear-gradient(135deg,#f8fbff,#ffffff);
+    border:1px solid var(--border);
+    border-radius:26px;
+    padding:24px;
+    box-shadow:0 12px 35px rgba(15,23,42,.06);
+    margin-bottom:26px;
+}
+
+.distribution-title{
+    font-weight:900;
+    color:#071a3d;
+    margin-bottom:18px;
+}
+
+.distribution-box{
+    border-radius:20px;
+    padding:20px;
+    height:100%;
+}
+
+.distribution-box.agency{
+    background:#fff7ed;
+    border:1px solid #fed7aa;
+}
+
+.distribution-box.owner{
+    background:#ecfdf5;
+    border:1px solid #bbf7d0;
+}
+
+.distribution-box.total{
+    background:#eff6ff;
+    border:1px solid #bfdbfe;
+}
+
+.distribution-label{
+    color:#64748b;
+    font-size:13px;
+    font-weight:800;
+    text-transform:uppercase;
+    margin-bottom:7px;
+}
+
+.distribution-value{
+    font-size:24px;
+    font-weight:900;
+    color:#071a3d;
+}
+
+/* =========================
+   TABLE CARD
+========================= */
+.payment-card{
+    background:white;
+    border-radius:26px;
+    padding:24px;
+    border:1px solid var(--border);
+    box-shadow:0 14px 38px rgba(15,23,42,.08);
+}
+
+.card-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-bottom:20px;
+}
+
+.card-top h4{
+    font-weight:900;
+    color:#071a3d;
+    margin:0;
+}
+
+.search-box{
+    background:#f8fbff;
+    border:1px solid #e5ecf6;
+    border-radius:16px;
+    padding:10px 14px;
+    min-width:280px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.search-box input{
+    border:none;
+    outline:none;
+    background:transparent;
+    width:100%;
+}
+
+/* =========================
+   TABLE
+========================= */
+.payment-table{
+    border-collapse:separate;
+    border-spacing:0 12px;
+    min-width:1450px;
+}
+
+.payment-table thead th{
+    background:#f8fbff;
+    color:#64748b;
+    text-transform:uppercase;
+    font-size:11px;
+    font-weight:900;
+    padding:14px 16px;
+    border:none;
+    white-space:nowrap;
+}
+
+.payment-table tbody tr{
+    background:white;
+    box-shadow:0 8px 22px rgba(15,23,42,.06);
+}
+
+.payment-table tbody td{
+    padding:17px 16px;
+    vertical-align:middle;
+    border-top:1px solid #eef3fb;
+    border-bottom:1px solid #eef3fb;
+}
+
+.payment-table tbody td:first-child{
+    border-left:1px solid #eef3fb;
+    border-radius:18px 0 0 18px;
+}
+
+.payment-table tbody td:last-child{
+    border-right:1px solid #eef3fb;
+    border-radius:0 18px 18px 0;
+}
+
+.tenant-box,
+.owner-box{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.avatar{
+    width:42px;
+    height:42px;
+    border-radius:14px;
+    background:linear-gradient(135deg,#0057ff,#071a3d);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    flex-shrink:0;
+}
+
+.owner-avatar-small{
+    width:42px;
+    height:42px;
+    border-radius:14px;
+    background:linear-gradient(135deg,#7c3aed,#4c1d95);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    flex-shrink:0;
+}
+
+.tenant-name,
+.owner-name{
+    font-weight:900;
+    color:#071a3d;
+}
+
+.text-small{
+    font-size:13px;
+    color:#64748b;
+}
+
+.amount{
+    color:#071a3d;
+    font-weight:900;
+    font-size:16px;
+    white-space:nowrap;
+}
+
+.agency-amount{
+    color:#dc2626;
+    font-weight:900;
+    white-space:nowrap;
+}
+
+.owner-amount{
+    color:#16a34a;
+    font-weight:900;
+    white-space:nowrap;
+}
+
+.percentage-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    background:#fff7ed;
+    color:#c2410c;
+    border-radius:999px;
+    padding:6px 10px;
+    font-size:12px;
+    font-weight:900;
+    margin-top:5px;
+}
+
+.mode-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:8px 12px;
+    border-radius:999px;
+    background:#eef4ff;
+    color:#0057ff;
+    font-size:13px;
+    font-weight:800;
+    white-space:nowrap;
+}
+
+.status-badge{
+    padding:8px 12px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:900;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    white-space:nowrap;
+}
+
+.status-paye{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.status-attente{
+    background:#fef3c7;
+    color:#b45309;
+}
+
+.status-retard{
+    background:#fee2e2;
+    color:#b91c1c;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+.action-btn{
+    width:40px;
+    height:40px;
+    border-radius:12px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    transition:.3s;
+}
+
+.action-btn:hover{
+    transform:translateY(-2px);
+}
+
+.action-edit{
+    background:#fff7ed;
+    color:#f59e0b;
+}
+
+.action-edit:hover{
+    color:#d97706;
+}
+
+.empty-box{
+    padding:60px 20px;
+    text-align:center;
+    color:#64748b;
+}
+
+.empty-box i{
+    font-size:48px;
+    color:#cbd5e1;
+    margin-bottom:14px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+@media(max-width:768px){
+
+    .payment-wrapper{
+        padding:0;
+    }
+
+    .payment-hero{
+        padding:24px;
+        border-radius:22px;
+    }
+
+    .hero-title{
+        margin-bottom:18px;
+        align-items:flex-start;
+    }
+
+    .hero-icon{
+        width:50px;
+        height:50px;
+        border-radius:15px;
+    }
+
+    .hero-actions{
+        width:100%;
+    }
+
+    .btn-new-payment,
+    .btn-dashboard{
+        width:100%;
+        justify-content:center;
+    }
+
+    .search-box{
+        width:100%;
+        min-width:100%;
+    }
+
+    .payment-card{
+        padding:16px;
+    }
+
+    .payment-table{
+        min-width:100%;
+    }
+
+    .payment-table thead{
+        display:none;
+    }
+
+    .payment-table,
+    .payment-table tbody,
+    .payment-table tr,
+    .payment-table td{
+        display:block;
+        width:100%;
+    }
+
+    .payment-table tbody tr{
+        margin-bottom:18px;
+        padding:14px;
+        border:1px solid #eef3fb;
+        border-radius:20px;
+    }
+
+    .payment-table tbody td{
+        border:none;
+        padding:10px 0;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:15px;
+    }
+
+    .payment-table tbody td::before{
+        content:attr(data-label);
+        font-weight:900;
+        color:#64748b;
+        flex-shrink:0;
+    }
+
+    .payment-table tbody td:first-child,
+    .payment-table tbody td:last-child{
+        border:none;
+        border-radius:0;
+    }
+
+    .tenant-box,
+    .owner-box{
+        justify-content:flex-end;
+        text-align:right;
+    }
+}
+</style>
+
+<div class="payment-wrapper">
+
+
+<!-- =========================
+     HERO
+========================== -->
+<div class="payment-hero d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+    <div class="hero-title">
+
+        <div class="hero-icon">
+            <i class="fa-solid fa-money-bill-wave"></i>
+        </div>
+
+        <div>
+            <h2>Gestion des paiements</h2>
+            <p>
+                Encaissements, commissions agence et revenus propriétaires
+            </p>
+        </div>
+
+    </div>
+
+    <div class="hero-actions d-flex gap-2 flex-wrap">
+
+        <a href="{% url 'dashboard' %}"
+           class="btn-dashboard">
+
+            <i class="fa-solid fa-gauge-high me-2"></i>
+            Tableau de bord
+
+        </a>
+
+        <a href="{% url 'ajouter_paiement' %}"
+           class="btn-new-payment">
+
+            <i class="fa-solid fa-plus me-2"></i>
+            Nouveau paiement
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     STATISTIQUES
+========================== -->
+<div class="row g-4 mb-4">
+
+    <!-- TOTAL PAIEMENTS -->
+    <div class="col-xl-3 col-md-6">
+
+        <div class="stat-card">
+
+            <div class="stat-icon green">
+                <i class="fa-solid fa-receipt"></i>
+            </div>
+
+            <h3>
+                {{ total_paiements|default:"0" }}
+            </h3>
+
+            <small>
+                Paiements enregistrés
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <!-- TOTAL ENCAISSÉ -->
+    <div class="col-xl-3 col-md-6">
+
+        <div class="stat-card">
+
+            <div class="stat-icon blue">
+                <i class="fa-solid fa-coins"></i>
+            </div>
+
+            <h3>
+                {{ montant_total|default:"0" }} FCFA
+            </h3>
+
+            <small>
+                Montant total encaissé
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <!-- COMMISSION AGENCE -->
+    <div class="col-xl-3 col-md-6">
+
+        <div class="stat-card">
+
+            <div class="stat-icon orange">
+                <i class="fa-solid fa-building-columns"></i>
+            </div>
+
+            <h3>
+                {{ total_commission_agence|default:"0" }} FCFA
+            </h3>
+
+            <small>
+                Revenus de l'agence
+            </small>
+
+            <span class="stat-detail">
+                Commission calculée sur les paiements
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- PART PROPRIÉTAIRES -->
+    <div class="col-xl-3 col-md-6">
+
+        <div class="stat-card">
+
+            <div class="stat-icon purple">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+
+            <h3>
+                {{ total_proprietaires|default:"0" }} FCFA
+            </h3>
+
+            <small>
+                Revenus propriétaires
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <!-- PAIEMENTS DU MOIS -->
+    <div class="col-xl-6 col-md-6">
+
+        <div class="stat-card">
+
+            <div class="stat-icon orange">
+                <i class="fa-solid fa-calendar-check"></i>
+            </div>
+
+            <h3>
+                {{ paiements_mois|default:"0" }}
+            </h3>
+
+            <small>
+                Paiements enregistrés ce mois
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <!-- MONTANT DU MOIS -->
+    <div class="col-xl-6 col-md-6">
+
+        <div class="stat-card">
+
+            <div class="stat-icon green">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+
+            <h3>
+                {{ montant_mois|default:"0" }} FCFA
+            </h3>
+
+            <small>
+                Montant encaissé ce mois
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     RÉPARTITION FINANCIÈRE
+========================== -->
+<div class="distribution-card">
+
+    <h4 class="distribution-title">
+        <i class="fa-solid fa-chart-pie text-primary me-2"></i>
+        Répartition financière
+    </h4>
+
+    <div class="row g-4">
+
+        <div class="col-lg-4">
+
+            <div class="distribution-box total">
+
+                <div class="distribution-label">
+                    Total encaissé
+                </div>
+
+                <div class="distribution-value">
+                    {{ montant_total|default:"0" }} FCFA
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-lg-4">
+
+            <div class="distribution-box agency">
+
+                <div class="distribution-label">
+                    Part agence
+                </div>
+
+                <div class="distribution-value">
+                    {{ total_commission_agence|default:"0" }} FCFA
+                </div>
+
+                <small class="text-muted">
+                    Somme des commissions agence
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-lg-4">
+
+            <div class="distribution-box owner">
+
+                <div class="distribution-label">
+                    Part propriétaires
+                </div>
+
+                <div class="distribution-value">
+                    {{ total_proprietaires|default:"0" }} FCFA
+                </div>
+
+                <small class="text-muted">
+                    Montant net destiné aux propriétaires
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     LISTE DES PAIEMENTS
+========================== -->
+<div class="payment-card">
+
+    <div class="card-top">
+
+        <h4>
+            <i class="fa-solid fa-list-check me-2 text-primary"></i>
+            Liste détaillée des paiements
+        </h4>
+
+        <div class="search-box">
+
+            <i class="fa-solid fa-magnifying-glass text-muted"></i>
+
+            <input type="text"
+                   id="searchPayment"
+                   placeholder="Locataire, propriétaire, bâtiment...">
+
+        </div>
+
+    </div>
+
+
+    <div class="table-responsive">
+
+        <table class="table payment-table align-middle"
+               id="paymentTable">
+
+            <thead>
+
+                <tr>
+                    <th>Locataire</th>
+                    <th>Propriétaire</th>
+                    <th>Bâtiment</th>
+                    <th>Montant payé</th>
+                    <th>Agence</th>
+                    <th>Propriétaire reçoit</th>
+                    <th>Mois</th>
+                    <th>Date</th>
+                    <th>Mode</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for p in paiements %}
+
+                <tr>
+
+                    <!-- LOCATAIRE -->
+                    <td data-label="Locataire">
+
+                        <div class="tenant-box">
+
+                            <div class="avatar">
+                                {{ p.location.locataire.nom|first|upper }}
+                            </div>
+
+                            <div>
+
+                                <div class="tenant-name">
+                                    {{ p.location.locataire.nom }}
+                                    {{ p.location.locataire.prenom }}
+                                </div>
+
+                                <div class="text-small">
+                                    Reçu :
+                                    {{ p.numero_recu|default:"Non défini" }}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </td>
+
+
+                    <!-- PROPRIÉTAIRE -->
+                    <td data-label="Propriétaire">
+
+                        {% if p.proprietaire %}
+
+                            <div class="owner-box">
+
+                                <div class="owner-avatar-small">
+                                    {{ p.proprietaire.nom|first|upper }}
+                                </div>
+
+                                <div>
+
+                                    <div class="owner-name">
+                                        {{ p.proprietaire.nom }}
+                                        {{ p.proprietaire.prenom }}
+                                    </div>
+
+                                    <div class="text-small">
+                                        Bénéficiaire
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        {% else %}
+
+                            <span class="text-muted">
+                                <i class="fa-solid fa-circle-exclamation me-1"></i>
+                                Non défini
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- BÂTIMENT -->
+                    <td data-label="Bâtiment">
+
+                        <strong>
+                            {{ p.location.batiment.nom }}
+                        </strong>
+
+                        <div class="text-small">
+                            {{ p.location.numero_appartement|default:"-" }}
+                        </div>
+
+                    </td>
+
+
+                    <!-- MONTANT TOTAL -->
+                    <td data-label="Montant payé">
+
+                        <span class="amount">
+                            {{ p.montant }} FCFA
+                        </span>
+
+                    </td>
+
+
+                    <!-- COMMISSION AGENCE -->
+                    <td data-label="Agence">
+
+                        <div class="agency-amount">
+                            {{ p.commission_agence|default:"0" }} FCFA
+                        </div>
+
+                        <span class="percentage-badge">
+                            <i class="fa-solid fa-percent"></i>
+                            {{ p.pourcentage_agence|default:"10" }} %
+                        </span>
+
+                    </td>
+
+
+                    <!-- PART PROPRIÉTAIRE -->
+                    <td data-label="Propriétaire reçoit">
+
+                        <div class="owner-amount">
+                            {{ p.montant_proprietaire|default:"0" }} FCFA
+                        </div>
+
+                        {% if p.proprietaire %}
+                            <div class="text-small">
+                                {{ p.proprietaire.nom }}
+                            </div>
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- MOIS -->
+                    <td data-label="Mois">
+
+                        <strong>
+                            {{ p.mois }}
+                        </strong>
+
+                    </td>
+
+
+                    <!-- DATE -->
+                    <td data-label="Date">
+
+                        <i class="fa-regular fa-calendar text-primary me-1"></i>
+
+                        {{ p.date_paiement|date:"d/m/Y" }}
+
+                    </td>
+
+
+                    <!-- MODE -->
+                    <td data-label="Mode">
+
+                        <span class="mode-badge">
+
+                            <i class="fa-solid fa-wallet"></i>
+
+                            {{ p.get_mode_paiement_display }}
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- STATUT -->
+                    <td data-label="Statut">
+
+                        {% if p.statut == "paye" %}
+
+                            <span class="status-badge status-paye">
+                                <i class="fa-solid fa-circle-check"></i>
+                                Payé
+                            </span>
+
+                        {% elif p.statut == "retard" %}
+
+                            <span class="status-badge status-retard">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                Retard
+                            </span>
+
+                        {% else %}
+
+                            <span class="status-badge status-attente">
+                                <i class="fa-solid fa-clock"></i>
+                                En attente
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- ACTIONS -->
+                    <td data-label="Actions">
+
+                        <div class="d-flex flex-wrap gap-1">
+
+                            <!-- FACTURE PDF -->
+                            <a href="{% url 'facture_paiement_pdf' p.id %}"
+                               class="action-btn"
+                               style="background:#dcfce7;color:#15803d;"
+                               title="Télécharger la facture PDF">
+
+                                <i class="fa-solid fa-file-pdf"></i>
+
+                            </a>
+
+
+                            <!-- REÇU PDF -->
+                            <a href="{% url 'recu_paiement_pdf' p.id %}"
+                               class="action-btn"
+                               style="background:#dbeafe;color:#0057ff;"
+                               title="Télécharger le reçu">
+
+                                <i class="fa-solid fa-download"></i>
+
+                            </a>
+
+
+                            <!-- MODIFIER -->
+                            <a href="{% url 'modifier_paiement' p.id %}"
+                               class="action-btn action-edit"
+                               title="Modifier le paiement">
+
+                                <i class="fa-solid fa-pen"></i>
+
+                            </a>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="11">
+
+                        <div class="empty-box">
+
+                            <i class="fa-solid fa-folder-open"></i>
+
+                            <h5 class="fw-bold">
+                                Aucun paiement enregistré
+                            </h5>
+
+                            <p class="mb-0">
+                                Cliquez sur « Nouveau paiement »
+                                pour ajouter un versement.
+                            </p>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+    const searchPayment = document.getElementById("searchPayment");
+    const paymentTable = document.getElementById("paymentTable");
+
+    if(searchPayment && paymentTable){
+
+        searchPayment.addEventListener("keyup", function(){
+
+            const value = this.value
+                .toLowerCase()
+                .trim();
+
+            const rows = paymentTable.querySelectorAll("tbody tr");
+
+            rows.forEach(function(row){
+
+                const text = row.innerText.toLowerCase();
+
+                row.style.display = text.includes(value)
+                    ? ""
+                    : "none";
+
+            });
+
+        });
+
+    }
+
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .step-page {
+        min-height: 100vh;
+        background: #f6f8fc;
+        padding: 30px 15px;
+    }
+
+    .step-card {
+        max-width: 850px;
+        margin: auto;
+        background: white;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 18px 50px rgba(15, 23, 42, .10);
+    }
+
+    .step-header {
+        background: linear-gradient(135deg, #071a3d, #0057ff);
+        color: white;
+        padding: 28px;
+    }
+
+    .step-header h2 {
+        margin: 0 0 7px;
+    }
+
+    .step-header p {
+        margin: 0;
+        opacity: .82;
+    }
+
+    .step-body {
+        padding: 28px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+    }
+
+    .group {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .group.full {
+        grid-column: 1 / -1;
+    }
+
+    .group label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #334155;
+    }
+
+    .control {
+        width: 100%;
+        border: 1px solid #dce3ef;
+        border-radius: 13px;
+        padding: 13px 14px;
+        background: #fbfcff;
+        outline: none;
+    }
+
+    .control:focus {
+        border-color: #0057ff;
+        box-shadow: 0 0 0 4px rgba(0, 87, 255, .08);
+    }
+
+    textarea.control {
+        min-height: 110px;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+    .save {
+        border: 0;
+        background: #0057ff;
+        color: white;
+        padding: 13px 20px;
+        border-radius: 13px;
+        font-weight: 800;
+    }
+
+    .cancel {
+        background: #eef2f7;
+        color: #334155;
+        padding: 13px 20px;
+        border-radius: 13px;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    @media(max-width: 700px) {
+        .grid {
+            grid-template-columns: 1fr;
+        }
+
+        .group.full {
+            grid-column: auto;
+        }
+    }
+</style>
+
+
+<div class="step-page">
+
+    <div class="step-card">
+
+        <div class="step-header">
+
+            <h2>
+                Ajouter un état de construction
+            </h2>
+
+            <p>
+                Projet : {{ construction.nom }}
+            </p>
+
+        </div>
+
+
+        <form method="POST" class="step-body">
+
+            {% csrf_token %}
+
+            <div class="grid">
+
+                <div class="group">
+                    <label>
+                        Nom de l'étape *
+                    </label>
+
+                    <input
+                        type="text"
+                        name="nom"
+                        class="control"
+                        placeholder="Ex : Fondation"
+                        required
+                    >
+                </div>
+
+
+                <div class="group">
+                    <label>
+                        Statut
+                    </label>
+
+                    <select
+                        name="statut"
+                        class="control"
+                    >
+                        {% for value, label in statuts %}
+                            <option value="{{ value }}">
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+
+                <div class="group">
+                    <label>
+                        Budget prévu
+                    </label>
+
+                    <input
+                        type="number"
+                        name="budget_prevu"
+                        step="0.01"
+                        min="0"
+                        value="0"
+                        class="control"
+                    >
+                </div>
+
+
+                <div class="group">
+                    <label>
+                        Montant dépensé
+                    </label>
+
+                    <input
+                        type="number"
+                        name="montant_depense"
+                        step="0.01"
+                        min="0"
+                        value="0"
+                        class="control"
+                    >
+                </div>
+
+
+                <div class="group">
+                    <label>
+                        Date de début
+                    </label>
+
+                    <input
+                        type="date"
+                        name="date_debut"
+                        class="control"
+                    >
+                </div>
+
+
+                <div class="group">
+                    <label>
+                        Date de fin
+                    </label>
+
+                    <input
+                        type="date"
+                        name="date_fin"
+                        class="control"
+                    >
+                </div>
+
+
+                <div class="group full">
+                    <label>
+                        Description
+                    </label>
+
+                    <textarea
+                        name="description"
+                        class="control"
+                        placeholder="Description de l'étape..."
+                    ></textarea>
+                </div>
+
+            </div>
+
+
+            <div class="actions">
+
+                <a href="{% url 'detail_construction' construction.id %}"
+                   class="cancel">
+                    Annuler
+                </a>
+
+                <button type="submit"
+                        class="save">
+
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Enregistrer l'étape
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

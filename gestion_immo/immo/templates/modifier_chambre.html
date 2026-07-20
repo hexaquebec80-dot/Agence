@@ -1,0 +1,386 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+:root{
+    --blue:#0057FF;
+    --dark:#071A3D;
+    --soft:#F4F7FC;
+    --border:#E2E8F0;
+    --text:#0F172A;
+    --muted:#64748B;
+}
+
+.page-wrapper{
+    padding-bottom:40px;
+}
+
+.page-hero{
+    background:linear-gradient(135deg,var(--dark),var(--blue));
+    color:white;
+    border-radius:28px;
+    padding:32px;
+    margin-bottom:26px;
+    box-shadow:0 18px 45px rgba(0,87,255,.22);
+}
+
+.hero-icon{
+    width:76px;
+    height:76px;
+    border-radius:24px;
+    background:rgba(255,255,255,.16);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:34px;
+}
+
+.card-modern{
+    background:white;
+    border-radius:26px;
+    padding:30px;
+    box-shadow:0 14px 40px rgba(15,23,42,.08);
+    border:1px solid rgba(226,232,240,.8);
+}
+
+.current-box{
+    background:linear-gradient(135deg,#F8FBFF,#EEF5FF);
+    border:1px solid #DDEAFF;
+    border-radius:22px;
+    padding:22px;
+    margin-bottom:28px;
+}
+
+.current-icon{
+    width:56px;
+    height:56px;
+    border-radius:18px;
+    background:linear-gradient(135deg,var(--blue),#4F8CFF);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+}
+
+.form-label{
+    font-weight:900;
+    color:var(--dark);
+    margin-bottom:8px;
+}
+
+.form-control{
+    border-radius:16px;
+    padding:15px 16px;
+    border:1px solid var(--border);
+    background:#FBFDFF;
+}
+
+.form-control:focus{
+    border-color:var(--blue);
+    box-shadow:0 0 0 .2rem rgba(0,87,255,.12);
+}
+
+.help-box{
+    background:#F8FAFC;
+    border:1px dashed #CBD5E1;
+    border-radius:18px;
+    padding:18px;
+    color:var(--muted);
+    font-size:14px;
+}
+
+.action-zone{
+    background:#F8FAFC;
+    border-radius:20px;
+    padding:18px;
+    margin-top:28px;
+}
+
+.btn-main{
+    background:linear-gradient(135deg,var(--blue),#4F8CFF);
+    border:none;
+    color:white;
+    font-weight:900;
+    padding:14px 24px;
+    border-radius:16px;
+}
+
+.btn-main:hover{
+    color:white;
+    transform:translateY(-2px);
+    box-shadow:0 12px 28px rgba(0,87,255,.25);
+}
+
+.btn-soft{
+    border:1px solid #CBD5E1;
+    color:#334155;
+    background:white;
+    font-weight:800;
+    padding:14px 24px;
+    border-radius:16px;
+}
+
+.btn-soft:hover{
+    background:#F1F5F9;
+}
+
+.preview-card{
+    background:#071A3D;
+    color:white;
+    border-radius:22px;
+    padding:22px;
+    height:100%;
+}
+
+.preview-badge{
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.18);
+    color:white;
+    border-radius:999px;
+    padding:7px 13px;
+    display:inline-block;
+    font-size:12px;
+    font-weight:800;
+}
+
+@media(max-width:768px){
+    .page-hero{
+        padding:24px;
+    }
+
+    .hero-block{
+        flex-direction:column;
+        align-items:flex-start !important;
+    }
+
+    .action-zone{
+        flex-direction:column;
+    }
+
+    .action-zone a,
+    .action-zone button{
+        width:100%;
+    }
+}
+</style>
+
+<div class="container-fluid page-wrapper">
+
+    <div class="page-hero">
+
+        <div class="d-flex justify-content-between align-items-center gap-3 hero-block">
+
+            <div class="d-flex align-items-center gap-3">
+
+                <div class="hero-icon">
+                    <i class="fa-solid fa-door-closed"></i>
+                </div>
+
+                <div>
+                    <h2 class="fw-bold mb-1">
+                        Modifier logement / chambre
+                    </h2>
+
+                    <p class="mb-0 opacity-75">
+                        Gestion du bâtiment : {{ batiment.nom }}
+                    </p>
+                </div>
+
+            </div>
+
+            <a href="{% url 'detail_batiment' batiment.id %}"
+               class="btn btn-light rounded-4 px-4 py-3 fw-bold">
+                <i class="fa-solid fa-arrow-left"></i>
+                Retour
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="card-modern">
+
+        <div class="current-box">
+
+            <div class="d-flex align-items-center gap-3">
+
+                <div class="current-icon">
+                    <i class="fa-solid fa-circle-info"></i>
+                </div>
+
+                <div>
+                    <div class="text-muted fw-bold small">
+                        Élément actuel
+                    </div>
+
+                    <h4 class="fw-bold mb-1" style="color:#071A3D;">
+                        {{ chambre.nom|default:"Logement / Chambre" }}
+                    </h4>
+
+                    <div class="text-muted">
+                        Numéro actuel :
+                        <strong>{{ chambre.numero }}</strong>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="row g-4">
+
+                <div class="col-lg-8">
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="fa-solid fa-hashtag text-primary"></i>
+                                Numéro
+                            </label>
+
+                            <input type="text"
+                                   name="numero"
+                                   value="{{ chambre.numero }}"
+                                   class="form-control form-control-lg"
+                                   placeholder="Ex : 1, A, C1"
+                                   required>
+
+                            <small class="text-muted">
+                                Ce numéro doit être unique dans ce bâtiment.
+                            </small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="fa-solid fa-signature text-primary"></i>
+                                Nom affiché
+                            </label>
+
+                            <input type="text"
+                                   name="nom"
+                                   value="{{ chambre.nom|default:'' }}"
+                                   class="form-control form-control-lg"
+                                   placeholder="Ex : Logement 1, Chambre C1">
+
+                            <small class="text-muted">
+                                Nom visible dans la fiche du bâtiment.
+                            </small>
+                        </div>
+
+                    </div>
+
+                    <div class="help-box mt-4">
+                        <strong>
+                            <i class="fa-solid fa-lightbulb text-warning"></i>
+                            Conseil :
+                        </strong>
+                        utilise un nom clair comme
+                        <strong>Logement 1</strong>,
+                        <strong>Appartement A</strong> ou
+                        <strong>Chambre C1</strong>.
+                    </div>
+
+                </div>
+
+                <div class="col-lg-4">
+
+                    <div class="preview-card">
+
+                        <span class="preview-badge">
+                            Aperçu
+                        </span>
+
+                        <h4 class="fw-bold mt-4 mb-2">
+                            {{ chambre.nom|default:"Logement / Chambre" }}
+                        </h4>
+
+                        <p class="mb-3 opacity-75">
+                            N° {{ chambre.numero }}
+                        </p>
+
+                        <hr style="border-color:rgba(255,255,255,.18);">
+
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-building"></i>
+                            <span>{{ batiment.nom }}</span>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2 mt-2">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span>{{ batiment.adresse|default:"Adresse non renseignée" }}</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row g-4 mt-2">
+
+    <div class="col-md-4">
+        <label class="form-label">
+            <i class="fa-solid fa-user text-primary"></i>
+            Locataire occupant
+        </label>
+
+        <select name="locataire_id" class="form-select form-select-lg">
+            <option value="">-- Aucun locataire --</option>
+
+            {% for locataire in locataires %}
+                <option value="{{ locataire.id }}"
+                    {% if bail and bail.locataire.id == locataire.id %}selected{% endif %}>
+                    {{ locataire.nom }} {{ locataire.prenom }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Loyer</label>
+        <input type="number"
+               step="0.01"
+               name="loyer"
+               value="{% if bail %}{{ bail.loyer }}{% endif %}"
+               class="form-control form-control-lg">
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Caution</label>
+        <input type="number"
+               step="0.01"
+               name="caution"
+               value="{% if bail %}{{ bail.caution }}{% endif %}"
+               class="form-control form-control-lg">
+    </div>
+
+</div>
+
+            <div class="action-zone d-flex justify-content-between align-items-center gap-3">
+
+                <a href="{% url 'detail_batiment' batiment.id %}"
+                   class="btn btn-soft">
+                    <i class="fa-solid fa-xmark"></i>
+                    Annuler
+                </a>
+
+                <button type="submit" class="btn btn-main">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Enregistrer les modifications
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

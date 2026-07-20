@@ -1,0 +1,3069 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <meta
+        name="theme-color"
+        content="#071a3d"
+    >
+
+    <title>Espace Employé | Hexa Immo</title>
+
+    <!-- Google Fonts -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        :root{
+            --navy:#071a3d;
+            --navy-dark:#041127;
+            --blue:#0057ff;
+            --blue-dark:#0044cc;
+            --blue-soft:#eaf1ff;
+
+            --green:#15803d;
+            --green-soft:#e7f8ed;
+
+            --orange:#e85d04;
+            --orange-soft:#fff0e6;
+
+            --red:#c6283d;
+            --red-soft:#ffe9ed;
+
+            --purple:#7c3aed;
+            --purple-soft:#f2eaff;
+
+            --indigo:#4f46e5;
+            --indigo-soft:#ececff;
+
+            --background:#f2f5fb;
+            --surface:#ffffff;
+            --surface-soft:#f8faff;
+
+            --text:#0f172a;
+            --muted:#64748b;
+            --border:#e2e8f0;
+
+            --shadow-sm:0 10px 30px rgba(15,23,42,.06);
+            --shadow-md:0 20px 50px rgba(15,23,42,.11);
+            --shadow-blue:0 25px 65px rgba(0,87,255,.22);
+        }
+
+        *{
+            box-sizing:border-box;
+        }
+
+        html{
+            scroll-behavior:smooth;
+        }
+
+        body{
+            margin:0;
+            min-height:100vh;
+            overflow-x:hidden;
+
+            color:var(--text);
+
+            background:
+                radial-gradient(
+                    circle at 95% 0,
+                    rgba(0,87,255,.12),
+                    transparent 26%
+                ),
+                radial-gradient(
+                    circle at 0 50%,
+                    rgba(124,58,237,.05),
+                    transparent 25%
+                ),
+                linear-gradient(
+                    180deg,
+                    #f9fbff 0%,
+                    var(--background) 100%
+                );
+
+            font-family:"Manrope","Segoe UI",Arial,sans-serif;
+            -webkit-font-smoothing:antialiased;
+        }
+
+        a{
+            -webkit-tap-highlight-color:transparent;
+        }
+
+        .page-wrapper{
+            width:min(100%,1680px);
+            margin:0 auto;
+            padding:26px;
+        }
+
+        /* =====================================================
+           EN-TÊTE
+        ===================================================== */
+
+        .employee-hero{
+            position:relative;
+            isolation:isolate;
+            overflow:hidden;
+
+            display:grid;
+            grid-template-columns:minmax(0,1fr) 310px;
+            align-items:center;
+            gap:35px;
+
+            min-height:290px;
+            margin-bottom:30px;
+            padding:42px;
+
+            color:white;
+
+            border:1px solid rgba(255,255,255,.15);
+            border-radius:32px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255,255,255,.06),
+                    transparent 46%
+                ),
+                linear-gradient(
+                    125deg,
+                    var(--navy-dark) 0%,
+                    var(--navy) 48%,
+                    var(--blue) 100%
+                );
+
+            box-shadow:var(--shadow-blue);
+        }
+
+        .employee-hero::before{
+            content:"";
+            position:absolute;
+            z-index:-1;
+
+            width:380px;
+            height:380px;
+
+            top:-210px;
+            right:-110px;
+
+            border:60px solid rgba(255,255,255,.07);
+            border-radius:50%;
+        }
+
+        .employee-hero::after{
+            content:"";
+            position:absolute;
+            z-index:-1;
+
+            width:230px;
+            height:230px;
+
+            left:42%;
+            bottom:-175px;
+
+            border-radius:50%;
+            background:rgba(255,255,255,.06);
+        }
+
+        .hero-content{
+            position:relative;
+            z-index:2;
+        }
+
+        .hero-eyebrow{
+            display:inline-flex;
+            align-items:center;
+            gap:9px;
+
+            margin-bottom:18px;
+            padding:8px 13px;
+
+            border:1px solid rgba(255,255,255,.18);
+            border-radius:999px;
+
+            background:rgba(255,255,255,.09);
+
+            color:rgba(255,255,255,.92);
+            font-size:11px;
+            font-weight:800;
+            letter-spacing:.08em;
+            text-transform:uppercase;
+
+            backdrop-filter:blur(10px);
+        }
+
+        .hero-eyebrow i{
+            color:#9fc3ff;
+        }
+
+        .employee-hero h1{
+            max-width:850px;
+            margin:0;
+
+            font-size:clamp(31px,4vw,54px);
+            font-weight:800;
+            letter-spacing:-.045em;
+            line-height:1.06;
+        }
+
+        .employee-hero h1 span{
+            color:#9fc3ff;
+        }
+
+        .hero-description{
+            max-width:730px;
+            margin:16px 0 0;
+
+            color:rgba(255,255,255,.72);
+            font-size:14px;
+            line-height:1.75;
+        }
+
+        .hero-meta{
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+
+            margin-top:24px;
+        }
+
+        .hero-meta-item{
+            display:inline-flex;
+            align-items:center;
+            gap:9px;
+
+            padding:10px 13px;
+
+            border:1px solid rgba(255,255,255,.14);
+            border-radius:13px;
+
+            background:rgba(255,255,255,.08);
+
+            color:rgba(255,255,255,.88);
+            font-size:12px;
+            font-weight:700;
+
+            backdrop-filter:blur(10px);
+        }
+
+        .hero-meta-item i{
+            color:#9fc3ff;
+        }
+
+        /* =====================================================
+           CARTE DU PROFIL
+        ===================================================== */
+
+        .hero-profile{
+            position:relative;
+            z-index:2;
+
+            padding:22px;
+
+            border:1px solid rgba(255,255,255,.18);
+            border-radius:24px;
+
+            background:rgba(255,255,255,.10);
+
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,.10),
+                0 15px 30px rgba(0,0,0,.10);
+
+            backdrop-filter:blur(16px);
+        }
+
+        .profile-top{
+            display:flex;
+            align-items:center;
+            gap:13px;
+
+            padding-bottom:18px;
+            border-bottom:1px solid rgba(255,255,255,.13);
+        }
+
+        .profile-avatar{
+            position:relative;
+
+            flex:0 0 56px;
+            width:56px;
+            height:56px;
+
+            display:grid;
+            place-items:center;
+
+            border:1px solid rgba(255,255,255,.24);
+            border-radius:18px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,.24),
+                    rgba(255,255,255,.08)
+                );
+
+            font-size:21px;
+        }
+
+        .profile-avatar::after{
+            content:"";
+
+            position:absolute;
+            right:-2px;
+            bottom:-2px;
+
+            width:15px;
+            height:15px;
+
+            border:3px solid var(--navy);
+            border-radius:50%;
+
+            background:#31d76b;
+        }
+
+        .profile-info{
+            min-width:0;
+        }
+
+        .profile-info small{
+            display:block;
+            margin-bottom:4px;
+
+            color:rgba(255,255,255,.58);
+            font-size:10px;
+            font-weight:800;
+            letter-spacing:.07em;
+            text-transform:uppercase;
+        }
+
+        .profile-info strong{
+            display:block;
+            overflow:hidden;
+
+            color:white;
+            font-size:14px;
+            font-weight:800;
+
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+
+        .profile-role{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+
+            margin:17px 0;
+
+            color:rgba(255,255,255,.68);
+            font-size:12px;
+        }
+
+        .profile-role strong{
+            color:white;
+            font-weight:800;
+        }
+
+        .btn-logout{
+            width:100%;
+            min-height:47px;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:9px;
+
+            padding:12px 17px;
+
+            border:0;
+            border-radius:14px;
+
+            color:var(--navy);
+            background:white;
+
+            box-shadow:0 12px 25px rgba(0,0,0,.13);
+
+            text-decoration:none;
+            font-size:12px;
+            font-weight:800;
+
+            transition:
+                transform .25s ease,
+                color .25s ease,
+                box-shadow .25s ease;
+        }
+
+        .btn-logout:hover{
+            color:var(--blue);
+            transform:translateY(-2px);
+            box-shadow:0 16px 30px rgba(0,0,0,.18);
+        }
+
+        /* =====================================================
+           TITRES DES SECTIONS
+        ===================================================== */
+
+        .dashboard-section{
+            margin-bottom:30px;
+        }
+
+        .section-heading{
+            display:flex;
+            align-items:flex-end;
+            justify-content:space-between;
+            gap:18px;
+
+            margin-bottom:17px;
+        }
+
+        .section-heading-main{
+            display:flex;
+            align-items:center;
+            gap:13px;
+        }
+
+        .section-icon{
+            flex:0 0 44px;
+            width:44px;
+            height:44px;
+
+            display:grid;
+            place-items:center;
+
+            border:1px solid #dce7ff;
+            border-radius:14px;
+
+            color:var(--blue);
+            background:var(--blue-soft);
+
+            box-shadow:0 8px 20px rgba(0,87,255,.08);
+        }
+
+        .section-heading h2{
+            margin:0;
+
+            color:var(--navy);
+            font-size:20px;
+            font-weight:800;
+            letter-spacing:-.025em;
+        }
+
+        .section-heading p{
+            margin:4px 0 0;
+
+            color:var(--muted);
+            font-size:12px;
+        }
+
+        .section-count{
+            padding:8px 12px;
+
+            border:1px solid var(--border);
+            border-radius:999px;
+
+            color:var(--muted);
+            background:rgba(255,255,255,.75);
+
+            font-size:11px;
+            font-weight:700;
+        }
+
+        /* =====================================================
+           STATISTIQUES
+        ===================================================== */
+
+        .stats-grid{
+            display:grid;
+            grid-template-columns:repeat(4,minmax(0,1fr));
+            gap:17px;
+        }
+
+        .stat-card{
+            --accent:var(--blue);
+            --soft:var(--blue-soft);
+
+            position:relative;
+            overflow:hidden;
+
+            min-height:180px;
+
+            display:flex;
+            flex-direction:column;
+            justify-content:space-between;
+
+            padding:22px;
+
+            border:1px solid var(--border);
+            border-radius:22px;
+
+            background:rgba(255,255,255,.94);
+            box-shadow:var(--shadow-sm);
+
+            transition:
+                transform .28s ease,
+                box-shadow .28s ease,
+                border-color .28s ease;
+        }
+
+        .stat-card::before{
+            content:"";
+
+            position:absolute;
+            top:0;
+            right:0;
+
+            width:105px;
+            height:105px;
+
+            border-radius:0 0 0 100%;
+            background:var(--soft);
+
+            opacity:.75;
+            transition:transform .3s ease;
+        }
+
+        .stat-card:hover{
+            z-index:2;
+            transform:translateY(-5px);
+            border-color:rgba(0,87,255,.25);
+            box-shadow:var(--shadow-md);
+        }
+
+        .stat-card:hover::before{
+            transform:scale(1.15);
+        }
+
+        .stat-card.blue{
+            --accent:var(--blue);
+            --soft:var(--blue-soft);
+        }
+
+        .stat-card.green{
+            --accent:var(--green);
+            --soft:var(--green-soft);
+        }
+
+        .stat-card.orange{
+            --accent:var(--orange);
+            --soft:var(--orange-soft);
+        }
+
+        .stat-card.red{
+            --accent:var(--red);
+            --soft:var(--red-soft);
+        }
+
+        .stat-card.purple{
+            --accent:var(--purple);
+            --soft:var(--purple-soft);
+        }
+
+        .stat-card.indigo{
+            --accent:var(--indigo);
+            --soft:var(--indigo-soft);
+        }
+
+        .stat-top{
+            position:relative;
+            z-index:1;
+
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:12px;
+        }
+
+        .stat-icon{
+            width:50px;
+            height:50px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:15px;
+
+            color:var(--accent);
+            background:var(--soft);
+
+            font-size:19px;
+        }
+
+        .stat-indicator{
+            display:inline-flex;
+            align-items:center;
+            gap:5px;
+
+            padding:6px 9px;
+
+            border-radius:999px;
+
+            color:var(--accent);
+            background:var(--soft);
+
+            font-size:9px;
+            font-weight:800;
+            text-transform:uppercase;
+        }
+
+        .stat-content{
+            position:relative;
+            z-index:1;
+            margin-top:18px;
+        }
+
+        .stat-number{
+            display:block;
+            margin-bottom:6px;
+
+            color:var(--navy);
+            font-size:34px;
+            font-weight:800;
+            letter-spacing:-.05em;
+            line-height:1;
+        }
+
+        .stat-label{
+            margin:0;
+
+            color:var(--muted);
+            font-size:12px;
+            font-weight:700;
+        }
+
+        /* =====================================================
+           ACCÈS RAPIDES
+        ===================================================== */
+
+        .actions-grid{
+            display:grid;
+            grid-template-columns:repeat(4,minmax(0,1fr));
+            gap:17px;
+        }
+
+        .action-link{
+            display:block;
+            height:100%;
+
+            color:inherit;
+            text-decoration:none;
+        }
+
+        .action-card{
+            --accent:var(--blue);
+            --soft:var(--blue-soft);
+
+            position:relative;
+            overflow:hidden;
+
+            height:100%;
+            min-height:215px;
+
+            padding:24px;
+
+            border:1px solid var(--border);
+            border-radius:23px;
+
+            background:
+                linear-gradient(
+                    155deg,
+                    white 60%,
+                    var(--soft) 160%
+                );
+
+            box-shadow:var(--shadow-sm);
+
+            transition:
+                transform .28s ease,
+                box-shadow .28s ease,
+                border-color .28s ease;
+        }
+
+        .action-card::after{
+            content:"";
+
+            position:absolute;
+            right:-52px;
+            bottom:-65px;
+
+            width:155px;
+            height:155px;
+
+            border-radius:50%;
+            background:var(--soft);
+
+            opacity:.85;
+            transition:transform .3s ease;
+        }
+
+        .action-link:hover .action-card{
+            transform:translateY(-5px);
+            border-color:rgba(0,87,255,.25);
+            box-shadow:var(--shadow-md);
+        }
+
+        .action-link:hover .action-card::after{
+            transform:scale(1.15);
+        }
+
+        .action-card.blue{
+            --accent:var(--blue);
+            --soft:var(--blue-soft);
+        }
+
+        .action-card.green{
+            --accent:var(--green);
+            --soft:var(--green-soft);
+        }
+
+        .action-card.orange{
+            --accent:var(--orange);
+            --soft:var(--orange-soft);
+        }
+
+        .action-card.purple{
+            --accent:var(--purple);
+            --soft:var(--purple-soft);
+        }
+
+        .action-card-head{
+            position:relative;
+            z-index:1;
+
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+
+            margin-bottom:22px;
+        }
+
+        .action-icon{
+            width:54px;
+            height:54px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:17px;
+
+            color:var(--accent);
+            background:var(--soft);
+
+            font-size:20px;
+        }
+
+        .action-arrow{
+            width:36px;
+            height:36px;
+
+            display:grid;
+            place-items:center;
+
+            border:1px solid var(--border);
+            border-radius:12px;
+
+            color:var(--muted);
+            background:white;
+
+            transition:
+                color .25s ease,
+                background .25s ease,
+                transform .25s ease;
+        }
+
+        .action-link:hover .action-arrow{
+            color:white;
+            background:var(--accent);
+            transform:translate(3px,-3px);
+        }
+
+        .action-card h3{
+            position:relative;
+            z-index:1;
+
+            margin:0 0 9px;
+
+            color:var(--navy);
+            font-size:15px;
+            font-weight:800;
+            letter-spacing:-.02em;
+        }
+
+        .action-card p{
+            position:relative;
+            z-index:1;
+
+            max-width:285px;
+            margin:0;
+
+            color:var(--muted);
+            font-size:12px;
+            line-height:1.7;
+        }
+
+        /* =====================================================
+           PANNEAUX ET TABLEAUX
+        ===================================================== */
+
+        .data-panel{
+            overflow:hidden;
+
+            margin-bottom:22px;
+
+            border:1px solid var(--border);
+            border-radius:24px;
+
+            background:rgba(255,255,255,.95);
+            box-shadow:var(--shadow-sm);
+        }
+
+        .panel-header{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:18px;
+
+            padding:22px 24px;
+
+            border-bottom:1px solid var(--border);
+
+            background:
+                linear-gradient(
+                    180deg,
+                    white 0%,
+                    #fbfcff 100%
+                );
+        }
+
+        .panel-title-group{
+            display:flex;
+            align-items:center;
+            gap:13px;
+        }
+
+        .panel-icon{
+            flex:0 0 43px;
+            width:43px;
+            height:43px;
+
+            display:grid;
+            place-items:center;
+
+            border:1px solid #dce7ff;
+            border-radius:14px;
+
+            color:var(--blue);
+            background:var(--blue-soft);
+        }
+
+        .panel-header h3{
+            margin:0;
+
+            color:var(--navy);
+            font-size:16px;
+            font-weight:800;
+            letter-spacing:-.02em;
+        }
+
+        .panel-header p{
+            margin:4px 0 0;
+
+            color:var(--muted);
+            font-size:11px;
+        }
+
+        .panel-badge{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+
+            padding:8px 11px;
+
+            border:1px solid var(--border);
+            border-radius:999px;
+
+            color:var(--muted);
+            background:white;
+
+            font-size:10px;
+            font-weight:800;
+            white-space:nowrap;
+        }
+
+        .panel-badge i{
+            color:var(--blue);
+        }
+
+        .table-responsive{
+            overflow-x:auto;
+        }
+
+        .dashboard-table{
+            width:100%;
+            min-width:920px;
+            margin:0;
+
+            border-collapse:separate;
+            border-spacing:0;
+        }
+
+        .dashboard-table thead th{
+            padding:14px 18px;
+
+            border:0;
+            border-bottom:1px solid var(--border);
+
+            color:#64748b;
+            background:#f8faff;
+
+            font-size:9px;
+            font-weight:800;
+            letter-spacing:.07em;
+            text-transform:uppercase;
+            white-space:nowrap;
+        }
+
+        .dashboard-table tbody td{
+            padding:16px 18px;
+
+            border:0;
+            border-bottom:1px solid #edf1f6;
+
+            color:#334155;
+            font-size:12px;
+            vertical-align:middle;
+        }
+
+        .dashboard-table tbody tr:last-child td{
+            border-bottom:0;
+        }
+
+        .dashboard-table tbody tr{
+            transition:background .2s ease;
+        }
+
+        .dashboard-table tbody tr:hover{
+            background:#f9fbff;
+        }
+
+        /* =====================================================
+           CONTENU DES TABLEAUX
+        ===================================================== */
+
+        .entity-main{
+            display:flex;
+            align-items:center;
+            gap:11px;
+        }
+
+        .entity-avatar{
+            flex:0 0 38px;
+            width:38px;
+            height:38px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:12px;
+
+            color:var(--blue);
+            background:var(--blue-soft);
+
+            font-size:13px;
+        }
+
+        .entity-avatar.green{
+            color:var(--green);
+            background:var(--green-soft);
+        }
+
+        .entity-avatar.orange{
+            color:var(--orange);
+            background:var(--orange-soft);
+        }
+
+        .entity-text{
+            min-width:0;
+        }
+
+        .entity-text strong{
+            display:block;
+
+            color:var(--navy);
+            font-size:12px;
+            font-weight:800;
+        }
+
+        .entity-text small{
+            display:block;
+
+            max-width:270px;
+            overflow:hidden;
+
+            margin-top:3px;
+
+            color:var(--muted);
+            font-size:10px;
+
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+
+        .code-badge,
+        .count-badge,
+        .status-badge{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:6px;
+
+            border-radius:999px;
+
+            font-weight:800;
+            white-space:nowrap;
+        }
+
+        .code-badge{
+            padding:7px 11px;
+
+            color:var(--blue-dark);
+            background:var(--blue-soft);
+
+            font-size:10px;
+            letter-spacing:.02em;
+        }
+
+        .count-badge{
+            min-width:32px;
+            padding:6px 9px;
+            font-size:10px;
+        }
+
+        .count-badge.danger{
+            color:#b42331;
+            background:var(--red-soft);
+        }
+
+        .count-badge.success{
+            color:#08783a;
+            background:var(--green-soft);
+        }
+
+        .status-badge{
+            padding:7px 10px;
+            font-size:9px;
+        }
+
+        .status-free,
+        .status-paid,
+        .status-active{
+            color:#08783a;
+            background:var(--green-soft);
+        }
+
+        .status-partial,
+        .status-pending{
+            color:#b74d08;
+            background:var(--orange-soft);
+        }
+
+        .status-full,
+        .status-late{
+            color:#b42331;
+            background:var(--red-soft);
+        }
+
+        .status-empty,
+        .status-default{
+            color:#475569;
+            background:#eef2f7;
+        }
+
+        .money{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+
+            color:var(--blue-dark);
+            font-weight:800;
+            white-space:nowrap;
+        }
+
+        .money i{
+            width:22px;
+            height:22px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:7px;
+
+            color:var(--blue);
+            background:var(--blue-soft);
+
+            font-size:9px;
+        }
+
+        .contact-link{
+            color:#334155;
+            text-decoration:none;
+            transition:color .2s ease;
+        }
+
+        .contact-link:hover{
+            color:var(--blue);
+        }
+
+        /* =====================================================
+           ÉTAT VIDE
+        ===================================================== */
+
+        .empty-state-cell{
+            padding:0 !important;
+        }
+
+        .empty-state{
+            min-height:210px;
+
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+
+            padding:34px 20px;
+            text-align:center;
+        }
+
+        .empty-icon{
+            width:58px;
+            height:58px;
+
+            display:grid;
+            place-items:center;
+
+            margin-bottom:14px;
+
+            border-radius:18px;
+
+            color:#94a3b8;
+            background:#f1f5f9;
+
+            font-size:20px;
+        }
+
+        .empty-state strong{
+            color:var(--navy);
+            font-size:13px;
+            font-weight:800;
+        }
+
+        .empty-state span{
+            max-width:420px;
+            margin-top:6px;
+
+            color:var(--muted);
+            font-size:11px;
+            line-height:1.6;
+        }
+
+        /* =====================================================
+           PIED DE PAGE
+        ===================================================== */
+
+        .dashboard-footer{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:16px;
+
+            margin-top:25px;
+            padding:18px 5px 5px;
+
+            color:#7c899d;
+            font-size:10px;
+        }
+
+        .dashboard-footer strong{
+            color:var(--navy);
+        }
+
+        .secure-label{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+        }
+
+        .secure-label i{
+            color:var(--green);
+        }
+
+        /* =====================================================
+           ANIMATIONS
+        ===================================================== */
+
+        [data-reveal]{
+            opacity:0;
+            transform:translateY(18px);
+
+            transition:
+                opacity .55s ease,
+                transform .55s ease;
+        }
+
+        [data-reveal].visible{
+            opacity:1;
+            transform:none;
+        }
+
+        /* =====================================================
+           TABLETTE
+        ===================================================== */
+
+        @media(max-width:1250px){
+
+            .stats-grid,
+            .actions-grid{
+                grid-template-columns:repeat(2,minmax(0,1fr));
+            }
+        }
+
+        @media(max-width:992px){
+
+            .page-wrapper{
+                padding:20px;
+            }
+
+            .employee-hero{
+                grid-template-columns:1fr;
+                padding:34px;
+            }
+
+            .hero-profile{
+                display:grid;
+                grid-template-columns:minmax(0,1fr) auto;
+                align-items:center;
+                gap:18px;
+            }
+
+            .profile-top{
+                padding:0;
+                border:0;
+            }
+
+            .profile-role{
+                display:none;
+            }
+
+            .btn-logout{
+                width:auto;
+                min-width:155px;
+            }
+        }
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media(max-width:767.98px){
+
+            .page-wrapper{
+                padding:12px;
+            }
+
+            .employee-hero{
+                min-height:auto;
+                margin-bottom:22px;
+                padding:25px 20px;
+                border-radius:24px;
+            }
+
+            .employee-hero h1{
+                font-size:31px;
+            }
+
+            .hero-description{
+                font-size:12px;
+            }
+
+            .hero-meta{
+                display:grid;
+                grid-template-columns:1fr;
+            }
+
+            .hero-meta-item{
+                width:100%;
+            }
+
+            .hero-profile{
+                display:block;
+                padding:17px;
+                border-radius:19px;
+            }
+
+            .profile-top{
+                margin-bottom:15px;
+            }
+
+            .btn-logout{
+                width:100%;
+            }
+
+            .section-heading{
+                align-items:flex-start;
+            }
+
+            .section-count{
+                display:none;
+            }
+
+            .stats-grid,
+            .actions-grid{
+                grid-template-columns:1fr;
+                gap:13px;
+            }
+
+            .stat-card{
+                min-height:155px;
+            }
+
+            .action-card{
+                min-height:185px;
+            }
+
+            .data-panel{
+                overflow:visible;
+
+                border:0;
+                background:transparent;
+                box-shadow:none;
+            }
+
+            .panel-header{
+                align-items:flex-start;
+                flex-direction:column;
+
+                margin-bottom:12px;
+                padding:18px;
+
+                border:1px solid var(--border);
+                border-radius:19px;
+
+                background:white;
+                box-shadow:var(--shadow-sm);
+            }
+
+            .panel-badge{
+                width:100%;
+                justify-content:center;
+            }
+
+            .table-responsive{
+                overflow:visible;
+            }
+
+            .dashboard-table{
+                min-width:0;
+                display:block;
+            }
+
+            .dashboard-table thead{
+                display:none;
+            }
+
+            .dashboard-table tbody{
+                display:grid;
+                gap:12px;
+            }
+
+            .dashboard-table tbody tr{
+                display:block;
+                overflow:hidden;
+
+                border:1px solid var(--border);
+                border-radius:18px;
+
+                background:white;
+                box-shadow:var(--shadow-sm);
+            }
+
+            .dashboard-table tbody tr:hover{
+                background:white;
+            }
+
+            .dashboard-table tbody td{
+                min-height:50px;
+
+                display:grid;
+                grid-template-columns:minmax(105px,.8fr) minmax(0,1.25fr);
+                align-items:center;
+                gap:12px;
+
+                padding:12px 15px;
+
+                border-bottom:1px solid #edf1f6;
+
+                text-align:right;
+            }
+
+            .dashboard-table tbody td::before{
+                content:attr(data-label);
+
+                color:#718096;
+                font-size:9px;
+                font-weight:800;
+                letter-spacing:.05em;
+                text-align:left;
+                text-transform:uppercase;
+            }
+
+            .dashboard-table tbody td:last-child{
+                border-bottom:0;
+            }
+
+            .entity-main{
+                justify-content:flex-end;
+                text-align:left;
+            }
+
+            .entity-text small{
+                max-width:185px;
+            }
+
+            .empty-state-cell{
+                display:block !important;
+            }
+
+            .empty-state-cell::before{
+                display:none;
+            }
+
+            .empty-state{
+                min-height:185px;
+            }
+
+            .dashboard-footer{
+                align-items:flex-start;
+                flex-direction:column;
+                padding:13px 5px 8px;
+            }
+        }
+
+        @media(max-width:420px){
+
+            .employee-hero h1{
+                font-size:27px;
+            }
+
+            .section-heading-main{
+                align-items:flex-start;
+            }
+
+            .section-icon{
+                flex-basis:40px;
+                width:40px;
+                height:40px;
+            }
+
+            .dashboard-table tbody td{
+                grid-template-columns:92px minmax(0,1fr);
+                padding:11px 13px;
+            }
+
+            .entity-avatar{
+                display:none;
+            }
+        }
+
+        @media(prefers-reduced-motion:reduce){
+
+            *,
+            *::before,
+            *::after{
+                scroll-behavior:auto !important;
+                transition-duration:.01ms !important;
+                animation-duration:.01ms !important;
+                animation-iteration-count:1 !important;
+            }
+
+            [data-reveal]{
+                opacity:1;
+                transform:none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="page-wrapper">
+
+    <!-- =====================================================
+         EN-TÊTE EMPLOYÉ
+    ====================================================== -->
+
+    <section class="employee-hero" data-reveal>
+
+        <div class="hero-content">
+
+            <div class="hero-eyebrow">
+                <i class="fa-solid fa-shield-halved"></i>
+                Portail sécurisé Hexa Immo
+            </div>
+
+            <h1>
+                Bonjour,
+                <span>
+                    {{ employe.prenom }}
+                    {{ employe.nom }}
+                </span>
+            </h1>
+
+            <p class="hero-description">
+                Gérez rapidement les opérations autorisées de votre agence,
+                consultez les effectifs et suivez les dernières activités
+                enregistrées.
+            </p>
+
+            <div class="hero-meta">
+
+                <div class="hero-meta-item">
+                    <i class="fa-solid fa-briefcase"></i>
+                    {{ employe.get_type_employe_display }}
+                </div>
+
+                {% if agence %}
+
+                    <div class="hero-meta-item">
+                        <i class="fa-solid fa-building-shield"></i>
+                        {{ agence.nom|default:"Agence" }}
+                    </div>
+
+                {% endif %}
+
+                <div class="hero-meta-item">
+                    <i class="fa-regular fa-calendar"></i>
+                    <span id="dateActuelle">
+                        Aujourd’hui
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+        <aside
+            class="hero-profile"
+            aria-label="Profil de l’employé connecté"
+        >
+
+            <div class="profile-top">
+
+                <div class="profile-avatar">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+
+                <div class="profile-info">
+                    <small>Compte connecté</small>
+                    <strong>
+                        {{ request.user.username }}
+                    </strong>
+                </div>
+
+            </div>
+
+            <div class="profile-role">
+                <span>Niveau d’accès</span>
+                <strong>Employé autorisé</strong>
+            </div>
+
+            <a
+                href="{% url 'logout' %}"
+                class="btn-logout"
+            >
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                Déconnexion
+            </a>
+
+        </aside>
+
+    </section>
+
+
+    <!-- =====================================================
+         STATISTIQUES
+    ====================================================== -->
+
+    <section class="dashboard-section" data-reveal>
+
+        <div class="section-heading">
+
+            <div class="section-heading-main">
+
+                <div class="section-icon">
+                    <i class="fa-solid fa-chart-column"></i>
+                </div>
+
+                <div>
+                    <h2>Vue d’ensemble</h2>
+                    <p>
+                        Effectifs et activités enregistrés dans votre agence.
+                    </p>
+                </div>
+
+            </div>
+
+            <span class="section-count">
+                Mise à jour automatique
+            </span>
+
+        </div>
+
+        <div class="stats-grid">
+
+            <article class="stat-card blue">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+
+                    <span class="stat-indicator">
+                        <i class="fa-solid fa-layer-group"></i>
+                        Parc
+                    </span>
+
+                </div>
+
+                <div class="stat-content">
+
+                    <strong
+                        class="stat-number js-counter"
+                        data-count="{{ total_batiments|default:'0' }}"
+                    >
+                        {{ total_batiments|default:"0" }}
+                    </strong>
+
+                    <p class="stat-label">
+                        Bâtiments enregistrés
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article class="stat-card purple">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-door-closed"></i>
+                    </div>
+
+                    <span class="stat-indicator">
+                        <i class="fa-solid fa-house"></i>
+                        Capacité
+                    </span>
+
+                </div>
+
+                <div class="stat-content">
+
+                    <strong
+                        class="stat-number js-counter"
+                        data-count="{{ total_chambres|default:'0' }}"
+                    >
+                        {{ total_chambres|default:"0" }}
+                    </strong>
+
+                    <p class="stat-label">
+                        Logements au total
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article class="stat-card red">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-house-lock"></i>
+                    </div>
+
+                    <span class="stat-indicator">
+                        <i class="fa-solid fa-user-lock"></i>
+                        Occupés
+                    </span>
+
+                </div>
+
+                <div class="stat-content">
+
+                    <strong
+                        class="stat-number js-counter"
+                        data-count="{{ total_chambres_occupees|default:'0' }}"
+                    >
+                        {{ total_chambres_occupees|default:"0" }}
+                    </strong>
+
+                    <p class="stat-label">
+                        Logements occupés
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article class="stat-card green">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-door-open"></i>
+                    </div>
+
+                    <span class="stat-indicator">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Libres
+                    </span>
+
+                </div>
+
+                <div class="stat-content">
+
+                    <strong
+                        class="stat-number js-counter"
+                        data-count="{{ total_chambres_libres|default:'0' }}"
+                    >
+                        {{ total_chambres_libres|default:"0" }}
+                    </strong>
+
+                    <p class="stat-label">
+                        Logements disponibles
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article class="stat-card orange">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+
+                    <span class="stat-indicator">
+                        <i class="fa-solid fa-user-group"></i>
+                        Clients
+                    </span>
+
+                </div>
+
+                <div class="stat-content">
+
+                    <strong
+                        class="stat-number js-counter"
+                        data-count="{{ total_locataires|default:'0' }}"
+                    >
+                        {{ total_locataires|default:"0" }}
+                    </strong>
+
+                    <p class="stat-label">
+                        Locataires enregistrés
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article class="stat-card indigo">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-file-contract"></i>
+                    </div>
+
+                    <span class="stat-indicator">
+                        <i class="fa-solid fa-folder-open"></i>
+                        Dossiers
+                    </span>
+
+                </div>
+
+                <div class="stat-content">
+
+                    <strong
+                        class="stat-number js-counter"
+                        data-count="{{ total_locations|default:'0' }}"
+                    >
+                        {{ total_locations|default:"0" }}
+                    </strong>
+
+                    <p class="stat-label">
+                        Locations enregistrées
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article class="stat-card green">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+
+                    <span class="stat-indicator">
+                        <i class="fa-solid fa-signal"></i>
+                        Actives
+                    </span>
+
+                </div>
+
+                <div class="stat-content">
+
+                    <strong
+                        class="stat-number js-counter"
+                        data-count="{{ total_locations_actives|default:'0' }}"
+                    >
+                        {{ total_locations_actives|default:"0" }}
+                    </strong>
+
+                    <p class="stat-label">
+                        Locations actives
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article class="stat-card blue">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+
+                    <span class="stat-indicator">
+                        <i class="fa-solid fa-money-check-dollar"></i>
+                        Paiements
+                    </span>
+
+                </div>
+
+                <div class="stat-content">
+
+                    <strong
+                        class="stat-number js-counter"
+                        data-count="{{ total_paiements_enregistres|default:'0' }}"
+                    >
+                        {{ total_paiements_enregistres|default:"0" }}
+                    </strong>
+
+                    <p class="stat-label">
+                        Paiements enregistrés
+                    </p>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ACCÈS RAPIDES
+    ====================================================== -->
+
+    <section class="dashboard-section" data-reveal>
+
+        <div class="section-heading">
+
+            <div class="section-heading-main">
+
+                <div class="section-icon">
+                    <i class="fa-solid fa-grid-2"></i>
+                </div>
+
+                <div>
+                    <h2>Accès rapides</h2>
+                    <p>
+                        Accédez aux opérations autorisées pour votre compte.
+                    </p>
+                </div>
+
+            </div>
+
+            <span class="section-count">
+                Actions disponibles
+            </span>
+
+        </div>
+
+        <div class="actions-grid">
+
+            {% if peut_ajouter_paiement %}
+
+                <a
+                    href="{% url 'ajouter_paiement_employe' %}"
+                    class="action-link"
+                >
+
+                    <article class="action-card orange">
+
+                        <div class="action-card-head">
+
+                            <div class="action-icon">
+                                <i class="fa-solid fa-money-check-dollar"></i>
+                            </div>
+
+                            <span class="action-arrow">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </span>
+
+                        </div>
+
+                        <h3>Enregistrer un paiement</h3>
+
+                        <p>
+                            Saisir le paiement d’un locataire et générer
+                            automatiquement son reçu.
+                        </p>
+
+                    </article>
+
+                </a>
+
+            {% endif %}
+
+
+            {% if peut_ajouter_locataire %}
+
+                <a
+                    href="{% url 'ajouter_locataire_employe' %}"
+                    class="action-link"
+                >
+
+                    <article class="action-card green">
+
+                        <div class="action-card-head">
+
+                            <div class="action-icon">
+                                <i class="fa-solid fa-user-plus"></i>
+                            </div>
+
+                            <span class="action-arrow">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </span>
+
+                        </div>
+
+                        <h3>Ajouter un locataire</h3>
+
+                        <p>
+                            Enregistrer un nouveau locataire avec sa location
+                            et les informations de caution.
+                        </p>
+
+                    </article>
+
+                </a>
+
+            {% endif %}
+
+{% if peut_voir_batiments %}
+
+    <a href="{% url 'espace_batiments_employe' %}"
+       class="action-link">
+
+        <article class="action-card blue">
+
+            <div class="action-card-head">
+
+                <div class="action-icon">
+                    <i class="fa-solid fa-building"></i>
+                </div>
+
+            </div>
+
+            <h3>Voir les bâtiments</h3>
+
+            <p>
+                Consulter les bâtiments, les logements occupés
+                et les logements libres.
+            </p>
+
+        </article>
+
+    </a>
+
+{% endif %}
+
+
+            {% if peut_voir_locations %}
+
+    <a
+        href="{% url 'locations_employe' %}"
+        class="action-link"
+    >
+
+        <article class="action-card purple">
+
+            <div class="action-card-head">
+
+                <div class="action-icon">
+                    <i class="fa-solid fa-file-contract"></i>
+                </div>
+
+                <span class="action-arrow">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </span>
+
+            </div>
+
+            <h3>Voir les locations</h3>
+
+            <p>
+                Consulter les contrats, les logements loués
+                et les locataires de votre agence.
+            </p>
+
+        </article>
+
+    </a>
+
+{% endif %}
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         BÂTIMENTS
+    ====================================================== -->
+
+    <section class="data-panel" data-reveal>
+
+        <header class="panel-header">
+
+            <div class="panel-title-group">
+
+                <div class="panel-icon">
+                    <i class="fa-solid fa-building"></i>
+                </div>
+
+                <div>
+                    <h3>Effectif des bâtiments</h3>
+                    <p>
+                        Répartition des logements occupés et libres
+                        par bâtiment.
+                    </p>
+                </div>
+
+            </div>
+
+            <span class="panel-badge">
+                <i class="fa-solid fa-chart-pie"></i>
+                État d’occupation
+            </span>
+
+        </header>
+
+        <div class="table-responsive">
+
+            <table class="dashboard-table">
+
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Bâtiment</th>
+                        <th>Ville</th>
+                        <th>Total logements</th>
+                        <th>Occupés</th>
+                        <th>Libres</th>
+                        <th>Occupation</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for b in batiments %}
+
+                        <tr>
+
+                            <td data-label="Code">
+
+                                <span class="code-badge">
+                                    <i class="fa-solid fa-barcode"></i>
+                                    {{ b.code_batiment|default:"-" }}
+                                </span>
+
+                            </td>
+
+                            <td data-label="Bâtiment">
+
+                                <div class="entity-main">
+
+                                    <span class="entity-avatar">
+                                        <i class="fa-solid fa-building"></i>
+                                    </span>
+
+                                    <div class="entity-text">
+
+                                        <strong>
+                                            {{ b.nom }}
+                                        </strong>
+
+                                        <small>
+                                            {{ b.adresse|default:"Adresse non renseignée" }}
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                            <td data-label="Ville">
+                                {{ b.ville|default:"-" }}
+                            </td>
+
+                            <td data-label="Total logements">
+                                <strong>
+                                    {{ b.nombre_chambres|default:"0" }}
+                                </strong>
+                            </td>
+
+                            <td data-label="Occupés">
+
+                                <span class="count-badge danger">
+                                    {{ b.nombre_chambres_occupees|default:"0" }}
+                                </span>
+
+                            </td>
+
+                            <td data-label="Libres">
+
+                                <span class="count-badge success">
+                                    {{ b.nombre_chambres_libres|default:"0" }}
+                                </span>
+
+                            </td>
+
+                            <td data-label="Occupation">
+
+                                {% if b.statut_employe == "Libre" %}
+
+                                    <span class="status-badge status-free">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        Libre
+                                    </span>
+
+                                {% elif b.statut_employe == "Partiellement occupé" %}
+
+                                    <span class="status-badge status-partial">
+                                        <i class="fa-solid fa-circle-half-stroke"></i>
+                                        Partiellement occupé
+                                    </span>
+
+                                {% elif b.statut_employe == "Complètement occupé" %}
+
+                                    <span class="status-badge status-full">
+                                        <i class="fa-solid fa-lock"></i>
+                                        Complètement occupé
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-empty">
+                                        <i class="fa-solid fa-minus"></i>
+                                        Aucun logement
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="empty-state-cell"
+                            >
+
+                                <div class="empty-state">
+
+                                    <div class="empty-icon">
+                                        <i class="fa-regular fa-building"></i>
+                                    </div>
+
+                                    <strong>
+                                        Aucun bâtiment enregistré
+                                    </strong>
+
+                                    <span>
+                                        Aucun bâtiment n’est actuellement
+                                        associé à cette agence.
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         LOCATIONS ACTIVES
+    ====================================================== -->
+
+    <section class="data-panel" data-reveal>
+
+        <header class="panel-header">
+
+            <div class="panel-title-group">
+
+                <div class="panel-icon">
+                    <i class="fa-solid fa-key"></i>
+                </div>
+
+                <div>
+                    <h3>Locations actives</h3>
+                    <p>
+                        Locataires et logements actuellement occupés.
+                    </p>
+                </div>
+
+            </div>
+
+            <span class="panel-badge">
+                <i class="fa-solid fa-circle-check"></i>
+                Contrats en cours
+            </span>
+
+        </header>
+
+        <div class="table-responsive">
+
+            <table class="dashboard-table">
+
+                <thead>
+                    <tr>
+                        <th>Locataire</th>
+                        <th>Bâtiment</th>
+                        <th>Logement</th>
+                        <th>Loyer</th>
+                        <th>Caution</th>
+                        <th>Date début</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for l in locations_actives %}
+
+                        <tr>
+
+                            <td data-label="Locataire">
+
+                                <div class="entity-main">
+
+                                    <span class="entity-avatar green">
+                                        <i class="fa-solid fa-user"></i>
+                                    </span>
+
+                                    <div class="entity-text">
+
+                                        <strong>
+                                            {{ l.locataire.prenom }}
+                                            {{ l.locataire.nom }}
+                                        </strong>
+
+                                        <small>
+                                            Locataire actif
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                            <td data-label="Bâtiment">
+                                {{ l.batiment.nom|default:"-" }}
+                            </td>
+
+                            <td data-label="Logement">
+
+                                {% if l.chambre %}
+
+                                    {% if l.chambre.numero %}
+
+                                        {{ l.chambre.numero }}
+
+                                    {% else %}
+
+                                        {{ l.chambre.nom|default:"-" }}
+
+                                    {% endif %}
+
+                                {% elif l.chambre_logement %}
+
+                                    {% if l.chambre_logement.numero %}
+
+                                        {{ l.chambre_logement.numero }}
+
+                                    {% else %}
+
+                                        {{ l.chambre_logement.nom|default:"-" }}
+
+                                    {% endif %}
+
+                                {% elif l.numero_appartement %}
+
+                                    {{ l.numero_appartement }}
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+                            <td data-label="Loyer">
+
+                                <span class="money">
+                                    <i class="fa-solid fa-dollar-sign"></i>
+                                    {{ l.loyer|default:"0"|floatformat:2 }} $
+                                </span>
+
+                            </td>
+
+                            <td data-label="Caution">
+
+                                {% if l.caution_payee %}
+
+                                    <span class="status-badge status-paid">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        Payée —
+                                        {{ l.caution|default:"0"|floatformat:2 }} $
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-pending">
+                                        <i class="fa-solid fa-clock"></i>
+                                        Non payée
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td data-label="Date début">
+                                {{ l.date_debut|date:"d/m/Y" }}
+                            </td>
+
+                            <td data-label="Statut">
+
+                                <span class="status-badge status-active">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    Active
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="empty-state-cell"
+                            >
+
+                                <div class="empty-state">
+
+                                    <div class="empty-icon">
+                                        <i class="fa-solid fa-key"></i>
+                                    </div>
+
+                                    <strong>
+                                        Aucune location active
+                                    </strong>
+
+                                    <span>
+                                        Aucune location active n’est actuellement
+                                        enregistrée dans cette agence.
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DERNIERS LOCATAIRES
+    ====================================================== -->
+
+    <section class="data-panel" data-reveal>
+
+        <header class="panel-header">
+
+            <div class="panel-title-group">
+
+                <div class="panel-icon">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+
+                <div>
+                    <h3>Derniers locataires enregistrés</h3>
+                    <p>
+                        Les dix derniers locataires ajoutés à l’agence.
+                    </p>
+                </div>
+
+            </div>
+
+            <span class="panel-badge">
+                <i class="fa-solid fa-user-clock"></i>
+                Enregistrements récents
+            </span>
+
+        </header>
+
+        <div class="table-responsive">
+
+            <table class="dashboard-table">
+
+                <thead>
+                    <tr>
+                        <th>Locataire</th>
+                        <th>Téléphone</th>
+                        <th>Email</th>
+                        <th>Date d’enregistrement</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for locataire in derniers_locataires %}
+
+                        <tr>
+
+                            <td data-label="Locataire">
+
+                                <div class="entity-main">
+
+                                    <span class="entity-avatar orange">
+                                        <i class="fa-solid fa-user"></i>
+                                    </span>
+
+                                    <div class="entity-text">
+
+                                        <strong>
+                                            {{ locataire.prenom }}
+                                            {{ locataire.nom }}
+                                        </strong>
+
+                                        <small>
+                                            Locataire enregistré
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                            <td data-label="Téléphone">
+
+                                {% if locataire.telephone %}
+
+                                    <a
+                                        href="tel:{{ locataire.telephone }}"
+                                        class="contact-link"
+                                    >
+                                        <i class="fa-solid fa-phone me-1 text-primary"></i>
+                                        {{ locataire.telephone }}
+                                    </a>
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+                            <td data-label="Email">
+
+                                {% if locataire.email %}
+
+                                    <a
+                                        href="mailto:{{ locataire.email }}"
+                                        class="contact-link"
+                                    >
+                                        <i class="fa-solid fa-envelope me-1 text-primary"></i>
+                                        {{ locataire.email }}
+                                    </a>
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+                            <td data-label="Date d’enregistrement">
+
+                                <i class="fa-regular fa-calendar me-1 text-primary"></i>
+
+                                {{ locataire.date_creation|date:"d/m/Y H:i" }}
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="4"
+                                class="empty-state-cell"
+                            >
+
+                                <div class="empty-state">
+
+                                    <div class="empty-icon">
+                                        <i class="fa-solid fa-users"></i>
+                                    </div>
+
+                                    <strong>
+                                        Aucun locataire enregistré
+                                    </strong>
+
+                                    <span>
+                                        Aucun locataire récent n’est disponible
+                                        pour le moment.
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DERNIERS PAIEMENTS
+    ====================================================== -->
+
+    <section class="data-panel" data-reveal>
+
+        <header class="panel-header">
+
+            <div class="panel-title-group">
+
+                <div class="panel-icon">
+                    <i class="fa-solid fa-receipt"></i>
+                </div>
+
+                <div>
+                    <h3>Mes derniers paiements enregistrés</h3>
+                    <p>
+                        Paiements saisis par cet employé.
+                    </p>
+                </div>
+
+            </div>
+
+            <span class="panel-badge">
+                <i class="fa-solid fa-money-check-dollar"></i>
+                Activité financière
+            </span>
+
+        </header>
+
+        <div class="table-responsive">
+
+            <table class="dashboard-table">
+
+                <thead>
+                    <tr>
+                        <th>Reçu</th>
+                        <th>Locataire</th>
+                        <th>Bâtiment</th>
+                        <th>Mois</th>
+                        <th>Montant</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for paiement in derniers_paiements %}
+
+                        <tr>
+
+                            <td data-label="Reçu">
+
+                                <span class="code-badge">
+                                    <i class="fa-solid fa-receipt"></i>
+                                    {{ paiement.numero_recu|default:"-" }}
+                                </span>
+
+                            </td>
+
+                            <td data-label="Locataire">
+
+                                {% if paiement.location %}
+
+                                    <div class="entity-main">
+
+                                        <span class="entity-avatar green">
+                                            <i class="fa-solid fa-user"></i>
+                                        </span>
+
+                                        <div class="entity-text">
+
+                                            <strong>
+                                                {{ paiement.location.locataire.prenom }}
+                                                {{ paiement.location.locataire.nom }}
+                                            </strong>
+
+                                            <small>
+                                                Paiement locataire
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+                            <td data-label="Bâtiment">
+
+                                {% if paiement.location %}
+
+                                    {{ paiement.location.batiment.nom|default:"-" }}
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+                            <td data-label="Mois">
+                                {{ paiement.mois|default:"-" }}
+                            </td>
+
+                            <td data-label="Montant">
+
+                                <span class="money">
+                                    <i class="fa-solid fa-dollar-sign"></i>
+                                    {{ paiement.montant|default:"0"|floatformat:2 }} $
+                                </span>
+
+                            </td>
+
+                            <td data-label="Date">
+
+                                <i class="fa-regular fa-calendar me-1 text-primary"></i>
+
+                                {{ paiement.date_paiement|date:"d/m/Y" }}
+
+                            </td>
+
+                            <td data-label="Statut">
+
+                                {% if paiement.statut == "paye" %}
+
+                                    <span class="status-badge status-paid">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        Payé
+                                    </span>
+
+                                {% elif paiement.statut == "attente" %}
+
+                                    <span class="status-badge status-pending">
+                                        <i class="fa-solid fa-clock"></i>
+                                        En attente
+                                    </span>
+
+                                {% elif paiement.statut == "retard" %}
+
+                                    <span class="status-badge status-late">
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+                                        En retard
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-default">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                        {{ paiement.get_statut_display|default:"Non défini" }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="empty-state-cell"
+                            >
+
+                                <div class="empty-state">
+
+                                    <div class="empty-icon">
+                                        <i class="fa-solid fa-receipt"></i>
+                                    </div>
+
+                                    <strong>
+                                        Aucun paiement enregistré
+                                    </strong>
+
+                                    <span>
+                                        Aucun paiement n’a encore été enregistré
+                                        par cet employé.
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         PIED DE PAGE
+    ====================================================== -->
+
+    <footer class="dashboard-footer">
+
+        <div>
+            © <span id="anneeActuelle"></span>
+            <strong>Hexa Immo</strong>.
+            Espace réservé aux employés autorisés.
+        </div>
+
+        <div class="secure-label">
+            <i class="fa-solid fa-shield-halved"></i>
+            Session sécurisée
+        </div>
+
+    </footer>
+
+</main>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+
+        /* =====================================================
+           DATE ACTUELLE
+        ===================================================== */
+
+        const dateElement = document.getElementById("dateActuelle");
+        const anneeElement = document.getElementById("anneeActuelle");
+
+        const maintenant = new Date();
+
+        if(dateElement){
+
+            const dateFormatee = new Intl.DateTimeFormat(
+                "fr-CA",
+                {
+                    weekday:"long",
+                    day:"numeric",
+                    month:"long",
+                    year:"numeric"
+                }
+            ).format(maintenant);
+
+            dateElement.textContent =
+                dateFormatee.charAt(0).toUpperCase() +
+                dateFormatee.slice(1);
+        }
+
+        if(anneeElement){
+            anneeElement.textContent = maintenant.getFullYear();
+        }
+
+
+        /* =====================================================
+           ANIMATION D’APPARITION
+        ===================================================== */
+
+        const elementsReveal =
+            document.querySelectorAll("[data-reveal]");
+
+        if("IntersectionObserver" in window){
+
+            const revealObserver = new IntersectionObserver(
+                function(entries, observer){
+
+                    entries.forEach(function(entry){
+
+                        if(entry.isIntersecting){
+
+                            entry.target.classList.add("visible");
+                            observer.unobserve(entry.target);
+                        }
+
+                    });
+
+                },
+                {
+                    threshold:0.08
+                }
+            );
+
+            elementsReveal.forEach(function(element,index){
+
+                element.style.transitionDelay =
+                    Math.min(index * 55,220) + "ms";
+
+                revealObserver.observe(element);
+            });
+
+        }else{
+
+            elementsReveal.forEach(function(element){
+                element.classList.add("visible");
+            });
+        }
+
+
+        /* =====================================================
+           ANIMATION DES COMPTEURS
+        ===================================================== */
+
+        const compteurs =
+            document.querySelectorAll(".js-counter");
+
+        const reduireAnimations =
+            window.matchMedia(
+                "(prefers-reduced-motion: reduce)"
+            ).matches;
+
+        function animerCompteur(element){
+
+            if(element.dataset.animated === "true"){
+                return;
+            }
+
+            element.dataset.animated = "true";
+
+            const valeurTexte =
+                String(element.dataset.count || "0")
+                    .replace(/\s/g,"")
+                    .replace(",",".");
+
+            const valeurFinale =
+                Number.parseInt(valeurTexte,10);
+
+            if(
+                !Number.isFinite(valeurFinale) ||
+                valeurFinale < 0 ||
+                reduireAnimations
+            ){
+                element.textContent =
+                    Number.isFinite(valeurFinale)
+                        ? valeurFinale
+                        : 0;
+
+                return;
+            }
+
+            if(valeurFinale === 0){
+                element.textContent = "0";
+                return;
+            }
+
+            const duree = 900;
+            const debut = performance.now();
+
+            function mettreAJour(tempsActuel){
+
+                const progression =
+                    Math.min(
+                        (tempsActuel - debut) / duree,
+                        1
+                    );
+
+                const progressionDouce =
+                    1 - Math.pow(1 - progression,3);
+
+                const valeurCourante =
+                    Math.floor(
+                        progressionDouce * valeurFinale
+                    );
+
+                element.textContent =
+                    valeurCourante.toLocaleString("fr-CA");
+
+                if(progression < 1){
+
+                    requestAnimationFrame(mettreAJour);
+
+                }else{
+
+                    element.textContent =
+                        valeurFinale.toLocaleString("fr-CA");
+                }
+            }
+
+            requestAnimationFrame(mettreAJour);
+        }
+
+        if("IntersectionObserver" in window){
+
+            const compteurObserver =
+                new IntersectionObserver(
+                    function(entries,observer){
+
+                        entries.forEach(function(entry){
+
+                            if(entry.isIntersecting){
+
+                                animerCompteur(entry.target);
+                                observer.unobserve(entry.target);
+                            }
+
+                        });
+
+                    },
+                    {
+                        threshold:0.4
+                    }
+                );
+
+            compteurs.forEach(function(compteur){
+                compteurObserver.observe(compteur);
+            });
+
+        }else{
+
+            compteurs.forEach(animerCompteur);
+        }
+
+    });
+</script>
+
+</body>
+</html>

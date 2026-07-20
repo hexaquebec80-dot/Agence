@@ -1,0 +1,1674 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<style>
+:root{
+    --navy:#071a3d;
+    --blue:#0057ff;
+    --blue-dark:#003fb8;
+    --bg:#f4f7fb;
+    --white:#ffffff;
+    --text:#0f172a;
+    --muted:#64748b;
+    --border:#e5eaf2;
+    --green:#16a34a;
+    --amber:#d97706;
+    --red:#dc2626;
+    --purple:#7c3aed;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+.terrain-page{
+    min-height:100vh;
+    padding:24px;
+    background:
+        radial-gradient(circle at top right, rgba(0,87,255,.08), transparent 28%),
+        var(--bg);
+}
+
+/* =========================
+   HERO
+========================= */
+
+.terrain-hero{
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:24px;
+    padding:32px;
+    margin-bottom:22px;
+    border-radius:24px;
+    color:#fff;
+    background:
+        linear-gradient(
+            135deg,
+            #06152f 0%,
+            #071a3d 45%,
+            #0057ff 100%
+        );
+    box-shadow:0 20px 45px rgba(7,26,61,.18);
+}
+
+.terrain-hero::before{
+    content:"";
+    position:absolute;
+    width:280px;
+    height:280px;
+    right:-100px;
+    top:-140px;
+    border-radius:50%;
+    background:rgba(255,255,255,.10);
+}
+
+.terrain-hero::after{
+    content:"";
+    position:absolute;
+    width:180px;
+    height:180px;
+    right:150px;
+    bottom:-140px;
+    border-radius:50%;
+    background:rgba(255,255,255,.06);
+}
+
+.hero-content,
+.btn-add-terrain{
+    position:relative;
+    z-index:2;
+}
+
+.hero-kicker{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 12px;
+    margin-bottom:12px;
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:999px;
+    background:rgba(255,255,255,.10);
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.5px;
+    text-transform:uppercase;
+}
+
+.terrain-hero h1{
+    margin:0 0 8px;
+    font-size:30px;
+    line-height:1.2;
+    font-weight:900;
+}
+
+.terrain-hero p{
+    max-width:650px;
+    margin:0;
+    color:rgba(255,255,255,.78);
+    line-height:1.6;
+}
+
+.btn-add-terrain{
+    flex-shrink:0;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    padding:14px 18px;
+    border-radius:14px;
+    background:#fff;
+    color:var(--blue);
+    text-decoration:none;
+    font-weight:900;
+    box-shadow:0 12px 25px rgba(0,0,0,.12);
+    transition:.25s ease;
+}
+
+.btn-add-terrain:hover{
+    color:var(--blue-dark);
+    transform:translateY(-2px);
+    box-shadow:0 16px 30px rgba(0,0,0,.16);
+}
+
+/* =========================
+   STATISTIQUES
+========================= */
+
+.terrain-stats{
+    display:grid;
+    grid-template-columns:repeat(4, minmax(0, 1fr));
+    gap:16px;
+    margin-bottom:22px;
+}
+
+.stat-card{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    min-width:0;
+    padding:20px;
+    border:1px solid var(--border);
+    border-radius:20px;
+    background:#fff;
+    box-shadow:0 10px 30px rgba(15,23,42,.055);
+    transition:.25s ease;
+}
+
+.stat-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 16px 36px rgba(15,23,42,.09);
+}
+
+.stat-icon{
+    flex:0 0 52px;
+    width:52px;
+    height:52px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:16px;
+    font-size:20px;
+}
+
+.stat-icon.blue{
+    color:#0057ff;
+    background:#eaf1ff;
+}
+
+.stat-icon.green{
+    color:#15803d;
+    background:#dcfce7;
+}
+
+.stat-icon.orange{
+    color:#b45309;
+    background:#fef3c7;
+}
+
+.stat-icon.purple{
+    color:#6d28d9;
+    background:#ede9fe;
+}
+
+.stat-content{
+    min-width:0;
+}
+
+.stat-content small{
+    display:block;
+    margin-bottom:5px;
+    color:var(--muted);
+    font-size:12px;
+    font-weight:700;
+}
+
+.stat-content strong{
+    display:block;
+    overflow:hidden;
+    color:var(--navy);
+    font-size:21px;
+    font-weight:900;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+
+/* =========================
+   CARTE
+========================= */
+
+.map-card{
+    overflow:hidden;
+    margin-bottom:22px;
+    border:1px solid var(--border);
+    border-radius:24px;
+    background:#fff;
+    box-shadow:0 14px 40px rgba(15,23,42,.07);
+}
+
+.map-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:18px;
+    padding:20px 22px;
+    border-bottom:1px solid var(--border);
+    background:
+        linear-gradient(
+            135deg,
+            rgba(7,26,61,.03),
+            rgba(0,87,255,.04)
+        );
+}
+
+.map-header-left{
+    display:flex;
+    align-items:center;
+    gap:13px;
+}
+
+.map-header-icon{
+    width:44px;
+    height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:14px;
+    color:#fff;
+    background:linear-gradient(135deg,var(--navy),var(--blue));
+    box-shadow:0 8px 18px rgba(0,87,255,.18);
+}
+
+.map-header h2{
+    margin:0 0 4px;
+    color:var(--navy);
+    font-size:19px;
+    font-weight:900;
+}
+
+.map-header p{
+    margin:0;
+    color:var(--muted);
+    font-size:12px;
+}
+
+.map-country-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 13px;
+    border-radius:999px;
+    color:#166534;
+    background:#dcfce7;
+    font-size:12px;
+    font-weight:900;
+}
+
+.mali-flag{
+    display:flex;
+    overflow:hidden;
+    width:24px;
+    height:16px;
+    border-radius:3px;
+    box-shadow:0 0 0 1px rgba(15,23,42,.08);
+}
+
+.mali-flag span{
+    flex:1;
+}
+
+.mali-flag .flag-green{
+    background:#14b53a;
+}
+
+.mali-flag .flag-yellow{
+    background:#fcd116;
+}
+
+.mali-flag .flag-red{
+    background:#ce1126;
+}
+
+.map-wrapper{
+    position:relative;
+    padding:14px;
+    background:#f8fafc;
+}
+
+#mapMali{
+    width:100%;
+    height:500px;
+    border:1px solid #dce4ef;
+    border-radius:18px;
+    background:#e8eef6;
+    z-index:1;
+}
+
+/* Leaflet */
+.leaflet-container{
+    font-family:Arial, sans-serif;
+}
+
+.leaflet-control-zoom{
+    overflow:hidden;
+    border:0 !important;
+    border-radius:12px !important;
+    box-shadow:0 8px 25px rgba(15,23,42,.15) !important;
+}
+
+.leaflet-control-zoom a{
+    color:var(--navy) !important;
+    border:0 !important;
+}
+
+.leaflet-popup-content-wrapper{
+    overflow:hidden;
+    padding:0;
+    border-radius:16px;
+    box-shadow:0 16px 45px rgba(15,23,42,.20);
+}
+
+.leaflet-popup-content{
+    width:245px !important;
+    margin:0 !important;
+}
+
+.leaflet-popup-tip{
+    box-shadow:none;
+}
+
+/* =========================
+   FILTRES
+========================= */
+
+.filter-card{
+    margin-bottom:22px;
+    padding:18px;
+    border:1px solid var(--border);
+    border-radius:20px;
+    background:#fff;
+    box-shadow:0 10px 30px rgba(15,23,42,.05);
+}
+
+.filter-grid{
+    display:grid;
+    grid-template-columns:minmax(240px,2fr) 1fr 1fr auto;
+    gap:12px;
+}
+
+.field-wrap{
+    position:relative;
+}
+
+.field-wrap > i{
+    position:absolute;
+    top:50%;
+    left:14px;
+    z-index:2;
+    color:#94a3b8;
+    transform:translateY(-50%);
+    pointer-events:none;
+}
+
+.terrain-input{
+    width:100%;
+    height:48px;
+    padding:0 14px 0 42px;
+    border:1px solid #dbe3ef;
+    outline:none;
+    border-radius:13px;
+    background:#fbfcff;
+    color:var(--text);
+    font-size:14px;
+    transition:.2s ease;
+}
+
+select.terrain-input{
+    cursor:pointer;
+}
+
+.terrain-input:focus{
+    border-color:var(--blue);
+    background:#fff;
+    box-shadow:0 0 0 4px rgba(0,87,255,.08);
+}
+
+.btn-filter{
+    height:48px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:0 20px;
+    border:0;
+    border-radius:13px;
+    cursor:pointer;
+    color:#fff;
+    background:linear-gradient(135deg,var(--navy),var(--blue));
+    font-weight:900;
+    transition:.2s ease;
+}
+
+.btn-filter:hover{
+    transform:translateY(-1px);
+    box-shadow:0 10px 20px rgba(0,87,255,.18);
+}
+
+/* =========================
+   LISTE TERRAINS
+========================= */
+
+.section-heading{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    margin:0 0 15px;
+}
+
+.section-heading h2{
+    margin:0;
+    color:var(--navy);
+    font-size:21px;
+    font-weight:900;
+}
+
+.section-heading span{
+    color:var(--muted);
+    font-size:13px;
+}
+
+.terrain-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:18px;
+}
+
+.terrain-card{
+    position:relative;
+    overflow:hidden;
+    padding:20px;
+    border:1px solid var(--border);
+    border-radius:21px;
+    background:#fff;
+    box-shadow:0 12px 35px rgba(15,23,42,.06);
+    transition:.25s ease;
+}
+
+.terrain-card:hover{
+    transform:translateY(-4px);
+    border-color:#cfd9e8;
+    box-shadow:0 18px 42px rgba(15,23,42,.10);
+}
+
+.terrain-card::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:4px;
+    background:linear-gradient(90deg,var(--navy),var(--blue));
+}
+
+.card-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    margin-bottom:15px;
+}
+
+.card-title{
+    min-width:0;
+}
+
+.card-title h3{
+    margin:0 0 6px;
+    overflow:hidden;
+    color:var(--navy);
+    font-size:18px;
+    font-weight:900;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+
+.card-code{
+    color:#94a3b8;
+    font-size:11px;
+    font-weight:700;
+}
+
+.card-location-icon{
+    flex:0 0 42px;
+    width:42px;
+    height:42px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:13px;
+    color:var(--blue);
+    background:#eaf1ff;
+}
+
+.terrain-meta{
+    display:grid;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+.meta-row{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.45;
+}
+
+.meta-row i{
+    width:16px;
+    margin-top:2px;
+    color:#94a3b8;
+    text-align:center;
+}
+
+.terrain-badges{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin:14px 0;
+}
+
+.terrain-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:7px 10px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:900;
+}
+
+.terrain-badge.vente{
+    color:#166534;
+    background:#dcfce7;
+}
+
+.terrain-badge.achat{
+    color:#1d4ed8;
+    background:#dbeafe;
+}
+
+.terrain-badge.libre{
+    color:#15803d;
+    background:#dcfce7;
+}
+
+.terrain-badge.construction{
+    color:#92400e;
+    background:#fef3c7;
+}
+
+.terrain-badge.vendu{
+    color:#b91c1c;
+    background:#fee2e2;
+}
+
+.terrain-badge.reserve{
+    color:#6d28d9;
+    background:#ede9fe;
+}
+
+.terrain-badge.quality{
+    color:#334155;
+    background:#f1f5f9;
+}
+
+.card-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+    padding-top:15px;
+    border-top:1px solid #edf1f6;
+}
+
+.terrain-price small{
+    display:block;
+    margin-bottom:3px;
+    color:#94a3b8;
+    font-size:10px;
+    font-weight:800;
+    text-transform:uppercase;
+}
+
+.terrain-price strong{
+    color:var(--blue);
+    font-size:20px;
+    font-weight:950;
+}
+
+.btn-detail{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    padding:10px 13px;
+    border-radius:11px;
+    color:var(--blue);
+    background:#eaf1ff;
+    text-decoration:none;
+    font-size:12px;
+    font-weight:900;
+    transition:.2s ease;
+}
+
+.btn-detail:hover{
+    color:#fff;
+    background:var(--blue);
+}
+
+.empty-state{
+    grid-column:1/-1;
+    padding:55px 25px;
+    border:1px dashed #cbd5e1;
+    border-radius:20px;
+    background:#fff;
+    color:var(--muted);
+    text-align:center;
+}
+
+.empty-icon{
+    width:64px;
+    height:64px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 14px;
+    border-radius:20px;
+    color:var(--blue);
+    background:#eaf1ff;
+    font-size:25px;
+}
+
+.empty-state h3{
+    margin:0 0 7px;
+    color:var(--navy);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:1100px){
+    .terrain-stats{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+
+    .terrain-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+
+    .filter-grid{
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+@media(max-width:768px){
+    .terrain-page{
+        padding:14px;
+    }
+
+    .terrain-hero{
+        flex-direction:column;
+        align-items:flex-start;
+        padding:24px;
+    }
+
+    .terrain-hero h1{
+        font-size:24px;
+    }
+
+    .btn-add-terrain{
+        width:100%;
+    }
+
+    .map-header{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    #mapMali{
+        height:420px;
+    }
+
+    .filter-grid{
+        grid-template-columns:1fr;
+    }
+
+    .terrain-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:520px){
+    .terrain-stats{
+        grid-template-columns:1fr;
+    }
+
+    .stat-card{
+        padding:16px;
+    }
+
+    .map-wrapper{
+        padding:8px;
+    }
+
+    #mapMali{
+        height:360px;
+        border-radius:14px;
+    }
+
+    .card-footer{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    .btn-detail{
+        width:100%;
+    }
+}
+</style>
+
+<div class="terrain-page">
+
+<!-- HERO -->
+<section class="terrain-hero">
+    <div class="hero-content">
+
+        <div class="hero-kicker">
+            <i class="fa-solid fa-location-dot"></i>
+            Gestion foncière au Mali
+        </div>
+
+        <h1>
+            Terrains vente / achat
+        </h1>
+
+        <p>
+            Gérez les terrains disponibles, en construction,
+            vendus ou réservés avec une localisation cartographique
+            limitée au territoire malien.
+        </p>
+
+    </div>
+
+    <a href="{% url 'ajouter_terrain' %}" class="btn-add-terrain">
+        <i class="fa-solid fa-plus"></i>
+        Ajouter un terrain
+    </a>
+</section>
+
+
+<!-- STATISTIQUES -->
+<section class="terrain-stats">
+
+    <div class="stat-card">
+        <div class="stat-icon blue">
+            <i class="fa-solid fa-layer-group"></i>
+        </div>
+
+        <div class="stat-content">
+            <small>Total terrains</small>
+            <strong>{{ total_terrains|default:"0" }}</strong>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon green">
+            <i class="fa-solid fa-map"></i>
+        </div>
+
+        <div class="stat-content">
+            <small>Terrains libres</small>
+            <strong>{{ terrains_libres|default:"0" }}</strong>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon orange">
+            <i class="fa-solid fa-helmet-safety"></i>
+        </div>
+
+        <div class="stat-content">
+            <small>En construction</small>
+            <strong>{{ terrains_construction|default:"0" }}</strong>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon purple">
+            <i class="fa-solid fa-coins"></i>
+        </div>
+
+        <div class="stat-content">
+            <small>Valeur totale</small>
+            <strong>
+                {{ valeur_totale|default:"0"|floatformat:2 }} $
+            </strong>
+        </div>
+    </div>
+
+</section>
+
+
+<!-- CARTE DU MALI -->
+<section class="map-card">
+
+    <div class="map-header">
+
+        <div class="map-header-left">
+
+            <div class="map-header-icon">
+                <i class="fa-solid fa-map-location-dot"></i>
+            </div>
+
+            <div>
+                <h2>Carte des terrains au Mali</h2>
+                <p>
+                    Visualisation des terrains enregistrés
+                    sur le territoire malien
+                </p>
+            </div>
+
+        </div>
+
+        <div class="map-country-badge">
+
+            <span class="mali-flag">
+                <span class="flag-green"></span>
+                <span class="flag-yellow"></span>
+                <span class="flag-red"></span>
+            </span>
+
+            Mali uniquement
+        </div>
+
+    </div>
+
+    <div class="map-wrapper">
+        <div id="mapMali"></div>
+    </div>
+
+</section>
+
+
+<!-- FILTRES -->
+<form method="GET" class="filter-card">
+
+    <div class="filter-grid">
+
+        <div class="field-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <input
+                type="text"
+                name="q"
+                value="{{ q|default:'' }}"
+                class="terrain-input"
+                placeholder="Terrain, ville, quartier, propriétaire..."
+            >
+        </div>
+
+
+        <div class="field-wrap">
+            <i class="fa-solid fa-filter"></i>
+
+            <select
+                name="statut"
+                class="terrain-input"
+            >
+                <option value="">
+                    Tous les statuts
+                </option>
+
+                <option
+                    value="libre"
+                    {% if statut == "libre" %}selected{% endif %}
+                >
+                    Libre
+                </option>
+
+                <option
+                    value="construction"
+                    {% if statut == "construction" %}selected{% endif %}
+                >
+                    En construction
+                </option>
+
+                <option
+                    value="vendu"
+                    {% if statut == "vendu" %}selected{% endif %}
+                >
+                    Vendu
+                </option>
+
+                <option
+                    value="reserve"
+                    {% if statut == "reserve" %}selected{% endif %}
+                >
+                    Réservé
+                </option>
+            </select>
+        </div>
+
+
+        <div class="field-wrap">
+            <i class="fa-solid fa-arrow-right-arrow-left"></i>
+
+            <select
+                name="type_operation"
+                class="terrain-input"
+            >
+                <option value="">
+                    Vente / Achat
+                </option>
+
+                <option
+                    value="vente"
+                    {% if type_operation == "vente" %}selected{% endif %}
+                >
+                    Vente
+                </option>
+
+                <option
+                    value="achat"
+                    {% if type_operation == "achat" %}selected{% endif %}
+                >
+                    Achat
+                </option>
+            </select>
+        </div>
+
+
+        <button
+            class="btn-filter"
+            type="submit"
+        >
+            <i class="fa-solid fa-sliders"></i>
+            Filtrer
+        </button>
+
+    </div>
+
+</form>
+
+
+<!-- TITRE LISTE -->
+<div class="section-heading">
+    <h2>
+        <i class="fa-solid fa-list-ul"></i>
+        Liste des terrains
+    </h2>
+
+    <span>
+        {{ terrains|length }} résultat{{ terrains|length|pluralize }}
+    </span>
+</div>
+
+
+<!-- CARTES TERRAINS -->
+<section class="terrain-grid">
+
+    {% for terrain in terrains %}
+
+    <article class="terrain-card">
+
+        <div class="card-top">
+
+            <div class="card-title">
+
+                <h3>
+                    {{ terrain.titre|default:"Terrain sans titre" }}
+                </h3>
+
+                <div class="card-code">
+                    TERRAIN #{{ terrain.id }}
+                </div>
+
+            </div>
+
+            <div class="card-location-icon">
+                <i class="fa-solid fa-location-dot"></i>
+            </div>
+
+        </div>
+
+
+        <div class="terrain-meta">
+
+            <div class="meta-row">
+                <i class="fa-solid fa-city"></i>
+
+                <span>
+                    {{ terrain.ville|default:"Ville non précisée" }}
+
+                    {% if terrain.quartier %}
+                        , {{ terrain.quartier }}
+                    {% endif %}
+                </span>
+            </div>
+
+
+            <div class="meta-row">
+                <i class="fa-solid fa-ruler-combined"></i>
+
+                <span>
+                    {{ terrain.superficie|default:"0"|floatformat:2 }} m²
+                </span>
+            </div>
+
+
+            <div class="meta-row">
+                <i class="fa-solid fa-user"></i>
+
+                <span>
+                    {% if terrain.proprietaire %}
+                        {{ terrain.proprietaire.nom }}
+                        {{ terrain.proprietaire.prenom }}
+                    {% else %}
+                        Aucun propriétaire
+                    {% endif %}
+                </span>
+            </div>
+
+        </div>
+
+
+        <div class="terrain-badges">
+
+            <span class="terrain-badge {{ terrain.type_operation }}">
+                <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                {{ terrain.get_type_operation_display }}
+            </span>
+
+            <span class="terrain-badge {{ terrain.statut }}">
+                <i class="fa-solid fa-circle-check"></i>
+                {{ terrain.get_statut_display }}
+            </span>
+
+            {% if terrain.qualite %}
+            <span class="terrain-badge quality">
+                <i class="fa-solid fa-star"></i>
+                Qualité {{ terrain.qualite }}
+            </span>
+            {% endif %}
+
+        </div>
+
+
+        <div class="card-footer">
+
+            <div class="terrain-price">
+                <small>Prix du terrain</small>
+
+                <strong>
+                    {{ terrain.prix|default:"0"|floatformat:2 }} $
+                </strong>
+            </div>
+
+            <a
+                href="{% url 'detail_terrain' terrain.id %}"
+                class="btn-detail"
+            >
+                Voir détails
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+
+        </div>
+
+    </article>
+
+
+    {% empty %}
+
+    <div class="empty-state">
+
+        <div class="empty-icon">
+            <i class="fa-solid fa-map-location-dot"></i>
+        </div>
+
+        <h3>Aucun terrain trouvé</h3>
+
+        <p>
+            Aucun terrain ne correspond actuellement
+            à vos critères de recherche.
+        </p>
+
+    </div>
+
+    {% endfor %}
+
+</section>
+
+
+</div>
+
+<!--
+=================================================
+DONNÉES TERRAINS SÉCURISÉES POUR JAVASCRIPT
+Correction importante :
+on n'injecte plus directement latitude/longitude
+dans le JavaScript.
+=================================================
+-->
+
+{% for terrain in terrains %}
+
+
+{% if terrain.latitude != None and terrain.longitude != None %}
+
+    <div
+        class="terrain-map-data"
+        hidden
+        data-titre="{{ terrain.titre|default:'Terrain'|escape }}"
+        data-ville="{{ terrain.ville|default:''|escape }}"
+        data-quartier="{{ terrain.quartier|default:''|escape }}"
+        data-prix="{{ terrain.prix|default:'0' }}"
+        data-statut="{{ terrain.get_statut_display|default:''|escape }}"
+        data-operation="{{ terrain.get_type_operation_display|default:''|escape }}"
+        data-qualite="{{ terrain.qualite|default:''|escape }}"
+        data-latitude="{{ terrain.latitude }}"
+        data-longitude="{{ terrain.longitude }}"
+        data-url="{% url 'detail_terrain' terrain.id %}"
+    ></div>
+
+{% endif %}
+
+
+{% endfor %}
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const mapElement = document.getElementById("mapMali");
+
+    if (!mapElement || typeof L === "undefined") {
+        return;
+    }
+
+
+    /*
+    ============================================
+    LIMITES GÉOGRAPHIQUES DU MALI
+    La carte reste centrée sur le Mali.
+    ============================================
+    */
+
+    const maliBounds = L.latLngBounds(
+        L.latLng(9.5, -12.5),
+        L.latLng(25.5, 5.0)
+    );
+
+
+    /*
+    ============================================
+    CRÉATION CARTE
+    ============================================
+    */
+
+    const map = L.map("mapMali", {
+        center: [17.2, -3.8],
+        zoom: 6,
+        minZoom: 5,
+        maxZoom: 18,
+        maxBounds: maliBounds,
+        maxBoundsViscosity: 1.0,
+        zoomControl: true,
+        attributionControl: true
+    });
+
+
+    /*
+    ============================================
+    FOND DE CARTE
+    ============================================
+    */
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            minZoom: 5,
+            maxZoom: 18,
+            noWrap: true,
+            attribution: "&copy; OpenStreetMap"
+        }
+    ).addTo(map);
+
+
+    /*
+    ============================================
+    CADRAGE INITIAL SUR LE MALI
+    ============================================
+    */
+
+    map.fitBounds(maliBounds, {
+        padding: [15, 15],
+        animate: false
+    });
+
+
+    /*
+    ============================================
+    ICÔNE PERSONNALISÉE
+    ============================================
+    */
+
+    const terrainIcon = L.divIcon({
+        className: "",
+        html: `
+            <div style="
+                width:42px;
+                height:42px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                border:4px solid #ffffff;
+                border-radius:50% 50% 50% 0;
+                background:linear-gradient(135deg,#071a3d,#0057ff);
+                box-shadow:0 8px 20px rgba(7,26,61,.28);
+                transform:rotate(-45deg);
+            ">
+                <i
+                    class="fa-solid fa-house"
+                    style="
+                        color:#ffffff;
+                        font-size:14px;
+                        transform:rotate(45deg);
+                    "
+                ></i>
+            </div>
+        `,
+        iconSize: [42, 42],
+        iconAnchor: [21, 42],
+        popupAnchor: [0, -43]
+    });
+
+
+    /*
+    ============================================
+    FONCTION COORDONNÉES
+    CORRECTION DU PROBLÈME .strip / virgule
+    ============================================
+    */
+
+    function parseCoordinate(value) {
+
+        if (value === null || value === undefined) {
+            return NaN;
+        }
+
+        const cleanedValue = String(value)
+            .trim()
+            .replace(/\s+/g, "")
+            .replace(",", ".");
+
+        return Number.parseFloat(cleanedValue);
+    }
+
+
+    /*
+    ============================================
+    ÉCHAPPEMENT HTML
+    Protection popup
+    ============================================
+    */
+
+    function escapeHtml(value) {
+
+        const div = document.createElement("div");
+
+        div.textContent = value === null || value === undefined
+            ? ""
+            : String(value);
+
+        return div.innerHTML;
+    }
+
+
+    /*
+    ============================================
+    LECTURE DES TERRAINS
+    ============================================
+    */
+
+    const terrainElements = document.querySelectorAll(
+        ".terrain-map-data"
+    );
+
+    const positions = [];
+
+
+    terrainElements.forEach(function (element) {
+
+        const latitude = parseCoordinate(
+            element.dataset.latitude
+        );
+
+        const longitude = parseCoordinate(
+            element.dataset.longitude
+        );
+
+
+        /*
+        Coordonnées invalides
+        */
+
+        if (
+            !Number.isFinite(latitude) ||
+            !Number.isFinite(longitude)
+        ) {
+            return;
+        }
+
+
+        /*
+        Vérification :
+        on refuse les points clairement hors zone Mali
+        */
+
+        const terrainPosition = L.latLng(
+            latitude,
+            longitude
+        );
+
+        if (!maliBounds.contains(terrainPosition)) {
+            return;
+        }
+
+
+        const terrain = {
+            titre: element.dataset.titre || "Terrain",
+            ville: element.dataset.ville || "",
+            quartier: element.dataset.quartier || "",
+            prix: element.dataset.prix || "0",
+            statut: element.dataset.statut || "",
+            operation: element.dataset.operation || "",
+            qualite: element.dataset.qualite || "",
+            url: element.dataset.url || "#",
+            latitude: latitude,
+            longitude: longitude
+        };
+
+
+        positions.push([
+            terrain.latitude,
+            terrain.longitude
+        ]);
+
+
+        /*
+        ========================================
+        POPUP PROFESSIONNELLE
+        ========================================
+        */
+
+        const titre = escapeHtml(terrain.titre);
+        const ville = escapeHtml(terrain.ville);
+        const quartier = escapeHtml(terrain.quartier);
+        const operation = escapeHtml(terrain.operation);
+        const statut = escapeHtml(terrain.statut);
+        const qualite = escapeHtml(terrain.qualite);
+        const prix = escapeHtml(terrain.prix);
+        const url = escapeHtml(terrain.url);
+
+
+        const localisation = quartier
+            ? `${ville}, ${quartier}`
+            : ville;
+
+
+        const popupContent = `
+            <div style="
+                width:245px;
+                overflow:hidden;
+                background:#ffffff;
+                font-family:Arial,sans-serif;
+            ">
+
+                <div style="
+                    padding:15px 16px;
+                    color:#ffffff;
+                    background:
+                        linear-gradient(
+                            135deg,
+                            #071a3d,
+                            #0057ff
+                        );
+                ">
+
+                    <div style="
+                        margin-bottom:4px;
+                        font-size:10px;
+                        font-weight:800;
+                        letter-spacing:.7px;
+                        opacity:.75;
+                        text-transform:uppercase;
+                    ">
+                        Terrain au Mali
+                    </div>
+
+                    <div style="
+                        font-size:16px;
+                        font-weight:900;
+                        line-height:1.3;
+                    ">
+                        ${titre}
+                    </div>
+
+                </div>
+
+
+                <div style="
+                    padding:15px 16px;
+                ">
+
+                    <div style="
+                        display:grid;
+                        gap:9px;
+                        color:#64748b;
+                        font-size:12px;
+                        line-height:1.4;
+                    ">
+
+                        <div>
+                            <strong style="color:#071a3d;">
+                                Localisation :
+                            </strong>
+                            ${localisation || "Non précisée"}
+                        </div>
+
+                        <div>
+                            <strong style="color:#071a3d;">
+                                Opération :
+                            </strong>
+                            ${operation || "Non précisée"}
+                        </div>
+
+                        <div>
+                            <strong style="color:#071a3d;">
+                                Statut :
+                            </strong>
+                            ${statut || "Non précisé"}
+                        </div>
+
+                        <div>
+                            <strong style="color:#071a3d;">
+                                Qualité :
+                            </strong>
+                            ${qualite || "Non précisée"}
+                        </div>
+
+                    </div>
+
+
+                    <div style="
+                        margin-top:14px;
+                        padding-top:12px;
+                        border-top:1px solid #e8edf5;
+                    ">
+
+                        <div style="
+                            margin-bottom:3px;
+                            color:#94a3b8;
+                            font-size:9px;
+                            font-weight:800;
+                            text-transform:uppercase;
+                        ">
+                            Prix du terrain
+                        </div>
+
+                        <div style="
+                            color:#0057ff;
+                            font-size:20px;
+                            font-weight:950;
+                        ">
+                            ${prix} $
+                        </div>
+
+                    </div>
+
+
+                    <a
+                        href="${url}"
+                        style="
+                            display:block;
+                            margin-top:13px;
+                            padding:11px;
+                            border-radius:10px;
+                            color:#ffffff;
+                            background:
+                                linear-gradient(
+                                    135deg,
+                                    #071a3d,
+                                    #0057ff
+                                );
+                            text-align:center;
+                            text-decoration:none;
+                            font-size:12px;
+                            font-weight:900;
+                        "
+                    >
+                        Voir les détails
+                    </a>
+
+                </div>
+
+            </div>
+        `;
+
+
+        /*
+        ========================================
+        AJOUT MARQUEUR
+        ========================================
+        */
+
+        L.marker(
+            [
+                terrain.latitude,
+                terrain.longitude
+            ],
+            {
+                icon: terrainIcon
+            }
+        )
+        .addTo(map)
+        .bindPopup(
+            popupContent,
+            {
+                maxWidth: 270,
+                minWidth: 245,
+                closeButton: true
+            }
+        );
+
+    });
+
+
+    /*
+    ============================================
+    AJUSTEMENT DE LA CARTE
+    ============================================
+    */
+
+    if (positions.length === 1) {
+
+        map.setView(
+            positions[0],
+            13,
+            {
+                animate: true
+            }
+        );
+
+    } else if (positions.length > 1) {
+
+        const terrainsBounds = L.latLngBounds(
+            positions
+        );
+
+        map.fitBounds(
+            terrainsBounds,
+            {
+                padding: [55, 55],
+                maxZoom: 13
+            }
+        );
+
+    } else {
+
+        /*
+        Aucun terrain :
+        affichage général du Mali
+        */
+
+        map.fitBounds(
+            maliBounds,
+            {
+                padding: [15, 15]
+            }
+        );
+    }
+
+
+    /*
+    ============================================
+    SÉCURITÉ :
+    impossible de déplacer la carte loin du Mali
+    ============================================
+    */
+
+    map.on("drag", function () {
+        map.panInsideBounds(
+            maliBounds,
+            {
+                animate: false
+            }
+        );
+    });
+
+
+    /*
+    ============================================
+    CORRECTION TAILLE LEAFLET
+    ============================================
+    */
+
+    window.setTimeout(function () {
+        map.invalidateSize();
+    }, 250);
+
+
+    window.addEventListener("resize", function () {
+        map.invalidateSize();
+    });
+
+});
+</script>
+
+{% endblock %}

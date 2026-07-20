@@ -1,0 +1,1591 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <meta
+        name="theme-color"
+        content="#064e3b"
+    >
+
+    <title>
+        Reçu {{ paiement.numero_recu|default:paiement.id }} | Hexa Immo
+    </title>
+
+    <!-- Google Fonts -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        :root{
+            --navy:#071a3d;
+            --navy-dark:#031229;
+
+            --green:#16a34a;
+            --green-dark:#064e3b;
+            --green-soft:#ecfdf3;
+
+            --blue:#0057ff;
+            --blue-soft:#edf4ff;
+
+            --gold:#d4af37;
+            --gold-soft:#fff8dd;
+
+            --background:#eef5f1;
+            --surface:#ffffff;
+            --surface-soft:#f8fafc;
+
+            --text:#0f172a;
+            --muted:#64748b;
+            --border:#e2e8f0;
+
+            --danger:#b42331;
+            --danger-soft:#fff0f2;
+
+            --shadow:
+                0 30px 80px rgba(15,23,42,.16);
+        }
+
+        *{
+            box-sizing:border-box;
+        }
+
+        html{
+            scroll-behavior:smooth;
+        }
+
+        body{
+            min-height:100vh;
+            margin:0;
+            padding:34px 20px;
+
+            color:var(--text);
+
+            background:
+                radial-gradient(
+                    circle at 10% 0,
+                    rgba(22,163,74,.12),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 100% 100%,
+                    rgba(0,87,255,.08),
+                    transparent 30%
+                ),
+                linear-gradient(
+                    180deg,
+                    #f8fcfa,
+                    var(--background)
+                );
+
+            font-family:
+                "Manrope",
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+            -webkit-font-smoothing:antialiased;
+        }
+
+        button,
+        a{
+            font-family:inherit;
+        }
+
+        /* =====================================================
+           BARRE D’ACTIONS
+        ===================================================== */
+
+        .page-actions{
+            width:min(100%,850px);
+            margin:0 auto 18px;
+
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+        }
+
+        .btn-action{
+            min-height:46px;
+
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:9px;
+
+            padding:11px 17px;
+
+            border:1px solid var(--border);
+            border-radius:14px;
+
+            color:#475569;
+            background:white;
+
+            box-shadow:
+                0 10px 25px rgba(15,23,42,.07);
+
+            font-size:12px;
+            font-weight:800;
+            text-decoration:none;
+            cursor:pointer;
+
+            transition:
+                transform .25s ease,
+                box-shadow .25s ease,
+                color .25s ease;
+        }
+
+        .btn-action:hover{
+            color:var(--green-dark);
+            transform:translateY(-2px);
+
+            box-shadow:
+                0 15px 30px rgba(15,23,42,.11);
+        }
+
+        .btn-print{
+            border:0;
+            color:white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--green-dark),
+                    var(--green)
+                );
+
+            box-shadow:
+                0 13px 30px rgba(22,163,74,.26);
+        }
+
+        .btn-print:hover{
+            color:white;
+
+            box-shadow:
+                0 18px 38px rgba(22,163,74,.34);
+        }
+
+        /* =====================================================
+           REÇU
+        ===================================================== */
+
+        .receipt{
+            position:relative;
+            overflow:hidden;
+
+            width:min(100%,850px);
+            margin:auto;
+
+            border:1px solid rgba(226,232,240,.9);
+            border-radius:28px;
+
+            background:var(--surface);
+            box-shadow:var(--shadow);
+
+            animation:receiptAppear .55s ease both;
+        }
+
+        @keyframes receiptAppear{
+            from{
+                opacity:0;
+                transform:translateY(18px);
+            }
+
+            to{
+                opacity:1;
+                transform:none;
+            }
+        }
+
+        /* =====================================================
+           EN-TÊTE
+        ===================================================== */
+
+        .receipt-header{
+            position:relative;
+            isolation:isolate;
+            overflow:hidden;
+
+            display:grid;
+            grid-template-columns:minmax(0,1fr) auto;
+            align-items:center;
+            gap:25px;
+
+            min-height:190px;
+            padding:34px 38px;
+
+            color:white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--green-dark) 0%,
+                    #087443 48%,
+                    var(--green) 100%
+                );
+        }
+
+        .receipt-header::before{
+            content:"";
+
+            position:absolute;
+            z-index:-1;
+
+            width:280px;
+            height:280px;
+
+            top:-170px;
+            right:-75px;
+
+            border:46px solid rgba(255,255,255,.08);
+            border-radius:50%;
+        }
+
+        .receipt-header::after{
+            content:"";
+
+            position:absolute;
+            z-index:-1;
+
+            width:180px;
+            height:180px;
+
+            left:43%;
+            bottom:-140px;
+
+            border-radius:50%;
+
+            background:rgba(255,255,255,.06);
+        }
+
+        .brand{
+            display:flex;
+            align-items:center;
+            gap:16px;
+        }
+
+        .brand-icon{
+            position:relative;
+
+            flex:0 0 66px;
+            width:66px;
+            height:66px;
+
+            display:grid;
+            place-items:center;
+
+            border:1px solid rgba(255,255,255,.24);
+            border-radius:20px;
+
+            color:white;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,.22),
+                    rgba(255,255,255,.08)
+                );
+
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,.18),
+                0 14px 30px rgba(0,0,0,.12);
+
+            font-size:27px;
+        }
+
+        .brand-icon::after{
+            content:"";
+
+            position:absolute;
+            right:-3px;
+            bottom:-3px;
+
+            width:18px;
+            height:18px;
+
+            border:3px solid #087443;
+            border-radius:50%;
+
+            background:#4ade80;
+        }
+
+        .brand-content small{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+
+            margin-bottom:7px;
+
+            color:rgba(255,255,255,.70);
+
+            font-size:10px;
+            font-weight:800;
+            letter-spacing:.08em;
+            text-transform:uppercase;
+        }
+
+        .brand-content h1{
+            margin:0;
+
+            color:white;
+            font-size:30px;
+            font-weight:800;
+            letter-spacing:-.04em;
+        }
+
+        .brand-content p{
+            margin:6px 0 0;
+
+            color:rgba(255,255,255,.76);
+            font-size:12px;
+        }
+
+        .receipt-reference{
+            min-width:210px;
+            padding:17px 18px;
+
+            border:1px solid rgba(255,255,255,.18);
+            border-radius:18px;
+
+            background:rgba(255,255,255,.10);
+
+            text-align:right;
+
+            backdrop-filter:blur(10px);
+        }
+
+        .receipt-reference small{
+            display:block;
+
+            margin-bottom:5px;
+
+            color:rgba(255,255,255,.62);
+            font-size:9px;
+            font-weight:800;
+            letter-spacing:.08em;
+            text-transform:uppercase;
+        }
+
+        .receipt-reference strong{
+            display:block;
+
+            color:white;
+            font-size:17px;
+            font-weight:800;
+        }
+
+        .receipt-reference span{
+            display:block;
+
+            margin-top:7px;
+
+            color:rgba(255,255,255,.76);
+            font-size:10px;
+        }
+
+        /* =====================================================
+           CORPS
+        ===================================================== */
+
+        .receipt-content{
+            padding:34px 38px 38px;
+        }
+
+        .top-status{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:15px;
+
+            margin-bottom:23px;
+        }
+
+        .status-badge{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+
+            padding:9px 14px;
+
+            border:1px solid #bbf7d0;
+            border-radius:999px;
+
+            color:#08783a;
+            background:var(--green-soft);
+
+            font-size:10px;
+            font-weight:800;
+            letter-spacing:.03em;
+            text-transform:uppercase;
+        }
+
+        .status-dot{
+            width:8px;
+            height:8px;
+
+            border-radius:50%;
+            background:#22c55e;
+
+            box-shadow:
+                0 0 0 4px rgba(34,197,94,.12);
+        }
+
+        .document-type{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+
+            color:var(--muted);
+            font-size:10px;
+            font-weight:700;
+        }
+
+        /* =====================================================
+           MONTANT
+        ===================================================== */
+
+        .amount-box{
+            position:relative;
+            overflow:hidden;
+
+            margin-bottom:25px;
+            padding:27px;
+
+            border:1px solid #c8efd6;
+            border-radius:22px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #f4fff7,
+                    #eaf9ef
+                );
+
+            text-align:center;
+        }
+
+        .amount-box::after{
+            content:"";
+
+            position:absolute;
+
+            width:120px;
+            height:120px;
+
+            right:-45px;
+            bottom:-70px;
+
+            border-radius:50%;
+            background:rgba(22,163,74,.08);
+        }
+
+        .amount-label{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+
+            color:#166534;
+            font-size:10px;
+            font-weight:800;
+            letter-spacing:.06em;
+            text-transform:uppercase;
+        }
+
+        .amount{
+            position:relative;
+            z-index:2;
+
+            margin-top:8px;
+
+            color:var(--green);
+            font-size:42px;
+            font-weight:800;
+            letter-spacing:-.05em;
+            line-height:1.15;
+        }
+
+        .amount small{
+            font-size:16px;
+            letter-spacing:0;
+        }
+
+        /* =====================================================
+           LOCATAIRE ET BÂTIMENT
+        ===================================================== */
+
+        .info-grid{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:15px;
+
+            margin-bottom:25px;
+        }
+
+        .info-card{
+            display:flex;
+            align-items:center;
+            gap:13px;
+
+            min-height:105px;
+            padding:18px;
+
+            border:1px solid var(--border);
+            border-radius:18px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #ffffff,
+                    var(--surface-soft)
+                );
+        }
+
+        .info-icon{
+            flex:0 0 45px;
+            width:45px;
+            height:45px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:14px;
+
+            color:var(--green);
+            background:var(--green-soft);
+
+            font-size:17px;
+        }
+
+        .info-icon.blue{
+            color:var(--blue);
+            background:var(--blue-soft);
+        }
+
+        .info-text{
+            min-width:0;
+        }
+
+        .info-text small{
+            display:block;
+
+            margin-bottom:5px;
+
+            color:var(--muted);
+            font-size:9px;
+            font-weight:800;
+            letter-spacing:.05em;
+            text-transform:uppercase;
+        }
+
+        .info-text h3{
+            margin:0;
+
+            overflow:hidden;
+
+            color:var(--navy);
+            font-size:15px;
+            font-weight:800;
+
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+
+        .info-text span{
+            display:block;
+
+            margin-top:4px;
+
+            color:var(--muted);
+            font-size:10px;
+        }
+
+        /* =====================================================
+           DÉTAILS
+        ===================================================== */
+
+        .section-title{
+            display:flex;
+            align-items:center;
+            gap:10px;
+
+            margin:0 0 12px;
+
+            color:var(--navy);
+            font-size:14px;
+            font-weight:800;
+        }
+
+        .section-title-icon{
+            width:34px;
+            height:34px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:11px;
+
+            color:var(--green);
+            background:var(--green-soft);
+        }
+
+        .details{
+            overflow:hidden;
+
+            border:1px solid var(--border);
+            border-radius:18px;
+
+            background:white;
+        }
+
+        .detail-row{
+            display:grid;
+            grid-template-columns:minmax(170px,.8fr) minmax(0,1.2fr);
+            align-items:center;
+            gap:20px;
+
+            padding:15px 17px;
+
+            border-bottom:1px solid #edf2f7;
+        }
+
+        .detail-row:last-child{
+            border-bottom:0;
+        }
+
+        .detail-row:nth-child(even){
+            background:#fbfcfe;
+        }
+
+        .detail-label{
+            display:flex;
+            align-items:center;
+            gap:8px;
+
+            color:var(--muted);
+            font-size:11px;
+            font-weight:700;
+        }
+
+        .detail-label i{
+            width:24px;
+            height:24px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:8px;
+
+            color:var(--green);
+            background:var(--green-soft);
+
+            font-size:9px;
+        }
+
+        .detail-value{
+            color:var(--text);
+            font-size:11px;
+            font-weight:800;
+            text-align:right;
+        }
+
+        /* =====================================================
+           MESSAGE DE CONFIRMATION
+        ===================================================== */
+
+        .confirmation-note{
+            display:flex;
+            align-items:flex-start;
+            gap:13px;
+
+            margin-top:23px;
+            padding:16px;
+
+            border:1px solid #d7e4ff;
+            border-radius:16px;
+
+            color:#415471;
+            background:#f6f9ff;
+
+            font-size:11px;
+            line-height:1.65;
+        }
+
+        .confirmation-icon{
+            flex:0 0 36px;
+            width:36px;
+            height:36px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:11px;
+
+            color:var(--blue);
+            background:var(--blue-soft);
+        }
+
+        .confirmation-note strong{
+            display:block;
+
+            margin-bottom:3px;
+
+            color:var(--navy);
+            font-size:11px;
+        }
+
+        /* =====================================================
+           SIGNATURES
+        ===================================================== */
+
+        .signature-section{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:38px;
+
+            margin-top:55px;
+        }
+
+        .signature-box{
+            text-align:center;
+        }
+
+        .signature-line{
+            height:1px;
+            margin-bottom:13px;
+
+            border-top:2px dashed #cbd5e1;
+        }
+
+        .signature-box strong{
+            display:block;
+
+            color:var(--navy);
+            font-size:11px;
+            font-weight:800;
+        }
+
+        .signature-box span{
+            display:block;
+
+            margin-top:4px;
+
+            color:var(--muted);
+            font-size:9px;
+        }
+
+        /* =====================================================
+           ATTESTATION
+        ===================================================== */
+
+        .certificate{
+            display:flex;
+            align-items:center;
+            gap:12px;
+
+            margin-top:30px;
+            padding:15px 16px;
+
+            border:1px solid #ebdda5;
+            border-radius:16px;
+
+            background:var(--gold-soft);
+        }
+
+        .certificate-icon{
+            position:relative;
+
+            flex:0 0 40px;
+            width:40px;
+            height:40px;
+
+            display:grid;
+            place-items:center;
+
+            border-radius:12px;
+
+            color:#846a0c;
+            background:#fff0ad;
+
+            font-size:17px;
+        }
+
+        .certificate-icon::after{
+            content:"✓";
+
+            position:absolute;
+
+            right:-3px;
+            bottom:-3px;
+
+            width:16px;
+            height:16px;
+
+            display:grid;
+            place-items:center;
+
+            border:2px solid var(--gold-soft);
+            border-radius:50%;
+
+            color:white;
+            background:var(--green);
+
+            font-size:8px;
+            font-weight:900;
+        }
+
+        .certificate-content small{
+            display:block;
+
+            color:#846a0c;
+            font-size:8px;
+            font-weight:800;
+            letter-spacing:.06em;
+            text-transform:uppercase;
+        }
+
+        .certificate-content strong{
+            display:block;
+
+            margin-top:3px;
+
+            color:#554503;
+            font-size:10px;
+            font-weight:800;
+        }
+
+        /* =====================================================
+           PIED DE PAGE
+        ===================================================== */
+
+        .receipt-footer{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:18px;
+
+            margin-top:23px;
+            padding-top:18px;
+
+            border-top:1px solid var(--border);
+
+            color:var(--muted);
+            font-size:9px;
+            line-height:1.6;
+        }
+
+        .receipt-footer strong{
+            color:var(--navy);
+        }
+
+        .security-label{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+
+            color:#08783a;
+            font-weight:700;
+            white-space:nowrap;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media(max-width:700px){
+
+            body{
+                padding:14px;
+            }
+
+            .page-actions{
+                align-items:stretch;
+                flex-direction:column;
+            }
+
+            .btn-action{
+                width:100%;
+            }
+
+            .receipt{
+                border-radius:22px;
+            }
+
+            .receipt-header{
+                grid-template-columns:1fr;
+                padding:27px 22px;
+            }
+
+            .receipt-reference{
+                width:100%;
+                text-align:left;
+            }
+
+            .receipt-content{
+                padding:25px 20px 28px;
+            }
+
+            .top-status{
+                align-items:flex-start;
+                flex-direction:column;
+            }
+
+            .amount{
+                font-size:34px;
+            }
+
+            .info-grid{
+                grid-template-columns:1fr;
+            }
+
+            .detail-row{
+                grid-template-columns:1fr;
+                gap:7px;
+            }
+
+            .detail-value{
+                text-align:left;
+            }
+
+            .signature-section{
+                gap:25px;
+            }
+
+            .receipt-footer{
+                align-items:flex-start;
+                flex-direction:column;
+            }
+        }
+
+        @media(max-width:430px){
+
+            .brand{
+                align-items:flex-start;
+            }
+
+            .brand-icon{
+                flex-basis:54px;
+                width:54px;
+                height:54px;
+            }
+
+            .brand-content h1{
+                font-size:24px;
+            }
+
+            .signature-section{
+                grid-template-columns:1fr;
+                gap:55px;
+            }
+        }
+
+        /* =====================================================
+           IMPRESSION A4
+        ===================================================== */
+
+        @page{
+            size:A4;
+            margin:10mm;
+        }
+
+        @media print{
+
+            html,
+            body{
+                width:210mm;
+                min-height:297mm;
+            }
+
+            body{
+                display:block;
+
+                padding:0;
+
+                color:#000;
+                background:white;
+
+                print-color-adjust:exact;
+                -webkit-print-color-adjust:exact;
+            }
+
+            .page-actions{
+                display:none !important;
+            }
+
+            .receipt{
+                width:100%;
+                max-width:none;
+                min-height:auto;
+
+                margin:0;
+
+                border:1px solid #d9e1e8;
+                border-radius:0;
+
+                box-shadow:none;
+                animation:none;
+            }
+
+            .receipt-header{
+                min-height:155px;
+                padding:25px 28px;
+            }
+
+            .receipt-content{
+                padding:26px 28px;
+            }
+
+            .amount-box{
+                padding:20px;
+            }
+
+            .amount{
+                font-size:36px;
+            }
+
+            .info-card{
+                min-height:90px;
+            }
+
+            .detail-row{
+                padding:12px 15px;
+            }
+
+            .signature-section{
+                margin-top:45px;
+            }
+
+            .certificate{
+                page-break-inside:avoid;
+            }
+
+            .receipt-footer{
+                page-break-inside:avoid;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+<!-- =====================================================
+     ACTIONS
+====================================================== -->
+
+<div class="page-actions">
+
+    <button
+        type="button"
+        class="btn-action"
+        onclick="history.back()"
+    >
+        <i class="fa-solid fa-arrow-left"></i>
+        Retour
+    </button>
+
+    <button
+        type="button"
+        class="btn-action btn-print"
+        onclick="window.print()"
+    >
+        <i class="fa-solid fa-print"></i>
+        Imprimer ou télécharger en PDF
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     REÇU
+====================================================== -->
+
+<main class="receipt">
+
+    <!-- =================================================
+         EN-TÊTE
+    ================================================== -->
+
+    <header class="receipt-header">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-receipt"></i>
+            </div>
+
+            <div class="brand-content">
+
+                <small>
+                    <i class="fa-solid fa-building-shield"></i>
+                    Gestion immobilière
+                </small>
+
+                <h1>
+                    Reçu de paiement
+                </h1>
+
+                <p>
+                    Confirmation officielle de règlement
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="receipt-reference">
+
+            <small>
+                Numéro du reçu
+            </small>
+
+            <strong>
+                N° {{ paiement.numero_recu|default:paiement.id }}
+            </strong>
+
+            <span>
+                <i class="fa-regular fa-calendar me-1"></i>
+
+                Émis le
+                {{ paiement.date_paiement|date:"d/m/Y" }}
+            </span>
+
+        </div>
+
+    </header>
+
+
+    <!-- =================================================
+         CONTENU
+    ================================================== -->
+
+    <section class="receipt-content">
+
+        <div class="top-status">
+
+            <span class="status-badge">
+
+                <span class="status-dot"></span>
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                {{ paiement.get_statut_display|default:"Paiement reçu" }}
+
+            </span>
+
+            <span class="document-type">
+
+                <i class="fa-solid fa-file-shield"></i>
+
+                Document officiel enregistré
+
+            </span>
+
+        </div>
+
+
+        <!-- =============================================
+             MONTANT
+        ============================================== -->
+
+        <section class="amount-box">
+
+            <div class="amount-label">
+
+                <i class="fa-solid fa-money-bill-wave"></i>
+
+                Montant reçu
+
+            </div>
+
+            <div class="amount">
+
+                {{ paiement.montant|default:"0"|floatformat:0 }}
+
+                <small>FCFA</small>
+
+            </div>
+
+        </section>
+
+
+        <!-- =============================================
+             INFORMATIONS PRINCIPALES
+        ============================================== -->
+
+        <section class="info-grid">
+
+            <article class="info-card">
+
+                <div class="info-icon">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div class="info-text">
+
+                    <small>
+                        Locataire
+                    </small>
+
+                    <h3>
+
+                        {{ paiement.location.locataire.prenom|default:"" }}
+
+                        {{ paiement.location.locataire.nom|default:"Non renseigné" }}
+
+                    </h3>
+
+                    <span>
+
+                        {% if paiement.location.locataire.telephone %}
+
+                            <i class="fa-solid fa-phone me-1"></i>
+
+                            {{ paiement.location.locataire.telephone }}
+
+                        {% else %}
+
+                            Locataire enregistré
+
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+            </article>
+
+
+            <article class="info-card">
+
+                <div class="info-icon blue">
+                    <i class="fa-solid fa-building"></i>
+                </div>
+
+                <div class="info-text">
+
+                    <small>
+                        Bâtiment
+                    </small>
+
+                    <h3>
+                        {{ paiement.location.batiment.nom|default:"Non renseigné" }}
+                    </h3>
+
+                    <span>
+
+                        {% if paiement.location.batiment.ville %}
+
+                            <i class="fa-solid fa-location-dot me-1"></i>
+
+                            {{ paiement.location.batiment.ville }}
+
+                        {% else %}
+
+                            Bien immobilier enregistré
+
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+            </article>
+
+        </section>
+
+
+        <!-- =============================================
+             DÉTAILS DU PAIEMENT
+        ============================================== -->
+
+        <h2 class="section-title">
+
+            <span class="section-title-icon">
+                <i class="fa-solid fa-list-check"></i>
+            </span>
+
+            Détails du paiement
+
+        </h2>
+
+
+        <section class="details">
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+
+                    <i class="fa-regular fa-calendar-days"></i>
+
+                    Mois concerné
+
+                </div>
+
+                <div class="detail-value">
+                    {{ paiement.mois|default:"Non renseigné" }}
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+
+                    <i class="fa-solid fa-credit-card"></i>
+
+                    Mode de paiement
+
+                </div>
+
+                <div class="detail-value">
+
+                    {{ paiement.get_mode_paiement_display|default:"Non renseigné" }}
+
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+
+                    <i class="fa-regular fa-calendar-check"></i>
+
+                    Date de paiement
+
+                </div>
+
+                <div class="detail-value">
+
+                    {{ paiement.date_paiement|date:"d/m/Y" }}
+
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    Statut
+
+                </div>
+
+                <div class="detail-value">
+
+                    {{ paiement.get_statut_display|default:"Paiement reçu" }}
+
+                </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <div class="detail-label">
+
+                    <i class="fa-solid fa-door-closed"></i>
+
+                    Logement
+
+                </div>
+
+                <div class="detail-value">
+
+                    {% if paiement.location.chambre %}
+
+                        {% if paiement.location.chambre.numero %}
+
+                            Logement N°
+                            {{ paiement.location.chambre.numero }}
+
+                        {% elif paiement.location.chambre.nom %}
+
+                            {{ paiement.location.chambre.nom }}
+
+                        {% else %}
+
+                            Logement enregistré
+
+                        {% endif %}
+
+                    {% elif paiement.location.numero_appartement %}
+
+                        {{ paiement.location.numero_appartement }}
+
+                    {% else %}
+
+                        Non renseigné
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =============================================
+             CONFIRMATION
+        ============================================== -->
+
+        <section class="confirmation-note">
+
+            <div class="confirmation-icon">
+                <i class="fa-solid fa-shield-check"></i>
+            </div>
+
+            <div>
+
+                <strong>
+                    Paiement confirmé
+                </strong>
+
+                Ce reçu confirme que le paiement présenté ci-dessus
+                a bien été enregistré dans le système de gestion
+                immobilière. Veuillez conserver ce document comme
+                preuve de règlement.
+
+            </div>
+
+        </section>
+
+
+        <!-- =============================================
+             SIGNATURES
+        ============================================== -->
+
+        <section class="signature-section">
+
+            <div class="signature-box">
+
+                <div class="signature-line"></div>
+
+                <strong>
+                    Agent ou secrétaire
+                </strong>
+
+                <span>
+                    Nom, signature et cachet
+                </span>
+
+            </div>
+
+
+            <div class="signature-box">
+
+                <div class="signature-line"></div>
+
+                <strong>
+                    Locataire
+                </strong>
+
+                <span>
+                    Nom et signature
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- =============================================
+             ATTESTATION
+        ============================================== -->
+
+        <section class="certificate">
+
+            <div class="certificate-icon">
+                <i class="fa-solid fa-certificate"></i>
+            </div>
+
+            <div class="certificate-content">
+
+                <small>
+                    Application attestée
+                </small>
+
+                <strong>
+                    Document généré par Hexa Immo,
+                    une application conçue par HexaQuébec Canada.
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- =============================================
+             PIED DE PAGE
+        ============================================== -->
+
+        <footer class="receipt-footer">
+
+            <div>
+
+                Document généré automatiquement le
+
+                <strong>
+                    {% now "d/m/Y à H:i" %}
+                </strong>
+
+                <br>
+
+                Assistance :
+                <strong>
+                    hexaquebec80@gmail.com
+                </strong>
+
+            </div>
+
+            <div class="security-label">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+                La sécurité de vos données est notre priorité
+
+            </div>
+
+        </footer>
+
+    </section>
+
+</main>
+
+</body>
+</html>
+
