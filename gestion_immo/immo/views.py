@@ -176,248 +176,1278 @@ def proprietaires(request):
     )
 
 
-from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Count
-from django.shortcuts import render
+
+
+from .models import (
+    Batiment,
+    Location,
+    Proprietaire,
+    UniteLocative,
+   
+
+)
+
+
+from .services.contrat_bail import (
+    generer_contrat_bail_numerique,
+)
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.shortcuts import render
+
+from .models import Batiment, Proprietaire, UniteLocative
+
 
 @login_required(login_url="login")
 def batiments(request):
-
     agence = get_agence(request.user)
     q = request.GET.get("q", "").strip()
 
-    batiments = Batiment.objects.filter(
-        agence=agence
+    unites_prefetch = Prefetch(
+        "unites_locatives",
+        queryset=UniteLocative.objects.filter(
+            actif=True,
+        ).order_by(
+            "type_unite",
+            "numero",
+        ),
+        to_attr="unites_prefetched",
+    )
+
+    batiments_queryset = Batiment.objects.filter(
+        agence=agence,
     ).select_related(
-        "proprietaire"
+        "proprietaire",
+        "agence",
     ).prefetch_related(
-        "chambres",
-        "chambres__locations",
-        "chambres__locations__locataire",
+        unites_prefetch,
     )
 
     if q:
-        batiments = batiments.filter(
-            Q(code_batiment__icontains=q) |
-            Q(nom__icontains=q) |
-            Q(ville__icontains=q) |
-            Q(adresse__icontains=q) |
-            Q(proprietaire__nom__icontains=q) |
-            Q(proprietaire__prenom__icontains=q)
-        )
+        batiments_queryset = batiments_queryset.filter(
+            Q(code_batiment__icontains=q)
+            | Q(nom__icontains=q)
+            | Q(ville__icontains=q)
+            | Q(adresse__icontains=q)
+            | Q(proprietaire__nom__icontains=q)
+            | Q(proprietaire__prenom__icontains=q)
+            | Q(unites_locatives__numero__icontains=q)
+            | Q(unites_locatives__description__icontains=q)
+        ).distinct()
+
+    batiments = list(batiments_queryset)
+
+    total_unites = 0
+    unites_occupees = 0
+    unites_libres = 0
+    unites_reservees = 0
+    unites_maintenance = 0
+
+    total_logements = 0
+    logements_occupes = 0
+    logements_libres = 0
+    logements_reserves = 0
+    logements_maintenance = 0
+
+    total_appartements = 0
+    total_studios = 0
+
+    total_magasins = 0
+    magasins_occupes = 0
+    magasins_libres = 0
+    magasins_reserves = 0
+    magasins_maintenance = 0
 
     for batiment in batiments:
+        unites = getattr(
+            batiment,
+            "unites_prefetched",
+            [],
+        )
+
         details_occupation = []
 
-        for chambre in batiment.chambres.all():
-            location_active = chambre.locations.filter(active=True).first()
+        batiment_total_unites = 0
+        batiment_unites_occupees = 0
+        batiment_unites_libres = 0
+        batiment_unites_reservees = 0
+        batiment_unites_maintenance = 0
 
-            if location_active:
+        batiment_appartements = 0
+        batiment_studios = 0
+        batiment_magasins = 0
+
+        batiment_logements = 0
+        batiment_logements_occupes = 0
+        batiment_logements_libres = 0
+
+        for unite in unites:
+            batiment_total_unites += 1
+            total_unites += 1
+
+            est_appartement = (
+                unite.type_unite
+                == UniteLocative.TypeUnite.APPARTEMENT
+            )
+
+            est_studio = (
+                unite.type_unite
+                == UniteLocative.TypeUnite.STUDIO
+            )
+
+            est_magasin = (
+                unite.type_unite
+                == UniteLocative.TypeUnite.MAGASIN
+            )
+
+            est_habitation = est_appartement or est_studio
+
+            if est_appartement:
+                batiment_appartements += 1
+                total_appartements += 1
+
+            elif est_studio:
+                batiment_studios += 1
+                total_studios += 1
+
+            elif est_magasin:
+                batiment_magasins += 1
+                total_magasins += 1
+
+            if est_habitation:
+                batiment_logements += 1
+                total_logements += 1
+
+            # L’occupation est temporairement déterminée
+            # à partir du statut de l’unité.
+            if unite.statut == UniteLocative.Statut.OCCUPE:
+                batiment_unites_occupees += 1
+                unites_occupees += 1
+
+                if est_habitation:
+                    batiment_logements_occupes += 1
+                    logements_occupes += 1
+
+                if est_magasin:
+                    magasins_occupes += 1
+
                 details_occupation.append({
-                    "chambre": chambre,
-                    "location": location_active,
-                    "locataire": location_active.locataire,
+                    "unite": unite,
+                    "location": None,
+                    "locataire": None,
                 })
+
+            elif unite.statut == UniteLocative.Statut.RESERVE:
+                batiment_unites_reservees += 1
+                unites_reservees += 1
+
+                if est_habitation:
+                    logements_reserves += 1
+
+                if est_magasin:
+                    magasins_reserves += 1
+
+            elif unite.statut == UniteLocative.Statut.MAINTENANCE:
+                batiment_unites_maintenance += 1
+                unites_maintenance += 1
+
+                if est_habitation:
+                    logements_maintenance += 1
+
+                if est_magasin:
+                    magasins_maintenance += 1
+
+            else:
+                batiment_unites_libres += 1
+                unites_libres += 1
+
+                if est_habitation:
+                    batiment_logements_libres += 1
+                    logements_libres += 1
+
+                if est_magasin:
+                    magasins_libres += 1
 
         batiment.details_occupation = details_occupation
 
-    total_batiments = batiments.count()
+        batiment.total_unites_affiche = batiment_total_unites
+        batiment.unites_occupees_affiche = (
+            batiment_unites_occupees
+        )
+        batiment.unites_libres_affiche = (
+            batiment_unites_libres
+        )
+        batiment.unites_reservees_affiche = (
+            batiment_unites_reservees
+        )
+        batiment.unites_maintenance_affiche = (
+            batiment_unites_maintenance
+        )
 
-    total_logements = sum(
-        b.chambres_total() for b in batiments
-    )
+        batiment.appartements_affiche = (
+            batiment_appartements
+        )
+        batiment.studios_affiche = (
+            batiment_studios
+        )
+        batiment.magasins_affiche = (
+            batiment_magasins
+        )
 
-    logements_occupes = sum(
-        b.chambres_occupees() for b in batiments
-    )
+        batiment.logements_affiche = batiment_logements
+        batiment.logements_occupes_affiche = (
+            batiment_logements_occupes
+        )
+        batiment.logements_libres_affiche = (
+            batiment_logements_libres
+        )
 
-    logements_libres = total_logements - logements_occupes
+        if batiment_total_unites > 0:
+            batiment.taux_occupation_affiche = round(
+                (
+                    batiment_unites_occupees
+                    / batiment_total_unites
+                )
+                * 100
+            )
+        else:
+            batiment.taux_occupation_affiche = 0
 
     context = {
         "batiments": batiments,
         "q": q,
-        "total_batiments": total_batiments,
+
+        "total_batiments": len(batiments),
+
+        "total_unites": total_unites,
+        "unites_occupees": unites_occupees,
+        "unites_libres": unites_libres,
+        "unites_reservees": unites_reservees,
+        "unites_maintenance": unites_maintenance,
+
         "total_logements": total_logements,
         "logements_occupes": logements_occupes,
         "logements_libres": logements_libres,
-        "total_proprietaires": Proprietaire.objects.filter(agence=agence).count(),
+        "logements_reserves": logements_reserves,
+        "logements_maintenance": logements_maintenance,
+
+        "total_appartements": total_appartements,
+        "total_studios": total_studios,
+
+        "total_magasins": total_magasins,
+        "magasins_occupes": magasins_occupes,
+        "magasins_libres": magasins_libres,
+        "magasins_reserves": magasins_reserves,
+        "magasins_maintenance": magasins_maintenance,
+
+        "total_proprietaires": Proprietaire.objects.filter(
+            agence=agence,
+        ).count(),
     }
 
-    return render(request, "batiments.html", context)
-
-
-
+    return render(
+        request,
+        "batiments.html",
+        context,
+    )
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
 
+from decimal import Decimal, InvalidOperation
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError, transaction
+from django.shortcuts import get_object_or_404, redirect, render
+
+from .models import Batiment, Proprietaire, UniteLocative
+
 
 @login_required(login_url="login")
 def ajouter_batiment(request):
-
     agence = get_agence(request.user)
 
     proprietaires = Proprietaire.objects.filter(
         agence=agence
-    ).order_by("nom", "prenom")
+    ).order_by(
+        "nom",
+        "prenom",
+    )
 
     if request.method == "POST":
+        proprietaire_id = request.POST.get(
+            "proprietaire",
+            ""
+        ).strip()
 
-        proprietaire_id = request.POST.get("proprietaire")
+        code_batiment = request.POST.get(
+            "code_batiment",
+            ""
+        ).strip()
+
+        nom = request.POST.get(
+            "nom",
+            ""
+        ).strip()
+
+        adresse = request.POST.get(
+            "adresse",
+            ""
+        ).strip()
+
+        ville = request.POST.get(
+            "ville",
+            ""
+        ).strip()
+
+        description = request.POST.get(
+            "description",
+            ""
+        ).strip()
+
+        actif = request.POST.get("actif") == "True"
+
+        # Les indices sont envoyés par les champs :
+        # <input name="unite_index" value="1">
+        indices_unites = request.POST.getlist("unite_index")
+
+        # -----------------------------------------------------
+        # VALIDATION DU BÂTIMENT
+        # -----------------------------------------------------
 
         if not proprietaire_id:
-            messages.error(request, "Veuillez sélectionner un propriétaire.")
-            return redirect("ajouter_batiment")
+            messages.error(
+                request,
+                "Veuillez sélectionner un propriétaire.",
+            )
+
+            return render(
+                request,
+                "ajouter_batiment.html",
+                {
+                    "proprietaires": proprietaires,
+                },
+            )
+
+        if not code_batiment:
+            messages.error(
+                request,
+                "Le code du bâtiment est obligatoire.",
+            )
+
+            return render(
+                request,
+                "ajouter_batiment.html",
+                {
+                    "proprietaires": proprietaires,
+                },
+            )
+
+        if not nom:
+            messages.error(
+                request,
+                "Le nom du bâtiment est obligatoire.",
+            )
+
+            return render(
+                request,
+                "ajouter_batiment.html",
+                {
+                    "proprietaires": proprietaires,
+                },
+            )
+
+        if not adresse:
+            messages.error(
+                request,
+                "L’adresse du bâtiment est obligatoire.",
+            )
+
+            return render(
+                request,
+                "ajouter_batiment.html",
+                {
+                    "proprietaires": proprietaires,
+                },
+            )
+
+        if not ville:
+            messages.error(
+                request,
+                "La ville du bâtiment est obligatoire.",
+            )
+
+            return render(
+                request,
+                "ajouter_batiment.html",
+                {
+                    "proprietaires": proprietaires,
+                },
+            )
+
+        if Batiment.objects.filter(
+            code_batiment__iexact=code_batiment
+        ).exists():
+            messages.error(
+                request,
+                (
+                    f"Un bâtiment ayant le code "
+                    f"« {code_batiment} » existe déjà."
+                ),
+            )
+
+            return render(
+                request,
+                "ajouter_batiment.html",
+                {
+                    "proprietaires": proprietaires,
+                },
+            )
+
+        if not indices_unites:
+            messages.error(
+                request,
+                (
+                    "Ajoutez au moins un appartement, "
+                    "un studio ou un magasin."
+                ),
+            )
+
+            return render(
+                request,
+                "ajouter_batiment.html",
+                {
+                    "proprietaires": proprietaires,
+                },
+            )
 
         proprietaire = get_object_or_404(
             Proprietaire,
             id=proprietaire_id,
-            agence=agence
+            agence=agence,
         )
 
+        # -----------------------------------------------------
+        # PRÉPARATION DES UNITÉS
+        # -----------------------------------------------------
+
+        types_unites_valides = {
+            valeur
+            for valeur, libelle
+            in UniteLocative.TypeUnite.choices
+        }
+
+        types_toilettes_valides = {
+            valeur
+            for valeur, libelle
+            in UniteLocative.TypeToilette.choices
+        }
+
+        usages_commerciaux_valides = {
+            valeur
+            for valeur, libelle
+            in UniteLocative.UsageCommercial.choices
+        }
+
+        unites_preparees = []
+        numeros_utilises = set()
+
+        total_appartements = 0
+        total_studios = 0
+        total_magasins = 0
+
         try:
-            nombre_logements = int(request.POST.get("nombre_logements") or 1)
-        except ValueError:
-            nombre_logements = 1
+            for index in indices_unites:
+                type_unite = request.POST.get(
+                    f"type_unite_{index}",
+                    "",
+                ).strip()
 
-        if nombre_logements < 1:
-            nombre_logements = 1
+                numero = request.POST.get(
+                    f"numero_{index}",
+                    "",
+                ).strip()
 
-        with transaction.atomic():
+                nombre_chambres_brut = request.POST.get(
+                    f"nombre_chambres_{index}",
+                    "0",
+                ).strip()
 
-            batiment = Batiment.objects.create(
-                agence=agence,
-                proprietaire=proprietaire,
-                code_batiment=request.POST.get("code_batiment"),
-                nom=request.POST.get("nom"),
-                adresse=request.POST.get("adresse"),
-                ville=request.POST.get("ville"),
-                nombre_logements=nombre_logements,
-                description=request.POST.get("description"),
-                actif=request.POST.get("actif") == "True",
+                # Compatible avec les deux noms possibles :
+                # type_toilette_1 ou type_toilettes_1
+                type_toilette = request.POST.get(
+                    f"type_toilette_{index}",
+                    "",
+                ).strip()
+
+                if not type_toilette:
+                    type_toilette = request.POST.get(
+                        f"type_toilettes_{index}",
+                        "",
+                    ).strip()
+
+                prix_brut = request.POST.get(
+                    f"prix_mensuel_{index}",
+                    "",
+                ).strip()
+
+                usage_commercial = request.POST.get(
+                    f"usage_commercial_{index}",
+                    "",
+                ).strip()
+
+                description_unite = request.POST.get(
+                    f"description_unite_{index}",
+                    "",
+                ).strip()
+
+                # -------------------------------------------------
+                # TYPE D’UNITÉ
+                # -------------------------------------------------
+
+                if type_unite not in types_unites_valides:
+                    raise ValueError(
+                        "Un type d’unité sélectionné est invalide."
+                    )
+
+                if not numero:
+                    raise ValueError(
+                        (
+                            "Chaque appartement, studio ou magasin "
+                            "doit avoir un nom ou un numéro."
+                        )
+                    )
+
+                numero_normalise = numero.casefold()
+
+                if numero_normalise in numeros_utilises:
+                    raise ValueError(
+                        (
+                            f"Le nom ou numéro « {numero} » "
+                            f"est utilisé plusieurs fois."
+                        )
+                    )
+
+                numeros_utilises.add(numero_normalise)
+
+                # -------------------------------------------------
+                # TOILETTES
+                # -------------------------------------------------
+
+                if type_toilette not in types_toilettes_valides:
+                    raise ValueError(
+                        (
+                            f"Veuillez sélectionner le type de "
+                            f"toilettes pour « {numero} »."
+                        )
+                    )
+
+                # -------------------------------------------------
+                # PRIX
+                # -------------------------------------------------
+
+                prix_nettoye = (
+                    prix_brut
+                    .replace(" ", "")
+                    .replace(",", ".")
+                )
+
+                try:
+                    prix_mensuel = Decimal(prix_nettoye)
+                except InvalidOperation:
+                    raise ValueError(
+                        (
+                            f"Le loyer mensuel de "
+                            f"« {numero} » est invalide."
+                        )
+                    )
+
+                if prix_mensuel < 0:
+                    raise ValueError(
+                        (
+                            f"Le loyer mensuel de "
+                            f"« {numero} » ne peut pas être négatif."
+                        )
+                    )
+
+                # -------------------------------------------------
+                # APPARTEMENT
+                # -------------------------------------------------
+
+                if (
+                    type_unite
+                    == UniteLocative.TypeUnite.APPARTEMENT
+                ):
+                    try:
+                        nombre_chambres = int(
+                            nombre_chambres_brut
+                        )
+                    except (TypeError, ValueError):
+                        nombre_chambres = 0
+
+                    if nombre_chambres < 1:
+                        raise ValueError(
+                            (
+                                f"L’appartement « {numero} » "
+                                f"doit avoir au moins une chambre."
+                            )
+                        )
+
+                    toilettes_autorisees = {
+                        UniteLocative.TypeToilette.COMMUNE_APPARTEMENT,
+                        UniteLocative.TypeToilette.UNE_PAR_CHAMBRE,
+                        UniteLocative.TypeToilette.COMMUNE_BATIMENT,
+                        UniteLocative.TypeToilette.AUCUNE,
+                    }
+
+                    if type_toilette not in toilettes_autorisees:
+                        raise ValueError(
+                            (
+                                f"Le type de toilettes choisi pour "
+                                f"l’appartement « {numero} » "
+                                f"n’est pas valide."
+                            )
+                        )
+
+                    usage_commercial = ""
+                    total_appartements += 1
+
+                # -------------------------------------------------
+                # STUDIO
+                # -------------------------------------------------
+
+                elif (
+                    type_unite
+                    == UniteLocative.TypeUnite.STUDIO
+                ):
+                    nombre_chambres = 0
+                    usage_commercial = ""
+
+                    toilettes_autorisees = {
+                        UniteLocative.TypeToilette.PRIVEE_STUDIO,
+                        UniteLocative.TypeToilette.COMMUNE_BATIMENT,
+                        UniteLocative.TypeToilette.AUCUNE,
+                    }
+
+                    if type_toilette not in toilettes_autorisees:
+                        raise ValueError(
+                            (
+                                f"Le type de toilettes choisi pour "
+                                f"le studio « {numero} » "
+                                f"n’est pas valide."
+                            )
+                        )
+
+                    total_studios += 1
+
+                # -------------------------------------------------
+                # MAGASIN
+                # -------------------------------------------------
+
+                else:
+                    nombre_chambres = 0
+
+                    if (
+                        usage_commercial
+                        not in usages_commerciaux_valides
+                    ):
+                        raise ValueError(
+                            (
+                                f"Veuillez indiquer l’utilisation "
+                                f"du magasin « {numero} »."
+                            )
+                        )
+
+                    toilettes_autorisees = {
+                        UniteLocative.TypeToilette.PRIVEE_MAGASIN,
+                        UniteLocative.TypeToilette.COMMUNE_BATIMENT,
+                        UniteLocative.TypeToilette.AUCUNE,
+                    }
+
+                    if type_toilette not in toilettes_autorisees:
+                        raise ValueError(
+                            (
+                                f"Le type de toilettes choisi pour "
+                                f"le magasin « {numero} » "
+                                f"n’est pas valide."
+                            )
+                        )
+
+                    total_magasins += 1
+
+                unites_preparees.append({
+                    "numero": numero,
+                    "type_unite": type_unite,
+                    "nombre_chambres": nombre_chambres,
+                    "type_toilette": type_toilette,
+                    "prix_mensuel": prix_mensuel,
+                    "usage_commercial": usage_commercial,
+                    "description": description_unite or None,
+                    "statut": UniteLocative.Statut.LIBRE,
+                    "actif": True,
+                })
+
+        except ValueError as erreur:
+            messages.error(
+                request,
+                str(erreur),
             )
 
-            for i in range(1, nombre_logements + 1):
-                ChambreLogement.objects.create(
-                    batiment=batiment,
-                    numero=str(i),
-                    nom=f"Logement {i}"
+            return render(
+                request,
+                "ajouter_batiment.html",
+                {
+                    "proprietaires": proprietaires,
+                },
+            )
+
+        # Appartements + studios seulement.
+        # Les magasins ne sont pas des logements d’habitation.
+        nombre_logements = (
+            total_appartements
+            + total_studios
+        )
+
+        # -----------------------------------------------------
+        # ENREGISTREMENT
+        # -----------------------------------------------------
+
+        try:
+            with transaction.atomic():
+                batiment = Batiment.objects.create(
+                    agence=agence,
+                    proprietaire=proprietaire,
+                    code_batiment=code_batiment,
+                    nom=nom,
+                    adresse=adresse,
+                    ville=ville,
+
+                    # Si votre champ est editable=False,
+                    # Django permet quand même de lui attribuer
+                    # une valeur depuis le code Python.
+                    nombre_logements=nombre_logements,
+
+                    description=description or None,
+                    actif=actif,
                 )
+
+                for donnees_unite in unites_preparees:
+                    UniteLocative.objects.create(
+                        batiment=batiment,
+                        **donnees_unite,
+                    )
+
+        except IntegrityError:
+            messages.error(
+                request,
+                (
+                    "Impossible d’enregistrer le bâtiment. "
+                    "Vérifiez que son code et les numéros "
+                    "des unités ne sont pas déjà utilisés."
+                ),
+            )
+
+            return render(
+                request,
+                "ajouter_batiment.html",
+                {
+                    "proprietaires": proprietaires,
+                },
+            )
+
+        except Exception as erreur:
+            messages.error(
+                request,
+                (
+                    "Une erreur est survenue pendant "
+                    f"l’enregistrement : {erreur}"
+                ),
+            )
+
+            return render(
+                request,
+                "ajouter_batiment.html",
+                {
+                    "proprietaires": proprietaires,
+                },
+            )
+
+        total_unites = len(unites_preparees)
 
         messages.success(
             request,
-            f"Bâtiment ajouté avec succès. {nombre_logements} logements ont été créés automatiquement."
+            (
+                f"Le bâtiment « {batiment.nom} » a été ajouté "
+                f"avec succès : {total_appartements} appartement(s), "
+                f"{total_studios} studio(s) et "
+                f"{total_magasins} magasin(s), soit "
+                f"{total_unites} unité(s) au total."
+            ),
         )
 
         return redirect("batiments")
 
-    return render(request, "ajouter_batiment.html", {
-        "proprietaires": proprietaires,
-    })
-
-
+    return render(
+        request,
+        "ajouter_batiment.html",
+        {
+            "proprietaires": proprietaires,
+        },
+    )
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
+from django.db.models.deletion import ProtectedError
+from django.views.decorators.http import require_POST
 
 
 @login_required(login_url="login")
+@require_POST
 def supprimer_batiment(request, id):
-
     agence = get_agence(request.user)
 
     batiment = get_object_or_404(
-        Batiment,
+        Batiment.objects.select_related(
+            "proprietaire",
+        ),
         id=id,
-        agence=agence
+        agence=agence,
     )
 
-    # Empêcher la suppression si un bail est encore actif
-    if batiment.locations.filter(active=True).exists():
+    nom_batiment = batiment.nom
+
+    locations_actives = Location.objects.filter(
+        agence=agence,
+        batiment=batiment,
+        active=True,
+    )
+
+    if locations_actives.exists():
+        total_baux_actifs = locations_actives.count()
+
         messages.error(
             request,
-            "Impossible de supprimer ce bâtiment car il possède un ou plusieurs baux actifs."
+            (
+                f"Impossible de supprimer le bâtiment « {nom_batiment} ». "
+                f"Il contient encore {total_baux_actifs} bail(aux) actif(s). "
+                "Libérez d’abord toutes les unités occupées."
+            ),
         )
+
         return redirect("batiments")
 
-    batiment.delete()
+    try:
+        with transaction.atomic():
+            batiment.delete()
 
-    messages.success(
-        request,
-        "Bâtiment supprimé avec succès."
-    )
+        messages.success(
+            request,
+            (
+                f"Le bâtiment « {nom_batiment} » et ses unités "
+                "ont été supprimés avec succès."
+            ),
+        )
+
+    except ProtectedError:
+        messages.error(
+            request,
+            (
+                f"Le bâtiment « {nom_batiment} » ne peut pas être supprimé, "
+                "car certaines données liées sont protégées."
+            ),
+        )
+
+    except Exception as erreur:
+        messages.error(
+            request,
+            f"Impossible de supprimer le bâtiment : {erreur}",
+        )
 
     return redirect("batiments")
 
 
+
+from django.contrib.auth.decorators import login_required
+from django.db.models import Prefetch
+from django.shortcuts import get_object_or_404, render
+
+from .models import (
+    Batiment,
+    ChambreLogement,
+    Location,
+    UniteLocative,
+)
+
+
+
+
 @login_required(login_url="login")
 def detail_batiment(request, id):
-
     agence = get_agence(request.user)
 
+    # ---------------------------------------------------------
+    # BÂTIMENT
+    # ---------------------------------------------------------
+
     batiment = get_object_or_404(
-        Batiment.objects.select_related("proprietaire"),
+        Batiment.objects.select_related(
+            "proprietaire",
+            "agence",
+        ),
         id=id,
-        agence=agence
+        agence=agence,
     )
 
-    chambres = ChambreLogement.objects.filter(
+    # ---------------------------------------------------------
+    # BAUX ACTIFS DES UNITÉS
+    # ---------------------------------------------------------
+
+    baux_actifs_queryset = Location.objects.filter(
+        agence=agence,
         batiment=batiment,
-        actif=True
-    ).order_by("numero")
+        active=True,
+        unite__isnull=False,
+    ).select_related(
+        "locataire",
+        "unite",
+        "batiment",
+    ).order_by(
+        "-date_debut",
+        "-id",
+    )
 
-    chambres_occupees = []
-    chambres_libres = []
+    prefetch_baux_actifs = Prefetch(
+        "locations",
+        queryset=baux_actifs_queryset,
+        to_attr="baux_actifs_prefetched",
+    )
 
-    for chambre in chambres:
+    # ---------------------------------------------------------
+    # APPARTEMENTS, STUDIOS ET MAGASINS
+    # ---------------------------------------------------------
 
-        bail = Location.objects.filter(
-            chambre=chambre,
+    unites = list(
+        UniteLocative.objects.filter(
             batiment=batiment,
-            active=True
-        ).select_related("locataire").first()
+            actif=True,
+        ).prefetch_related(
+            prefetch_baux_actifs,
+        ).order_by(
+            "type_unite",
+            "numero",
+        )
+    )
+
+    unites_occupees = []
+    unites_libres = []
+    unites_reservees = []
+    unites_maintenance = []
+
+    total_appartements = 0
+    total_studios = 0
+    total_magasins = 0
+    total_chambres = 0
+
+    revenus_mensuels_potentiels = 0
+    revenus_mensuels_actifs = 0
+
+    # ---------------------------------------------------------
+    # ANALYSE DE CHAQUE UNITÉ
+    # ---------------------------------------------------------
+
+    for unite in unites:
+        # Compatibilité temporaire avec un ancien template
+        # qui utiliserait unite.nom.
+        unite.nom = unite.numero
+
+        revenus_mensuels_potentiels += (
+            unite.prix_mensuel or 0
+        )
+
+        # Compter les types d’unités.
+        if (
+            unite.type_unite
+            == UniteLocative.TypeUnite.APPARTEMENT
+        ):
+            total_appartements += 1
+            total_chambres += unite.nombre_chambres or 0
+
+        elif (
+            unite.type_unite
+            == UniteLocative.TypeUnite.STUDIO
+        ):
+            total_studios += 1
+
+        elif (
+            unite.type_unite
+            == UniteLocative.TypeUnite.MAGASIN
+        ):
+            total_magasins += 1
+
+        baux_actifs = getattr(
+            unite,
+            "baux_actifs_prefetched",
+            [],
+        )
+
+        bail = (
+            baux_actifs[0]
+            if baux_actifs
+            else None
+        )
+
+        # -----------------------------------------------------
+        # UNITÉ OCCUPÉE
+        # -----------------------------------------------------
 
         if bail:
-            chambres_occupees.append({
-                "chambre": chambre,
+            # Mettre automatiquement l’unité au statut occupé.
+            if (
+                unite.statut
+                != UniteLocative.Statut.OCCUPE
+            ):
+                UniteLocative.objects.filter(
+                    pk=unite.pk,
+                ).update(
+                    statut=UniteLocative.Statut.OCCUPE,
+                )
+
+                unite.statut = (
+                    UniteLocative.Statut.OCCUPE
+                )
+
+            erreur_contrat = None
+
+            # Génération automatique du contrat numérique.
+            if not bail.contrat_bail_numerique:
+                try:
+                    generer_contrat_bail_numerique(
+                        bail
+                    )
+
+                    bail.refresh_from_db(
+                        fields=[
+                            "contrat_bail_numerique",
+                            "date_generation_contrat",
+                        ]
+                    )
+
+                except Exception as erreur:
+                    # Le bâtiment reste affiché même si le PDF
+                    # rencontre temporairement une erreur.
+                    erreur_contrat = str(erreur)
+
+            montant_bail = (
+                bail.loyer
+                if bail.loyer is not None
+                else unite.prix_mensuel
+            )
+
+            revenus_mensuels_actifs += (
+                montant_bail or 0
+            )
+
+            contrat_disponible = bool(
+                bail.contrat_bail_numerique
+            )
+
+            contrat_url = None
+
+            if contrat_disponible:
+                try:
+                    contrat_url = (
+                        bail.contrat_bail_numerique.url
+                    )
+                except ValueError:
+                    contrat_url = None
+                    contrat_disponible = False
+
+            unites_occupees.append({
+                "unite": unite,
+
+                # Compatibilité avec l’ancien template.
+                "chambre": unite,
+
                 "bail": bail,
                 "location": bail,
                 "locataire": bail.locataire,
-            })
-        else:
-            chambres_libres.append(chambre)
 
-    total_chambres = chambres.count()
-    total_occupees = len(chambres_occupees)
-    total_libres = len(chambres_libres)
+                "montant_loyer": montant_bail,
+
+                "contrat_disponible": (
+                    contrat_disponible
+                ),
+                "contrat_url": contrat_url,
+                "erreur_contrat": erreur_contrat,
+            })
+
+        # -----------------------------------------------------
+        # UNITÉ RÉSERVÉE
+        # -----------------------------------------------------
+
+        elif (
+            unite.statut
+            == UniteLocative.Statut.RESERVE
+        ):
+            unites_reservees.append(unite)
+
+        # -----------------------------------------------------
+        # UNITÉ EN MAINTENANCE
+        # -----------------------------------------------------
+
+        elif (
+            unite.statut
+            == UniteLocative.Statut.MAINTENANCE
+        ):
+            unites_maintenance.append(unite)
+
+        # -----------------------------------------------------
+        # UNITÉ LIBRE
+        # -----------------------------------------------------
+
+        else:
+            # Une unité marquée occupée sans bail actif
+            # doit redevenir libre.
+            if (
+                unite.statut
+                == UniteLocative.Statut.OCCUPE
+            ):
+                UniteLocative.objects.filter(
+                    pk=unite.pk,
+                ).update(
+                    statut=UniteLocative.Statut.LIBRE,
+                )
+
+                unite.statut = (
+                    UniteLocative.Statut.LIBRE
+                )
+
+            unites_libres.append(unite)
+
+    # ---------------------------------------------------------
+    # ANCIENNES LOCATIONS BASÉES SUR CHAMBRELOGEMENT
+    # ---------------------------------------------------------
+
+    anciennes_locations_actives = list(
+        Location.objects.filter(
+            agence=agence,
+            batiment=batiment,
+            active=True,
+            unite__isnull=True,
+            chambre__isnull=False,
+        ).select_related(
+            "locataire",
+            "chambre",
+        ).order_by(
+            "chambre__numero",
+            "-date_debut",
+        )
+    )
+
+    # ---------------------------------------------------------
+    # STATISTIQUES
+    # ---------------------------------------------------------
+
+    total_unites = len(unites)
+    total_occupees = len(unites_occupees)
+    total_libres = len(unites_libres)
+    total_reservees = len(unites_reservees)
+    total_maintenance = len(unites_maintenance)
+
+    if total_unites > 0:
+        taux_occupation = round(
+            (total_occupees / total_unites) * 100
+        )
+    else:
+        taux_occupation = 0
+
+    occupation_complete = (
+        total_unites > 0
+        and total_occupees == total_unites
+    )
+
+    occupation_partielle = (
+        total_unites > 0
+        and 0 < total_occupees < total_unites
+    )
+
+    batiment_libre = (
+        total_unites > 0
+        and total_occupees == 0
+    )
+
+    aucune_unite = total_unites == 0
+
+    # ---------------------------------------------------------
+    # CONTEXTE
+    # ---------------------------------------------------------
 
     context = {
         "batiment": batiment,
-        "chambres": chambres,
 
-        "chambres_occupees": chambres_occupees,
-        "chambres_libres": chambres_libres,
+        # Nouveau système
+        "unites": unites,
+        "unites_occupees": unites_occupees,
+        "unites_libres": unites_libres,
+        "unites_reservees": unites_reservees,
+        "unites_maintenance": unites_maintenance,
+
+        # Statistiques générales
+        "total_unites_batiment": total_unites,
+        "unites_occupees_batiment": total_occupees,
+        "unites_libres_batiment": total_libres,
+        "unites_reservees_batiment": total_reservees,
+        "unites_maintenance_batiment": total_maintenance,
+
+        # Types d’unités
+        "total_appartements": total_appartements,
+        "total_studios": total_studios,
+        "total_magasins": total_magasins,
+        "total_chambres": total_chambres,
+
+        # Occupation
+        "taux_occupation": taux_occupation,
+        "occupation_complete": occupation_complete,
+        "occupation_partielle": occupation_partielle,
+        "batiment_libre": batiment_libre,
+        "aucune_unite": aucune_unite,
+
+        # Revenus
+        "revenus_mensuels_potentiels": (
+            revenus_mensuels_potentiels
+        ),
+        "revenus_mensuels_actifs": (
+            revenus_mensuels_actifs
+        ),
+
+        # Anciennes locations
+        "anciennes_locations_actives": (
+            anciennes_locations_actives
+        ),
+
+        # -----------------------------------------------------
+        # COMPATIBILITÉ AVEC VOTRE ANCIEN TEMPLATE
+        # -----------------------------------------------------
+
+        "chambres": unites,
+        "chambres_occupees": unites_occupees,
+        "chambres_libres": unites_libres,
 
         "logements_occupes_batiment": total_occupees,
         "logements_libres_batiment": total_libres,
+        "total_logements_batiment": total_unites,
         "total_chambres_batiment": total_chambres,
-        "total_logements_batiment": total_chambres,
-
-        "occupation_complete": total_chambres > 0 and total_occupees == total_chambres,
-        "occupation_partielle": total_occupees > 0 and total_occupees < total_chambres,
-        "batiment_libre": total_occupees == 0,
     }
 
-    return render(request, "detail_batiment.html", context)
-
-
-
+    return render(
+        request,
+        "detail_batiment.html",
+        context,
+    )
 from datetime import date
 from decimal import Decimal, InvalidOperation
 
@@ -720,96 +1750,722 @@ def supprimer_chamb(request, id):
 
 
 
+
+
+def convertir_decimal(valeur, valeur_par_defaut="0"):
+    texte = str(valeur or valeur_par_defaut).strip().replace(" ", "")
+    texte = texte.replace(",", ".")
+
+    try:
+        return Decimal(texte)
+    except (InvalidOperation, TypeError, ValueError):
+        raise ValueError("Montant invalide.")
+
+
+def convertir_date(valeur):
+    if not valeur:
+        return None
+
+    try:
+        return date.fromisoformat(valeur)
+    except (TypeError, ValueError):
+        raise ValueError("Date invalide.")
+
+
 @login_required(login_url="login")
 def ajouter_chambre(request, id):
-
+    """
+    Le nom est conservé pour ne pas casser l'ancienne URL.
+    Cette vue crée maintenant un appartement, un studio ou un magasin.
+    """
     agence = get_agence(request.user)
 
     batiment = get_object_or_404(
-        Batiment,
+        Batiment.objects.select_related("proprietaire"),
         id=id,
-        agence=agence
+        agence=agence,
     )
 
     locataires = Locataire.objects.filter(
-        agence=agence
+        agence=agence,
     ).order_by("nom", "prenom")
 
     if request.method == "POST":
+        type_unite = request.POST.get(
+            "type_unite",
+            UniteLocative.TypeUnite.APPARTEMENT,
+        ).strip()
 
-        type_ajout = request.POST.get("type", "logement")
+        numero = request.POST.get("numero", "").strip()
+        nombre_chambres_brut = request.POST.get(
+            "nombre_chambres",
+            "1",
+        ).strip()
 
-        if type_ajout == "logement":
-            numero = request.POST.get("numero_logement", "").strip()
-            nom = request.POST.get("nom_logement", "").strip()
+        type_toilette = request.POST.get(
+            "type_toilette",
+            "",
+        ).strip()
 
-            if not numero:
-                numero = str(ChambreLogement.objects.filter(batiment=batiment).count() + 1)
+        usage_commercial = request.POST.get(
+            "usage_commercial",
+            "",
+        ).strip()
 
-            if not nom:
-                nom = f"Logement {numero}"
+        description = request.POST.get(
+            "description",
+            "",
+        ).strip()
 
-        else:
-            numero = request.POST.get("numero_chambre", "").strip()
-            nom = request.POST.get("nom_chambre", "").strip()
+        locataire_id = request.POST.get(
+            "locataire_id",
+            "",
+        ).strip()
 
-            if not numero:
-                messages.error(request, "Veuillez entrer un numéro de chambre.")
-                return redirect("ajouter_chambre", id=batiment.id)
-
-            if not nom:
-                nom = f"Chambre {numero}"
-
-        if ChambreLogement.objects.filter(batiment=batiment, numero=numero).exists():
-            messages.error(request, f"Le logement/chambre N° {numero} existe déjà.")
-            return redirect("ajouter_chambre", id=batiment.id)
-
-        chambre = ChambreLogement.objects.create(
-            batiment=batiment,
-            numero=numero,
-            nom=nom
+        caution_payee = (
+            request.POST.get("caution_payee") == "on"
         )
 
-        locataire_id = request.POST.get("locataire_id")
-        loyer = request.POST.get("loyer") or 0
-        caution = request.POST.get("caution") or 0
+        observation_caution = request.POST.get(
+            "observation_caution",
+            "",
+        ).strip()
+
+        types_valides = {
+            choix[0]
+            for choix in UniteLocative.TypeUnite.choices
+        }
+
+        toilettes_valides = {
+            choix[0]
+            for choix in UniteLocative.TypeToilette.choices
+        }
+
+        usages_valides = {
+            choix[0]
+            for choix in UniteLocative.UsageCommercial.choices
+        }
+
+        erreurs = []
+
+        if type_unite not in types_valides:
+            erreurs.append(
+                "Le type d'unité sélectionné est invalide."
+            )
+
+        if not numero:
+            erreurs.append(
+                "Veuillez saisir le numéro de l'unité."
+            )
+
+        if numero and UniteLocative.objects.filter(
+            batiment=batiment,
+            numero__iexact=numero,
+        ).exists():
+            erreurs.append(
+                f"L'unité n° {numero} existe déjà dans ce bâtiment."
+            )
+
+        try:
+            prix_mensuel = convertir_decimal(
+                request.POST.get("prix_mensuel"),
+            )
+            if prix_mensuel < 0:
+                erreurs.append(
+                    "Le prix mensuel ne peut pas être négatif."
+                )
+        except ValueError:
+            prix_mensuel = Decimal("0")
+            erreurs.append(
+                "Veuillez saisir un prix mensuel valide."
+            )
+
+        try:
+            loyer = convertir_decimal(
+                request.POST.get("loyer"),
+                str(prix_mensuel),
+            )
+            if loyer < 0:
+                erreurs.append(
+                    "Le loyer ne peut pas être négatif."
+                )
+        except ValueError:
+            loyer = prix_mensuel
+            erreurs.append(
+                "Veuillez saisir un loyer valide."
+            )
+
+        try:
+            caution = convertir_decimal(
+                request.POST.get("caution"),
+                "0",
+            )
+            if caution < 0:
+                erreurs.append(
+                    "La caution ne peut pas être négative."
+                )
+        except ValueError:
+            caution = Decimal("0")
+            erreurs.append(
+                "Veuillez saisir une caution valide."
+            )
+
+        if type_unite == UniteLocative.TypeUnite.APPARTEMENT:
+            try:
+                nombre_chambres = int(
+                    nombre_chambres_brut or "1"
+                )
+            except (TypeError, ValueError):
+                nombre_chambres = 0
+
+            if nombre_chambres < 1:
+                erreurs.append(
+                    "Un appartement doit avoir au moins une chambre."
+                )
+
+            if not type_toilette:
+                type_toilette = (
+                    UniteLocative.TypeToilette.COMMUNE_APPARTEMENT
+                )
+
+        elif type_unite == UniteLocative.TypeUnite.STUDIO:
+            nombre_chambres = 0
+            usage_commercial = ""
+
+            if not type_toilette:
+                type_toilette = (
+                    UniteLocative.TypeToilette.PRIVEE_STUDIO
+                )
+
+        elif type_unite == UniteLocative.TypeUnite.MAGASIN:
+            nombre_chambres = 0
+
+            if not type_toilette:
+                type_toilette = (
+                    UniteLocative.TypeToilette.PRIVEE_MAGASIN
+                )
+
+            if usage_commercial and usage_commercial not in usages_valides:
+                erreurs.append(
+                    "L'usage commercial sélectionné est invalide."
+                )
+        else:
+            nombre_chambres = 0
+
+        if type_toilette not in toilettes_valides:
+            erreurs.append(
+                "Le type de toilette sélectionné est invalide."
+            )
+
+        try:
+            date_debut = convertir_date(
+                request.POST.get("date_debut")
+            )
+            date_fin = convertir_date(
+                request.POST.get("date_fin")
+            )
+            date_caution = convertir_date(
+                request.POST.get("date_caution")
+            )
+        except ValueError as erreur:
+            date_debut = None
+            date_fin = None
+            date_caution = None
+            erreurs.append(str(erreur))
+
+        if locataire_id and not date_debut:
+            erreurs.append(
+                "Veuillez indiquer la date de début du bail."
+            )
+
+        if date_debut and date_fin and date_fin < date_debut:
+            erreurs.append(
+                "La date de fin ne peut pas être antérieure "
+                "à la date de début."
+            )
+
+        if caution_payee and not date_caution:
+            erreurs.append(
+                "Veuillez indiquer la date de paiement de la caution."
+            )
+
+        locataire = None
 
         if locataire_id:
-            locataire = get_object_or_404(
-                Locataire,
+            locataire = Locataire.objects.filter(
                 id=locataire_id,
-                agence=agence
-            )
-
-            Location.objects.create(
                 agence=agence,
-                batiment=batiment,
-                chambre=chambre,
-                locataire=locataire,
-                numero_appartement=numero,
-                loyer=loyer,
-                caution=caution,
-                active=True
+            ).first()
+
+            if not locataire:
+                erreurs.append(
+                    "Le locataire sélectionné est invalide."
+                )
+
+        if erreurs:
+            for erreur in erreurs:
+                messages.error(request, erreur)
+        else:
+            location = None
+            erreur_contrat = None
+
+            try:
+                with transaction.atomic():
+                    unite = UniteLocative.objects.create(
+                        batiment=batiment,
+                        numero=numero,
+                        type_unite=type_unite,
+                        nombre_chambres=nombre_chambres,
+                        type_toilette=type_toilette,
+                        prix_mensuel=prix_mensuel,
+                        usage_commercial=(
+                            usage_commercial
+                            if type_unite
+                            == UniteLocative.TypeUnite.MAGASIN
+                            else ""
+                        ),
+                        statut=UniteLocative.Statut.LIBRE,
+                        description=description,
+                        actif=True,
+                    )
+
+                    if locataire:
+                        location = Location.objects.create(
+                            agence=agence,
+                            batiment=batiment,
+                            locataire=locataire,
+                            unite=unite,
+                            chambre=None,
+                            numero_appartement=unite.numero,
+                            loyer=loyer,
+                            caution=caution,
+                            caution_payee=caution_payee,
+                            date_caution=date_caution,
+                            observation_caution=(
+                                observation_caution or None
+                            ),
+                            date_debut=(
+                                date_debut
+                                or timezone.localdate()
+                            ),
+                            date_fin=date_fin,
+                            active=True,
+                        )
+
+                    total_logements = UniteLocative.objects.filter(
+                        batiment=batiment,
+                        actif=True,
+                        type_unite__in=[
+                            UniteLocative.TypeUnite.APPARTEMENT,
+                            UniteLocative.TypeUnite.STUDIO,
+                        ],
+                    ).count()
+
+                    Batiment.objects.filter(
+                        pk=batiment.pk
+                    ).update(
+                        nombre_logements=total_logements
+                    )
+
+                if location:
+                    try:
+                        generer_contrat_bail_numerique(
+                            location
+                        )
+                    except Exception as erreur:
+                        erreur_contrat = str(erreur)
+
+                if location and erreur_contrat:
+                    messages.warning(
+                        request,
+                        (
+                            "L'unité et le bail ont été créés, "
+                            "mais le contrat PDF n'a pas pu être "
+                            f"généré : {erreur_contrat}"
+                        ),
+                    )
+                elif location:
+                    messages.success(
+                        request,
+                        (
+                            "L'unité a été ajoutée, le locataire "
+                            "a été affecté et le contrat de bail "
+                            "numérique a été généré."
+                        ),
+                    )
+                else:
+                    messages.success(
+                        request,
+                        "L'unité locative a été ajoutée avec succès.",
+                    )
+
+                return redirect(
+                    "detail_batiment",
+                    id=batiment.id,
+                )
+
+            except Exception as erreur:
+                messages.error(
+                    request,
+                    f"Impossible d'ajouter l'unité : {erreur}",
+                )
+
+    prochain_numero = (
+        UniteLocative.objects.filter(
+            batiment=batiment,
+        ).count()
+        + 1
+    )
+
+    return render(
+        request,
+        "ajouter_chambre.html",
+        {
+            "batiment": batiment,
+            "prochain_numero": prochain_numero,
+            "locataires": locataires,
+            "types_unite": UniteLocative.TypeUnite.choices,
+            "types_toilette": UniteLocative.TypeToilette.choices,
+            "usages_commerciaux": (
+                UniteLocative.UsageCommercial.choices
+            ),
+            "date_du_jour": timezone.localdate(),
+        },
+    )
+
+
+
+
+def _decimal_formulaire(valeur, valeur_par_defaut="0"):
+    """
+    Convertit une valeur du formulaire en Decimal.
+    Accepte les espaces, les virgules et les points.
+    """
+    texte = str(
+        valeur if valeur not in (None, "") else valeur_par_defaut
+    ).strip()
+
+    texte = texte.replace(" ", "").replace(",", ".")
+
+    try:
+        return Decimal(texte)
+    except (InvalidOperation, TypeError, ValueError):
+        raise ValidationError("Veuillez saisir un montant valide.")
+
+
+def _date_formulaire(valeur, obligatoire=False):
+    """
+    Convertit une date HTML YYYY-MM-DD en objet date.
+    """
+    if not valeur:
+        if obligatoire:
+            raise ValidationError(
+                "Veuillez indiquer la date de début du bail."
+            )
+        return None
+
+    try:
+        return date.fromisoformat(valeur)
+    except (TypeError, ValueError):
+        raise ValidationError("Veuillez saisir une date valide.")
+
+
+@login_required(login_url="login")
+def affecter_unite_locataire(request, unite_id):
+    agence = get_agence(request.user)
+
+    unite = get_object_or_404(
+        UniteLocative.objects.select_related(
+            "batiment",
+            "batiment__proprietaire",
+        ),
+        id=unite_id,
+        batiment__agence=agence,
+        actif=True,
+    )
+
+    batiment = unite.batiment
+
+    bail_actif_existant = Location.objects.filter(
+        unite=unite,
+        active=True,
+    ).select_related(
+        "locataire",
+    ).first()
+
+    if bail_actif_existant:
+        messages.warning(
+            request,
+            (
+                f"L’unité n° {unite.numero} est déjà occupée par "
+                f"{bail_actif_existant.locataire.nom} "
+                f"{bail_actif_existant.locataire.prenom}."
+            ),
+        )
+        return redirect(
+            "detail_batiment",
+            id=batiment.id,
+        )
+
+    if unite.statut != UniteLocative.Statut.LIBRE:
+        messages.warning(
+            request,
+            (
+                f"L’unité n° {unite.numero} n’est pas disponible. "
+                f"Son statut actuel est : "
+                f"{unite.get_statut_display()}."
+            ),
+        )
+        return redirect(
+            "detail_batiment",
+            id=batiment.id,
+        )
+
+    locataires = Locataire.objects.filter(
+        agence=agence,
+    ).order_by(
+        "nom",
+        "prenom",
+    )
+
+    if request.method == "POST":
+        locataire_id = request.POST.get(
+            "locataire_id",
+            "",
+        ).strip()
+
+        caution_payee = (
+            request.POST.get("caution_payee") == "on"
+        )
+
+        observation_caution = request.POST.get(
+            "observation_caution",
+            "",
+        ).strip()
+
+        erreurs = []
+
+        locataire = None
+
+        if not locataire_id:
+            erreurs.append(
+                "Veuillez sélectionner un locataire."
+            )
+        else:
+            locataire = Locataire.objects.filter(
+                id=locataire_id,
+                agence=agence,
+            ).first()
+
+            if not locataire:
+                erreurs.append(
+                    "Le locataire sélectionné est invalide."
+                )
+
+        try:
+            loyer = _decimal_formulaire(
+                request.POST.get("loyer"),
+                unite.prix_mensuel,
             )
 
-        batiment.nombre_logements = ChambreLogement.objects.filter(
-            batiment=batiment
-        ).count()
+            if loyer < 0:
+                erreurs.append(
+                    "Le loyer ne peut pas être négatif."
+                )
 
-        batiment.save(update_fields=["nombre_logements"])
+        except ValidationError as erreur:
+            loyer = unite.prix_mensuel
+            erreurs.extend(erreur.messages)
 
-        messages.success(request, "Logement / chambre ajouté avec succès.")
-        return redirect("detail_batiment", id=batiment.id)
+        try:
+            caution = _decimal_formulaire(
+                request.POST.get("caution"),
+                "0",
+            )
 
-    prochain_numero = ChambreLogement.objects.filter(
-        batiment=batiment
-    ).count() + 1
+            if caution < 0:
+                erreurs.append(
+                    "La caution ne peut pas être négative."
+                )
 
-    return render(request, "ajouter_chambre.html", {
-        "batiment": batiment,
-        "prochain_numero": prochain_numero,
-        "locataires": locataires,
-    })
+        except ValidationError as erreur:
+            caution = Decimal("0")
+            erreurs.extend(erreur.messages)
+
+        try:
+            date_debut = _date_formulaire(
+                request.POST.get("date_debut"),
+                obligatoire=True,
+            )
+
+            date_fin = _date_formulaire(
+                request.POST.get("date_fin"),
+            )
+
+            date_caution = _date_formulaire(
+                request.POST.get("date_caution"),
+            )
+
+        except ValidationError as erreur:
+            date_debut = None
+            date_fin = None
+            date_caution = None
+            erreurs.extend(erreur.messages)
+
+        if (
+            date_debut
+            and date_fin
+            and date_fin < date_debut
+        ):
+            erreurs.append(
+                "La date de fin ne peut pas être antérieure "
+                "à la date de début."
+            )
+
+        if caution_payee and not date_caution:
+            erreurs.append(
+                "Veuillez indiquer la date de paiement de la caution."
+            )
+
+        if erreurs:
+            for erreur in erreurs:
+                messages.error(request, erreur)
+
+        else:
+            location = None
+            erreur_contrat = None
+
+            try:
+                with transaction.atomic():
+                    unite_verrouillee = (
+                        UniteLocative.objects
+                        .select_for_update()
+                        .select_related("batiment")
+                        .get(
+                            id=unite.id,
+                            batiment__agence=agence,
+                            actif=True,
+                        )
+                    )
+
+                    bail_concurrent = Location.objects.filter(
+                        unite=unite_verrouillee,
+                        active=True,
+                    ).exists()
+
+                    if (
+                        bail_concurrent
+                        or unite_verrouillee.statut
+                        != UniteLocative.Statut.LIBRE
+                    ):
+                        raise ValidationError(
+                            (
+                                "Cette unité vient d’être affectée "
+                                "ou n’est plus disponible."
+                            )
+                        )
+
+                    location = Location(
+                        agence=agence,
+                        batiment=batiment,
+                        locataire=locataire,
+                        unite=unite_verrouillee,
+                        chambre=None,
+                        numero_appartement=(
+                            unite_verrouillee.numero
+                        ),
+                        loyer=loyer,
+                        caution=caution,
+                        caution_payee=caution_payee,
+                        date_caution=date_caution,
+                        observation_caution=(
+                            observation_caution or None
+                        ),
+                        date_debut=date_debut,
+                        date_fin=date_fin,
+                        active=True,
+                    )
+
+                    location.full_clean()
+                    location.save()
+
+                    UniteLocative.objects.filter(
+                        pk=unite_verrouillee.pk,
+                    ).update(
+                        statut=UniteLocative.Statut.OCCUPE,
+                    )
+
+                try:
+                    generer_contrat_bail_numerique(
+                        location
+                    )
+
+                    location.refresh_from_db(
+                        fields=[
+                            "contrat_bail_numerique",
+                            "date_generation_contrat",
+                        ]
+                    )
+
+                except Exception as erreur:
+                    erreur_contrat = str(erreur)
+
+                if erreur_contrat:
+                    messages.warning(
+                        request,
+                        (
+                            "Le locataire a été affecté et le bail "
+                            "a été enregistré, mais le contrat PDF "
+                            "n’a pas pu être généré : "
+                            f"{erreur_contrat}"
+                        ),
+                    )
+                else:
+                    messages.success(
+                        request,
+                        (
+                            f"{locataire.nom} {locataire.prenom} "
+                            f"a été affecté à l’unité n° "
+                            f"{unite.numero}. Le contrat de bail "
+                            "numérique a été généré."
+                        ),
+                    )
+
+                return redirect(
+                    "detail_batiment",
+                    id=batiment.id,
+                )
+
+            except ValidationError as erreur:
+                for message in erreur.messages:
+                    messages.error(request, message)
+
+            except Exception as erreur:
+                messages.error(
+                    request,
+                    (
+                        "Impossible d’affecter le locataire : "
+                        f"{erreur}"
+                    ),
+                )
+
+    return render(
+        request,
+        "affecter_unite_locataire.html",
+        {
+            "agence": agence,
+            "batiment": batiment,
+            "unite": unite,
+            "locataires": locataires,
+            "date_du_jour": timezone.localdate(),
+        },
+    )
+
+
+
+
+
+
 
 
 @login_required(login_url="login")
@@ -1173,63 +2829,218 @@ def modifier_chambre(request, id):
     )
 
 
+
+
+
+
 @login_required(login_url="login")
 def modifier_batiment(request, id):
-
     agence = get_agence(request.user)
 
     batiment = get_object_or_404(
-        Batiment,
+        Batiment.objects.select_related(
+            "proprietaire",
+            "agence",
+        ),
         id=id,
-        agence=agence
+        agence=agence,
     )
 
     proprietaires = Proprietaire.objects.filter(
-        agence=agence
-    ).order_by("nom", "prenom")
+        agence=agence,
+    ).order_by(
+        "nom",
+        "prenom",
+    )
 
     if request.method == "POST":
+        proprietaire_id = request.POST.get(
+            "proprietaire",
+            "",
+        ).strip()
 
-        proprietaire_id = request.POST.get("proprietaire")
+        code_batiment = request.POST.get(
+            "code_batiment",
+            "",
+        ).strip()
 
-        if not proprietaire_id:
-            messages.error(request, "Veuillez sélectionner un propriétaire.")
-            return redirect("modifier_batiment", id=batiment.id)
+        nom = request.POST.get(
+            "nom",
+            "",
+        ).strip()
 
-        proprietaire = get_object_or_404(
-            Proprietaire,
-            id=proprietaire_id,
-            agence=agence
+        adresse = request.POST.get(
+            "adresse",
+            "",
+        ).strip()
+
+        ville = request.POST.get(
+            "ville",
+            "",
+        ).strip()
+
+        description = request.POST.get(
+            "description",
+            "",
+        ).strip()
+
+        actif = (
+            request.POST.get("actif", "True")
+            == "True"
         )
 
-        try:
-            nombre_logements = int(request.POST.get("nombre_logements") or 1)
-        except ValueError:
-            nombre_logements = 1
+        erreurs = []
 
-        if nombre_logements < 1:
-            nombre_logements = 1
+        # Vérification du propriétaire
+        proprietaire = None
 
-        batiment.proprietaire = proprietaire
-        batiment.code_batiment = request.POST.get("code_batiment", "").strip()
-        batiment.nom = request.POST.get("nom", "").strip()
-        batiment.adresse = request.POST.get("adresse", "").strip()
-        batiment.ville = request.POST.get("ville", "").strip()
-        batiment.nombre_logements = nombre_logements
-        batiment.description = request.POST.get("description", "").strip()
-        batiment.actif = request.POST.get("actif") == "True"
+        if not proprietaire_id:
+            erreurs.append(
+                "Veuillez sélectionner un propriétaire."
+            )
+        else:
+            proprietaire = Proprietaire.objects.filter(
+                id=proprietaire_id,
+                agence=agence,
+            ).first()
 
-        batiment.save()
+            if not proprietaire:
+                erreurs.append(
+                    "Le propriétaire sélectionné est invalide."
+                )
 
-        messages.success(request, "Bâtiment modifié avec succès.")
+        # Vérification des champs obligatoires
+        if not code_batiment:
+            erreurs.append(
+                "Veuillez saisir le code du bâtiment."
+            )
 
-        return redirect("batiments")
+        if not nom:
+            erreurs.append(
+                "Veuillez saisir le nom du bâtiment."
+            )
 
-    return render(request, "modifier_batiment.html", {
-        "batiment": batiment,
-        "proprietaires": proprietaires,
-    })
+        if not ville:
+            erreurs.append(
+                "Veuillez saisir la ville du bâtiment."
+            )
 
+        if not adresse:
+            erreurs.append(
+                "Veuillez saisir l’adresse du bâtiment."
+            )
+
+        # Vérifier si le code existe déjà dans l’agence
+        if (
+            code_batiment
+            and Batiment.objects.filter(
+                agence=agence,
+                code_batiment__iexact=code_batiment,
+            )
+            .exclude(pk=batiment.pk)
+            .exists()
+        ):
+            erreurs.append(
+                (
+                    f"Le code bâtiment « {code_batiment} » "
+                    "est déjà utilisé dans cette agence."
+                )
+            )
+
+        if erreurs:
+            for erreur in erreurs:
+                messages.error(
+                    request,
+                    erreur,
+                )
+
+        else:
+            try:
+                with transaction.atomic():
+                    # Recalcul automatique du nombre d’unités
+                    total_unites = UniteLocative.objects.filter(
+                        batiment=batiment,
+                        actif=True,
+                    ).count()
+
+                    batiment.proprietaire = proprietaire
+                    batiment.code_batiment = code_batiment
+                    batiment.nom = nom
+                    batiment.adresse = adresse
+                    batiment.ville = ville
+                    batiment.nombre_logements = total_unites
+                    batiment.description = description
+                    batiment.actif = actif
+
+                    # Vérifier les contraintes du modèle
+                    batiment.full_clean()
+
+                    batiment.save(
+                        update_fields=[
+                            "proprietaire",
+                            "code_batiment",
+                            "nom",
+                            "adresse",
+                            "ville",
+                            "nombre_logements",
+                            "description",
+                            "actif",
+                        ]
+                    )
+
+                messages.success(
+                    request,
+                    (
+                        f"Le bâtiment « {batiment.nom} » "
+                        "a été modifié avec succès."
+                    ),
+                )
+
+                return redirect(
+                    "detail_batiment",
+                    id=batiment.id,
+                )
+
+            except ValidationError as erreur:
+                if hasattr(erreur, "message_dict"):
+                    for champ, messages_erreur in (
+                        erreur.message_dict.items()
+                    ):
+                        for message_erreur in messages_erreur:
+                            messages.error(
+                                request,
+                                message_erreur,
+                            )
+                else:
+                    for message_erreur in erreur.messages:
+                        messages.error(
+                            request,
+                            message_erreur,
+                        )
+
+            except Exception as erreur:
+                messages.error(
+                    request,
+                    (
+                        "Impossible de modifier le bâtiment : "
+                        f"{erreur}"
+                    ),
+                )
+
+    total_unites_actives = UniteLocative.objects.filter(
+        batiment=batiment,
+        actif=True,
+    ).count()
+
+    return render(
+        request,
+        "modifier_batiment.html",
+        {
+            "batiment": batiment,
+            "proprietaires": proprietaires,
+            "total_unites_actives": total_unites_actives,
+        },
+    )
 
 
 
@@ -1273,20 +3084,713 @@ from django.contrib.auth.decorators import login_required
 from .models import Locataire
 
 
-
 @login_required(login_url="login")
 def locations(request):
     agence = get_agence(request.user)
 
-    locations = Location.objects.filter(agence=agence)
+    q = request.GET.get("q", "").strip()
+    statut = request.GET.get("statut", "").strip()
+    caution = request.GET.get("caution", "").strip()
+    batiment_id = request.GET.get("batiment", "").strip()
+    tri = request.GET.get("tri", "-date_debut").strip()
 
-    return render(request, "locations.html", {
-        "locations": locations,
-    })
+    queryset = (
+        Location.objects
+        .filter(agence=agence)
+        .select_related(
+            "locataire",
+            "batiment",
+            "unite",
+            "chambre",
+        )
+    )
+
+    if q:
+        queryset = queryset.filter(
+            Q(locataire__nom__icontains=q)
+            | Q(locataire__prenom__icontains=q)
+            | Q(locataire__telephone__icontains=q)
+            | Q(locataire__email__icontains=q)
+            | Q(batiment__nom__icontains=q)
+            | Q(batiment__adresse__icontains=q)
+            | Q(batiment__ville__icontains=q)
+            | Q(numero_appartement__icontains=q)
+            | Q(unite__numero__icontains=q)
+        )
+
+    if statut == "active":
+        queryset = queryset.filter(active=True)
+
+    elif statut == "terminee":
+        queryset = queryset.filter(active=False)
+
+    if caution == "payee":
+        queryset = queryset.filter(caution_payee=True)
+
+    elif caution == "non_payee":
+        queryset = queryset.filter(caution_payee=False)
+
+    if batiment_id.isdigit():
+        queryset = queryset.filter(
+            batiment_id=int(batiment_id),
+        )
+
+    tris_autorises = {
+        "-date_debut": ("-date_debut", "-id"),
+        "date_debut": ("date_debut", "id"),
+        "locataire": (
+            "locataire__nom",
+            "locataire__prenom",
+            "-date_debut",
+        ),
+        "batiment": (
+            "batiment__nom",
+            "-date_debut",
+        ),
+        "-loyer": (
+            "-loyer",
+            "-date_debut",
+        ),
+        "loyer": (
+            "loyer",
+            "-date_debut",
+        ),
+    }
+
+    queryset = queryset.order_by(
+        *tris_autorises.get(
+            tri,
+            tris_autorises["-date_debut"],
+        )
+    )
+
+    stats_queryset = Location.objects.filter(
+        agence=agence,
+    )
+
+    total_locations = stats_queryset.count()
+
+    total_actives = stats_queryset.filter(
+        active=True,
+    ).count()
+
+    total_terminees = (
+        total_locations - total_actives
+    )
+
+    cautions_non_payees = stats_queryset.filter(
+        active=True,
+        caution_payee=False,
+    ).count()
+
+    revenus_mensuels_actifs = (
+        stats_queryset
+        .filter(active=True)
+        .aggregate(total=Sum("loyer"))
+        .get("total")
+        or 0
+    )
+
+    paginator = Paginator(
+        queryset,
+        40,
+    )
+
+    page_obj = paginator.get_page(
+        request.GET.get("page"),
+    )
+
+    batiments_filtre = (
+        Batiment.objects
+        .filter(
+            agence=agence,
+            actif=True,
+        )
+        .order_by("nom")
+        .only(
+            "id",
+            "nom",
+        )
+    )
+
+    return render(
+        request,
+        "locations.html",
+        {
+            "locations": page_obj.object_list,
+            "page_obj": page_obj,
+            "total_locations": total_locations,
+            "total_actives": total_actives,
+            "total_terminees": total_terminees,
+            "cautions_non_payees": cautions_non_payees,
+            "revenus_mensuels_actifs": revenus_mensuels_actifs,
+            "batiments_filtre": batiments_filtre,
+            "q": q,
+            "statut": statut,
+            "caution": caution,
+            "batiment_id": batiment_id,
+            "tri": tri,
+        },
+    )
+
+@login_required(login_url="login")
+def modifier_location(request, id):
+    """
+    Modifie une location existante.
+
+    Sécurités incluses :
+    - la location doit appartenir à l'agence connectée ;
+    - le bâtiment, le locataire et l'unité doivent appartenir à la même agence ;
+    - une unité ne peut pas avoir deux baux actifs ;
+    - l'ancienne unité redevient libre lorsqu'elle est remplacée ;
+    - l'unité sélectionnée devient occupée lorsque le bail est actif ;
+    - le contrat PDF existant est régénéré après modification.
+    """
+    agence = get_agence(request.user)
+
+    location = get_object_or_404(
+        Location.objects.select_related(
+            "agence",
+            "batiment",
+            "locataire",
+            "unite",
+            "chambre",
+        ),
+        id=id,
+        agence=agence,
+    )
+
+    ancienne_unite_id = location.unite_id
+    contrat_existant = bool(
+        location.contrat_bail_numerique
+    )
+
+    batiments = Batiment.objects.filter(
+        agence=agence,
+        actif=True,
+    ).order_by("nom")
+
+    locataires = Locataire.objects.filter(
+        agence=agence,
+    ).order_by("nom", "prenom")
+
+    if request.method == "POST":
+        batiment_id = request.POST.get(
+            "batiment",
+            "",
+        ).strip()
+
+        locataire_id = request.POST.get(
+            "locataire",
+            "",
+        ).strip()
+
+        unite_id = request.POST.get(
+            "unite",
+            "",
+        ).strip()
+
+        numero_appartement = request.POST.get(
+            "numero_appartement",
+            "",
+        ).strip()
+
+        loyer_brut = request.POST.get(
+            "loyer",
+            "",
+        ).strip()
+
+        caution_brute = request.POST.get(
+            "caution",
+            "",
+        ).strip()
+
+        caution_payee = (
+            request.POST.get("caution_payee")
+            in {
+                "on",
+                "true",
+                "True",
+                "1",
+                "oui",
+            }
+        )
+
+        date_caution_brute = request.POST.get(
+            "date_caution",
+            "",
+        ).strip()
+
+        observation_caution = request.POST.get(
+            "observation_caution",
+            "",
+        ).strip()
+
+        date_debut_brute = request.POST.get(
+            "date_debut",
+            "",
+        ).strip()
+
+        date_fin_brute = request.POST.get(
+            "date_fin",
+            "",
+        ).strip()
+
+        active = (
+            request.POST.get("active", "True")
+            == "True"
+        )
+
+        erreurs = []
+
+        # -------------------------------------------------
+        # Vérification du bâtiment
+        # -------------------------------------------------
+        batiment = None
+
+        if not batiment_id:
+            erreurs.append(
+                "Veuillez sélectionner un bâtiment."
+            )
+        else:
+            batiment = Batiment.objects.filter(
+                id=batiment_id,
+                agence=agence,
+            ).first()
+
+            if not batiment:
+                erreurs.append(
+                    "Le bâtiment sélectionné est invalide."
+                )
+
+        # -------------------------------------------------
+        # Vérification du locataire
+        # -------------------------------------------------
+        locataire = None
+
+        if not locataire_id:
+            erreurs.append(
+                "Veuillez sélectionner un locataire."
+            )
+        else:
+            locataire = Locataire.objects.filter(
+                id=locataire_id,
+                agence=agence,
+            ).first()
+
+            if not locataire:
+                erreurs.append(
+                    "Le locataire sélectionné est invalide."
+                )
+
+        # -------------------------------------------------
+        # Vérification de l'unité
+        # -------------------------------------------------
+        unite = None
+
+        if unite_id:
+            unite = (
+                UniteLocative.objects
+                .select_related("batiment")
+                .filter(
+                    id=unite_id,
+                    batiment__agence=agence,
+                    actif=True,
+                )
+                .first()
+            )
+
+            if not unite:
+                erreurs.append(
+                    "L’unité sélectionnée est invalide."
+                )
+
+            elif (
+                batiment
+                and unite.batiment_id != batiment.id
+            ):
+                erreurs.append(
+                    (
+                        "L’unité sélectionnée n’appartient pas "
+                        "au bâtiment choisi."
+                    )
+                )
+
+        elif active and not location.chambre_id:
+            erreurs.append(
+                (
+                    "Veuillez sélectionner une unité pour "
+                    "un bail actif."
+                )
+            )
+
+        # Empêcher deux locations actives sur la même unité.
+        if unite and active:
+            unite_deja_occupee = (
+                Location.objects
+                .filter(
+                    agence=agence,
+                    unite=unite,
+                    active=True,
+                )
+                .exclude(pk=location.pk)
+                .exists()
+            )
+
+            if unite_deja_occupee:
+                erreurs.append(
+                    (
+                        f"L’unité n° {unite.numero} possède déjà "
+                        "un bail actif."
+                    )
+                )
+
+        # -------------------------------------------------
+        # Vérification des montants
+        # -------------------------------------------------
+        loyer = Decimal("0")
+        caution = Decimal("0")
+
+        try:
+            loyer = Decimal(
+                loyer_brut.replace(" ", "")
+                or "0"
+            )
+
+            if loyer <= 0:
+                erreurs.append(
+                    "Le loyer doit être supérieur à zéro."
+                )
+
+        except InvalidOperation:
+            erreurs.append(
+                "Le montant du loyer est invalide."
+            )
+
+        try:
+            caution = Decimal(
+                caution_brute.replace(" ", "")
+                or "0"
+            )
+
+            if caution < 0:
+                erreurs.append(
+                    "La caution ne peut pas être négative."
+                )
+
+        except InvalidOperation:
+            erreurs.append(
+                "Le montant de la caution est invalide."
+            )
+
+        # -------------------------------------------------
+        # Vérification des dates
+        # -------------------------------------------------
+        date_debut = parse_date(
+            date_debut_brute
+        )
+
+        date_fin = (
+            parse_date(date_fin_brute)
+            if date_fin_brute
+            else None
+        )
+
+        date_caution = (
+            parse_date(date_caution_brute)
+            if date_caution_brute
+            else None
+        )
+
+        if not date_debut:
+            erreurs.append(
+                "La date de début est obligatoire."
+            )
+
+        if (
+            date_debut
+            and date_fin
+            and date_fin < date_debut
+        ):
+            erreurs.append(
+                (
+                    "La date de fin ne peut pas être "
+                    "antérieure à la date de début."
+                )
+            )
+
+        if caution_payee and not date_caution:
+            date_caution = timezone.localdate()
+
+        if not caution_payee:
+            date_caution = None
+
+        # Un bail terminé doit avoir une date de fin.
+        if not active and not date_fin:
+            date_fin = timezone.localdate()
+
+        # Un bail réactivé peut redevenir sans date de fin.
+        if active and date_fin and date_fin < timezone.localdate():
+            erreurs.append(
+                (
+                    "Un bail actif ne peut pas avoir une date "
+                    "de fin déjà passée."
+                )
+            )
+
+        if erreurs:
+            for erreur in erreurs:
+                messages.error(
+                    request,
+                    erreur,
+                )
+
+        else:
+            try:
+                with transaction.atomic():
+                    location_verrouillee = (
+                        Location.objects
+                        .select_for_update()
+                        .select_related(
+                            "unite",
+                            "batiment",
+                            "locataire",
+                        )
+                        .get(
+                            pk=location.pk,
+                            agence=agence,
+                        )
+                    )
+
+                    ancienne_unite = None
+
+                    if location_verrouillee.unite_id:
+                        ancienne_unite = (
+                            UniteLocative.objects
+                            .select_for_update()
+                            .filter(
+                                pk=location_verrouillee.unite_id,
+                                batiment__agence=agence,
+                            )
+                            .first()
+                        )
+
+                    nouvelle_unite = None
+
+                    if unite:
+                        nouvelle_unite = (
+                            UniteLocative.objects
+                            .select_for_update()
+                            .get(
+                                pk=unite.pk,
+                                batiment__agence=agence,
+                            )
+                        )
+
+                        conflit = (
+                            Location.objects
+                            .select_for_update()
+                            .filter(
+                                agence=agence,
+                                unite=nouvelle_unite,
+                                active=True,
+                            )
+                            .exclude(
+                                pk=location_verrouillee.pk
+                            )
+                            .exists()
+                        )
+
+                        if active and conflit:
+                            raise ValidationError(
+                                (
+                                    f"L’unité n° "
+                                    f"{nouvelle_unite.numero} "
+                                    "vient d’être attribuée à "
+                                    "un autre bail actif."
+                                )
+                            )
+
+                    # Mettre à jour la location.
+                    location_verrouillee.batiment = batiment
+                    location_verrouillee.locataire = locataire
+                    location_verrouillee.unite = nouvelle_unite
+
+                    if nouvelle_unite:
+                        location_verrouillee.chambre = None
+                        location_verrouillee.numero_appartement = (
+                            nouvelle_unite.numero
+                        )
+                    else:
+                        location_verrouillee.numero_appartement = (
+                            numero_appartement or None
+                        )
+
+                    location_verrouillee.loyer = loyer
+                    location_verrouillee.caution = caution
+                    location_verrouillee.caution_payee = (
+                        caution_payee
+                    )
+                    location_verrouillee.date_caution = (
+                        date_caution
+                    )
+                    location_verrouillee.observation_caution = (
+                        observation_caution or None
+                    )
+                    location_verrouillee.date_debut = date_debut
+                    location_verrouillee.date_fin = date_fin
+                    location_verrouillee.active = active
+
+                    location_verrouillee.full_clean()
+                    location_verrouillee.save()
+
+                    # Libérer l'ancienne unité lorsqu'elle change
+                    # ou lorsque le bail devient inactif.
+                    if ancienne_unite and (
+                        ancienne_unite.pk
+                        != getattr(
+                            nouvelle_unite,
+                            "pk",
+                            None,
+                        )
+                        or not active
+                    ):
+                        UniteLocative.objects.filter(
+                            pk=ancienne_unite.pk,
+                        ).update(
+                            statut=UniteLocative.Statut.LIBRE,
+                        )
+
+                    # Occuper la nouvelle unité si le bail est actif.
+                    if nouvelle_unite:
+                        nouveau_statut = (
+                            UniteLocative.Statut.OCCUPE
+                            if active
+                            else UniteLocative.Statut.LIBRE
+                        )
+
+                        UniteLocative.objects.filter(
+                            pk=nouvelle_unite.pk,
+                        ).update(
+                            statut=nouveau_statut,
+                        )
+
+                    location = location_verrouillee
+
+                # Régénérer le contrat uniquement s'il existait déjà.
+                if contrat_existant:
+                    try:
+                        generer_contrat_bail_numerique(
+                            location,
+                            forcer=True,
+                        )
+
+                    except Exception as erreur_contrat:
+                        messages.warning(
+                            request,
+                            (
+                                "La location a été modifiée, mais "
+                                "le contrat PDF n’a pas pu être "
+                                f"régénéré : {erreur_contrat}"
+                            ),
+                        )
+
+                messages.success(
+                    request,
+                    (
+                        "La location a été modifiée avec succès."
+                    ),
+                )
+
+                return redirect(
+                    "locations",
+                )
+
+            except ValidationError as erreur:
+                if hasattr(erreur, "message_dict"):
+                    for messages_erreur in (
+                        erreur.message_dict.values()
+                    ):
+                        for message_erreur in messages_erreur:
+                            messages.error(
+                                request,
+                                message_erreur,
+                            )
+                else:
+                    for message_erreur in erreur.messages:
+                        messages.error(
+                            request,
+                            message_erreur,
+                        )
+
+            except Exception as erreur:
+                messages.error(
+                    request,
+                    (
+                        "Impossible de modifier la location : "
+                        f"{erreur}"
+                    ),
+                )
+
+    # -------------------------------------------------
+    # Unités affichées dans le formulaire
+    # -------------------------------------------------
+    batiment_selectionne_id = (
+        request.POST.get("batiment")
+        if request.method == "POST"
+        else location.batiment_id
+    )
+
+    unites = UniteLocative.objects.none()
+
+    if str(batiment_selectionne_id).isdigit():
+        unites = (
+            UniteLocative.objects
+            .filter(
+                batiment_id=int(
+                    batiment_selectionne_id
+                ),
+                batiment__agence=agence,
+                actif=True,
+            )
+            .filter(
+                # Afficher les unités libres et l'unité actuelle.
+                # Le filtrage précis est fait en Python ci-dessous.
+            )
+            .order_by(
+                "type_unite",
+                "numero",
+            )
+        )
+
+        unites = [
+            unite
+            for unite in unites
+            if (
+                unite.statut
+                == UniteLocative.Statut.LIBRE
+                or unite.pk == location.unite_id
+            )
+        ]
+
+    return render(
+        request,
+        "modifier_location.html",
+        {
+            "location": location,
+            "batiments": batiments,
+            "locataires": locataires,
+            "unites": unites,
+            "ancienne_unite_id": ancienne_unite_id,
+        },
+    )
+
+
+
 
 from django.db.models import Sum
 from django.utils import timezone
-
+from django.core.paginator import Paginator
 
 
 from django.db.models import Sum
@@ -7466,3 +9970,176 @@ def attestation_proprietaire(request, proprietaire_id):
         "attestation_proprietaire.html",
         contexte
     )
+
+
+
+
+
+
+@login_required(login_url="login")
+@require_POST
+def generer_contrat_bail(request, location_id):
+    agence = get_agence(request.user)
+
+    location = get_object_or_404(
+        Location.objects.select_related(
+            "agence",
+            "batiment",
+            "batiment__proprietaire",
+            "locataire",
+            "unite",
+        ),
+        id=location_id,
+        agence=agence,
+        active=True,
+    )
+
+    if not location.unite_id:
+        messages.error(
+            request,
+            "Cette location n’est associée à aucune unité locative.",
+        )
+
+        return redirect(
+            "detail_batiment",
+            id=location.batiment_id,
+        )
+
+    try:
+        generer_contrat_bail_numerique(
+            location,
+            forcer=True,
+        )
+
+        location.refresh_from_db(
+            fields=[
+                "contrat_bail_numerique",
+                "date_generation_contrat",
+            ]
+        )
+
+        if location.contrat_bail_numerique:
+            messages.success(
+                request,
+                (
+                    f"Le contrat de bail {location.numero_contrat} "
+                    "a été généré avec succès."
+                ),
+            )
+        else:
+            messages.error(
+                request,
+                "Le contrat n’a pas pu être enregistré.",
+            )
+
+    except Exception as erreur:
+        messages.error(
+            request,
+            (
+                "Impossible de générer le contrat de bail : "
+                f"{erreur}"
+            ),
+        )
+
+    return redirect(
+        "detail_batiment",
+        id=location.batiment_id,
+    )
+
+
+
+
+
+
+
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.shortcuts import get_object_or_404, redirect
+from django.utils import timezone
+from django.views.decorators.http import require_POST
+
+from .models import Location, UniteLocative
+
+
+@login_required(login_url="login")
+@require_POST
+def liberer_unite_locataire(request, location_id):
+    agence = get_agence(request.user)
+
+    location = get_object_or_404(
+        Location.objects.select_related(
+            "batiment",
+            "locataire",
+            "unite",
+        ),
+        id=location_id,
+        agence=agence,
+        active=True,
+        unite__isnull=False,
+    )
+
+    batiment_id = location.batiment_id
+    numero_unite = location.unite.numero
+
+    nom_locataire = (
+        f"{location.locataire.nom} "
+        f"{location.locataire.prenom}"
+    ).strip()
+
+    try:
+        with transaction.atomic():
+            location_verrouillee = (
+                Location.objects
+                .select_for_update()
+                .get(
+                    id=location.id,
+                    agence=agence,
+                    active=True,
+                )
+            )
+
+            unite_verrouillee = (
+                UniteLocative.objects
+                .select_for_update()
+                .get(
+                    id=location_verrouillee.unite_id,
+                    batiment__agence=agence,
+                )
+            )
+
+            Location.objects.filter(
+                pk=location_verrouillee.pk,
+            ).update(
+                active=False,
+                date_fin=timezone.localdate(),
+                date_modification=timezone.now(),
+            )
+
+            UniteLocative.objects.filter(
+                pk=unite_verrouillee.pk,
+            ).update(
+                statut=UniteLocative.Statut.LIBRE,
+            )
+
+        messages.success(
+            request,
+            (
+                f"{nom_locataire} a été retiré de l’unité "
+                f"n° {numero_unite}. L’unité est maintenant disponible."
+            ),
+        )
+
+    except Exception as erreur:
+        messages.error(
+            request,
+            f"Impossible de libérer l’unité : {erreur}",
+        )
+
+    return redirect(
+        "detail_batiment",
+        id=batiment_id,
+    )
+
+

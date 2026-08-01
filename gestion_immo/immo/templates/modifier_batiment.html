@@ -1,180 +1,871 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% block title %}
+    Modifier {{ batiment.nom }}
+{% endblock %}
 
 {% block content %}
 
 <style>
-.edit-hero{
-    background:linear-gradient(135deg,#071a3d,#0057ff);
-    color:white;
-    border-radius:28px;
-    padding:28px;
-    margin-bottom:25px;
-    box-shadow:0 20px 50px rgba(0,87,255,.22);
-}
+    :root {
+        --edit-primary: #2563eb;
+        --edit-primary-dark: #1d4ed8;
+        --edit-success: #059669;
+        --edit-danger: #dc2626;
+        --edit-warning: #d97706;
+        --edit-text: #0f172a;
+        --edit-muted: #64748b;
+        --edit-border: #e2e8f0;
+        --edit-bg: #f4f7fb;
+        --edit-surface: #ffffff;
+        --edit-radius-xl: 28px;
+        --edit-radius-lg: 20px;
+        --edit-radius-md: 14px;
+        --edit-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+    }
 
-.form-box{
-    background:white;
-    border:1px solid #e4ecf8;
-    border-radius:26px;
-    padding:28px;
-    box-shadow:0 15px 45px rgba(15,23,42,.08);
-}
+    .building-edit-page {
+        min-height: 100vh;
+        padding: 28px 0 60px;
+        background:
+            radial-gradient(
+                circle at top right,
+                rgba(37, 99, 235, 0.13),
+                transparent 32%
+            ),
+            var(--edit-bg);
+    }
 
-.input-icon{
-    position:relative;
-}
+    .building-edit-container {
+        width: min(1120px, calc(100% - 30px));
+        margin: 0 auto;
+    }
 
-.input-icon i{
-    position:absolute;
-    left:17px;
-    top:50%;
-    transform:translateY(-50%);
-    color:#0057ff;
-}
+    .building-edit-hero {
+        position: relative;
+        overflow: hidden;
+        padding: clamp(24px, 4vw, 38px);
+        border-radius: var(--edit-radius-xl);
+        color: #ffffff;
+        background:
+            linear-gradient(
+                135deg,
+                #0f172a,
+                #1d4ed8
+            );
+        box-shadow: var(--edit-shadow);
+    }
 
-.input-icon input,
-.input-icon select{
-    padding-left:48px;
-    height:56px;
-    border-radius:18px;
-}
+    .building-edit-hero::before,
+    .building-edit-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 999px;
+        pointer-events: none;
+    }
 
-.form-label{
-    color:#071a3d;
-}
+    .building-edit-hero::before {
+        width: 280px;
+        height: 280px;
+        right: -100px;
+        top: -150px;
+        background: rgba(255, 255, 255, 0.10);
+    }
 
-textarea{
-    border-radius:18px!important;
-}
+    .building-edit-hero::after {
+        width: 170px;
+        height: 170px;
+        right: 190px;
+        bottom: -120px;
+        background: rgba(56, 189, 248, 0.14);
+    }
+
+    .building-edit-hero-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .building-edit-heading {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-width: 0;
+    }
+
+    .building-edit-main-icon {
+        width: 70px;
+        height: 70px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        border-radius: 22px;
+        color: var(--edit-primary-dark);
+        background: #ffffff;
+        font-size: 28px;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+    }
+
+    .building-edit-eyebrow {
+        margin: 0 0 5px;
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 12px;
+        font-weight: 850;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+    }
+
+    .building-edit-title {
+        margin: 0;
+        font-size: clamp(26px, 4vw, 40px);
+        font-weight: 950;
+        line-height: 1.1;
+        overflow-wrap: anywhere;
+    }
+
+    .building-edit-subtitle {
+        margin: 8px 0 0;
+        color: rgba(255, 255, 255, 0.76);
+        font-size: 14px;
+    }
+
+    .building-edit-back {
+        min-height: 46px;
+        padding: 11px 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 14px;
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.10);
+        text-decoration: none;
+        font-weight: 850;
+        transition: 0.2s ease;
+    }
+
+    .building-edit-back:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.18);
+        transform: translateY(-1px);
+    }
+
+    .building-edit-summary {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 20px;
+    }
+
+    .building-edit-summary-card {
+        padding: 17px;
+        border: 1px solid var(--edit-border);
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+    }
+
+    .building-edit-summary-label {
+        margin: 0 0 5px;
+        color: var(--edit-muted);
+        font-size: 11px;
+        font-weight: 850;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .building-edit-summary-value {
+        margin: 0;
+        color: var(--edit-text);
+        font-size: 20px;
+        font-weight: 950;
+        overflow-wrap: anywhere;
+    }
+
+    .building-edit-form-card {
+        margin-top: 20px;
+        padding: clamp(20px, 4vw, 32px);
+        border: 1px solid var(--edit-border);
+        border-radius: var(--edit-radius-xl);
+        background: var(--edit-surface);
+        box-shadow: var(--edit-shadow);
+    }
+
+    .building-edit-alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 14px;
+        padding: 14px 16px;
+        border-radius: 15px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .building-edit-alert.success {
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+        background: #ecfdf5;
+    }
+
+    .building-edit-alert.error,
+    .building-edit-alert.danger {
+        color: #991b1b;
+        border: 1px solid #fecaca;
+        background: #fef2f2;
+    }
+
+    .building-edit-alert.warning {
+        color: #92400e;
+        border: 1px solid #fde68a;
+        background: #fffbeb;
+    }
+
+    .building-edit-alert.info {
+        color: #075985;
+        border: 1px solid #bae6fd;
+        background: #f0f9ff;
+    }
+
+    .building-edit-section {
+        padding: 22px;
+        border: 1px solid var(--edit-border);
+        border-radius: var(--edit-radius-lg);
+        background: #fbfdff;
+    }
+
+    .building-edit-section + .building-edit-section {
+        margin-top: 18px;
+    }
+
+    .building-edit-section-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .building-edit-section-icon {
+        width: 46px;
+        height: 46px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        border-radius: 15px;
+        color: var(--edit-primary);
+        background: #dbeafe;
+        font-size: 18px;
+    }
+
+    .building-edit-section-title {
+        margin: 0;
+        color: var(--edit-text);
+        font-size: 20px;
+        font-weight: 900;
+    }
+
+    .building-edit-section-text {
+        margin: 4px 0 0;
+        color: var(--edit-muted);
+        font-size: 13px;
+    }
+
+    .building-edit-grid {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .building-edit-field {
+        min-width: 0;
+        grid-column: span 6;
+    }
+
+    .building-edit-field.col-4 {
+        grid-column: span 4;
+    }
+
+    .building-edit-field.col-8 {
+        grid-column: span 8;
+    }
+
+    .building-edit-field.full {
+        grid-column: 1 / -1;
+    }
+
+    .building-edit-label {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 8px;
+        color: var(--edit-text);
+        font-size: 13px;
+        font-weight: 850;
+    }
+
+    .building-edit-required {
+        color: var(--edit-danger);
+    }
+
+    .building-edit-input-wrap {
+        position: relative;
+    }
+
+    .building-edit-input-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        z-index: 2;
+        transform: translateY(-50%);
+        color: var(--edit-primary);
+        pointer-events: none;
+    }
+
+    .building-edit-control {
+        width: 100%;
+        min-height: 52px;
+        padding: 11px 14px 11px 46px;
+        border: 1px solid #cbd5e1;
+        border-radius: 15px;
+        color: var(--edit-text);
+        background: #ffffff;
+        outline: none;
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease;
+    }
+
+    select.building-edit-control {
+        cursor: pointer;
+    }
+
+    textarea.building-edit-control {
+        min-height: 125px;
+        padding: 15px;
+        resize: vertical;
+    }
+
+    .building-edit-control:focus {
+        border-color: var(--edit-primary);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.11);
+    }
+
+    .building-edit-control[readonly] {
+        color: #475569;
+        background: #f1f5f9;
+        cursor: not-allowed;
+    }
+
+    .building-edit-help {
+        margin: 7px 0 0;
+        color: var(--edit-muted);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .building-edit-status-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 15px;
+        padding: 14px;
+        border-radius: 15px;
+        color: #075985;
+        border: 1px solid #bae6fd;
+        background: #f0f9ff;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .building-edit-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 11px;
+        flex-wrap: wrap;
+        margin-top: 22px;
+    }
+
+    .building-edit-button {
+        min-height: 48px;
+        padding: 11px 18px;
+        border: 1px solid transparent;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+        font-weight: 900;
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease;
+    }
+
+    .building-edit-button.cancel {
+        color: #334155;
+        border-color: #cbd5e1;
+        background: #ffffff;
+    }
+
+    .building-edit-button.cancel:hover {
+        color: var(--edit-text);
+        background: #f8fafc;
+    }
+
+    .building-edit-button.submit {
+        color: #ffffff;
+        background:
+            linear-gradient(
+                135deg,
+                var(--edit-primary),
+                var(--edit-primary-dark)
+            );
+        box-shadow: 0 12px 25px rgba(37, 99, 235, 0.22);
+    }
+
+    .building-edit-button.submit:hover {
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 15px 30px rgba(37, 99, 235, 0.28);
+    }
+
+    @media (max-width: 850px) {
+        .building-edit-summary {
+            grid-template-columns: 1fr;
+        }
+
+        .building-edit-field,
+        .building-edit-field.col-4,
+        .building-edit-field.col-8 {
+            grid-column: 1 / -1;
+        }
+    }
+
+    @media (max-width: 650px) {
+        .building-edit-page {
+            padding-top: 14px;
+        }
+
+        .building-edit-container {
+            width: min(100% - 18px, 1120px);
+        }
+
+        .building-edit-hero,
+        .building-edit-form-card,
+        .building-edit-section {
+            padding: 18px 14px;
+        }
+
+        .building-edit-main-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 18px;
+            font-size: 23px;
+        }
+
+        .building-edit-hero-content {
+            align-items: flex-start;
+        }
+
+        .building-edit-back {
+            width: 100%;
+        }
+
+        .building-edit-actions {
+            flex-direction: column-reverse;
+        }
+
+        .building-edit-button {
+            width: 100%;
+        }
+    }
 </style>
 
-<div class="edit-hero d-flex justify-content-between align-items-center flex-wrap gap-3">
-    <div>
-        <h2 class="fw-bold mb-1">
-            <i class="fa-solid fa-pen-to-square"></i>
-            Modifier le bâtiment
-        </h2>
-        <p class="mb-0 opacity-75">{{ batiment.nom }}</p>
+<div class="building-edit-page">
+    <div class="building-edit-container">
+
+        <header class="building-edit-hero">
+            <div class="building-edit-hero-content">
+
+                <div class="building-edit-heading">
+                    <div class="building-edit-main-icon">
+                        <i class="fa-solid fa-building-pen"></i>
+                    </div>
+
+                    <div>
+                        <p class="building-edit-eyebrow">
+                            Gestion du patrimoine
+                        </p>
+
+                        <h1 class="building-edit-title">
+                            Modifier le bâtiment
+                        </h1>
+
+                        <p class="building-edit-subtitle">
+                            {{ batiment.nom }} —
+                            {{ batiment.code_batiment }}
+                        </p>
+                    </div>
+                </div>
+
+                <a href="{% url 'detail_batiment' batiment.id %}"
+                   class="building-edit-back">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Retour au bâtiment
+                </a>
+
+            </div>
+        </header>
+
+        <section class="building-edit-summary">
+            <article class="building-edit-summary-card">
+                <p class="building-edit-summary-label">
+                    Code
+                </p>
+                <p class="building-edit-summary-value">
+                    {{ batiment.code_batiment }}
+                </p>
+            </article>
+
+            <article class="building-edit-summary-card">
+                <p class="building-edit-summary-label">
+                    Unités locatives
+                </p>
+                <p class="building-edit-summary-value">
+                    {{ batiment.unites_locatives.count|default:batiment.nombre_logements }}
+                </p>
+            </article>
+
+            <article class="building-edit-summary-card">
+                <p class="building-edit-summary-label">
+                    Statut
+                </p>
+                <p class="building-edit-summary-value">
+                    {% if batiment.actif %}
+                        <span style="color:#059669;">Actif</span>
+                    {% else %}
+                        <span style="color:#dc2626;">Inactif</span>
+                    {% endif %}
+                </p>
+            </article>
+        </section>
+
+        <main class="building-edit-form-card">
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="building-edit-alert {{ message.tags|default:'info' }}">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" id="buildingEditForm">
+                {% csrf_token %}
+
+                <section class="building-edit-section">
+                    <div class="building-edit-section-head">
+                        <div class="building-edit-section-icon">
+                            <i class="fa-solid fa-building"></i>
+                        </div>
+
+                        <div>
+                            <h2 class="building-edit-section-title">
+                                Informations principales
+                            </h2>
+                            <p class="building-edit-section-text">
+                                Identité administrative du bâtiment.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="building-edit-grid">
+
+                        <div class="building-edit-field col-4">
+                            <label class="building-edit-label"
+                                   for="idCodeBatiment">
+                                Code bâtiment
+                                <span class="building-edit-required">*</span>
+                            </label>
+
+                            <div class="building-edit-input-wrap">
+                                <i class="fa-solid fa-barcode building-edit-input-icon"></i>
+
+                                <input id="idCodeBatiment"
+                                       type="text"
+                                       name="code_batiment"
+                                       class="building-edit-control"
+                                       value="{{ request.POST.code_batiment|default:batiment.code_batiment }}"
+                                       maxlength="100"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="building-edit-field col-8">
+                            <label class="building-edit-label"
+                                   for="idNomBatiment">
+                                Nom du bâtiment
+                                <span class="building-edit-required">*</span>
+                            </label>
+
+                            <div class="building-edit-input-wrap">
+                                <i class="fa-solid fa-signature building-edit-input-icon"></i>
+
+                                <input id="idNomBatiment"
+                                       type="text"
+                                       name="nom"
+                                       class="building-edit-control"
+                                       value="{{ request.POST.nom|default:batiment.nom }}"
+                                       maxlength="200"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="building-edit-field">
+                            <label class="building-edit-label"
+                                   for="idProprietaire">
+                                Propriétaire
+                                <span class="building-edit-required">*</span>
+                            </label>
+
+                            <div class="building-edit-input-wrap">
+                                <i class="fa-solid fa-user-tie building-edit-input-icon"></i>
+
+                                <select id="idProprietaire"
+                                        name="proprietaire"
+                                        class="building-edit-control"
+                                        required>
+                                    <option value="">
+                                        Sélectionner un propriétaire
+                                    </option>
+
+                                    {% for proprietaire in proprietaires %}
+                                        <option value="{{ proprietaire.id }}"
+                                            {% if request.POST.proprietaire %}
+                                                {% if request.POST.proprietaire == proprietaire.id|stringformat:"s" %}
+                                                    selected
+                                                {% endif %}
+                                            {% elif batiment.proprietaire_id == proprietaire.id %}
+                                                selected
+                                            {% endif %}>
+                                            {{ proprietaire.nom }}
+                                            {{ proprietaire.prenom }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="building-edit-field">
+                            <label class="building-edit-label"
+                                   for="idStatut">
+                                Statut du bâtiment
+                                <span class="building-edit-required">*</span>
+                            </label>
+
+                            <div class="building-edit-input-wrap">
+                                <i class="fa-solid fa-toggle-on building-edit-input-icon"></i>
+
+                                <select id="idStatut"
+                                        name="actif"
+                                        class="building-edit-control"
+                                        required>
+                                    <option value="True"
+                                        {% if request.POST.actif == "True" or not request.POST and batiment.actif %}
+                                            selected
+                                        {% endif %}>
+                                        Actif
+                                    </option>
+
+                                    <option value="False"
+                                        {% if request.POST.actif == "False" or not request.POST and not batiment.actif %}
+                                            selected
+                                        {% endif %}>
+                                        Inactif
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <section class="building-edit-section">
+                    <div class="building-edit-section-head">
+                        <div class="building-edit-section-icon">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+
+                        <div>
+                            <h2 class="building-edit-section-title">
+                                Localisation
+                            </h2>
+                            <p class="building-edit-section-text">
+                                Ville et adresse complète du bâtiment.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="building-edit-grid">
+
+                        <div class="building-edit-field">
+                            <label class="building-edit-label"
+                                   for="idVille">
+                                Ville
+                                <span class="building-edit-required">*</span>
+                            </label>
+
+                            <div class="building-edit-input-wrap">
+                                <i class="fa-solid fa-city building-edit-input-icon"></i>
+
+                                <input id="idVille"
+                                       type="text"
+                                       name="ville"
+                                       class="building-edit-control"
+                                       value="{{ request.POST.ville|default:batiment.ville }}"
+                                       maxlength="150"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="building-edit-field">
+                            <label class="building-edit-label"
+                                   for="idNombreLogements">
+                                Nombre d’unités
+                            </label>
+
+                            <div class="building-edit-input-wrap">
+                                <i class="fa-solid fa-door-open building-edit-input-icon"></i>
+
+                                <input id="idNombreLogements"
+                                       type="number"
+                                       class="building-edit-control"
+                                       value="{{ batiment.unites_locatives.count|default:batiment.nombre_logements }}"
+                                       readonly>
+                            </div>
+
+                            <p class="building-edit-help">
+                                Cette valeur est calculée automatiquement à partir
+                                des appartements, studios et magasins enregistrés.
+                            </p>
+                        </div>
+
+                        <div class="building-edit-field full">
+                            <label class="building-edit-label"
+                                   for="idAdresse">
+                                Adresse complète
+                                <span class="building-edit-required">*</span>
+                            </label>
+
+                            <div class="building-edit-input-wrap">
+                                <i class="fa-solid fa-map-location-dot building-edit-input-icon"></i>
+
+                                <input id="idAdresse"
+                                       type="text"
+                                       name="adresse"
+                                       class="building-edit-control"
+                                       value="{{ request.POST.adresse|default:batiment.adresse }}"
+                                       maxlength="255"
+                                       required>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <section class="building-edit-section">
+                    <div class="building-edit-section-head">
+                        <div class="building-edit-section-icon">
+                            <i class="fa-solid fa-align-left"></i>
+                        </div>
+
+                        <div>
+                            <h2 class="building-edit-section-title">
+                                Description
+                            </h2>
+                            <p class="building-edit-section-text">
+                                Informations complémentaires sur le bâtiment.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="building-edit-grid">
+                        <div class="building-edit-field full">
+                            <label class="building-edit-label"
+                                   for="idDescription">
+                                Description du bâtiment
+                            </label>
+
+                            <textarea id="idDescription"
+                                      name="description"
+                                      class="building-edit-control"
+                                      placeholder="État général, nombre d’étages, équipements ou informations utiles...">{{ request.POST.description|default:batiment.description }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="building-edit-status-note">
+                        <i class="fa-solid fa-circle-info mt-1"></i>
+
+                        <div>
+                            La désactivation du bâtiment ne supprime aucune donnée.
+                            Les unités, les baux, les paiements et les contrats restent
+                            conservés dans l’historique.
+                        </div>
+                    </div>
+                </section>
+
+                <div class="building-edit-actions">
+                    <a href="{% url 'detail_batiment' batiment.id %}"
+                       class="building-edit-button cancel">
+                        <i class="fa-solid fa-xmark"></i>
+                        Annuler
+                    </a>
+
+                    <button type="submit"
+                            class="building-edit-button submit"
+                            id="saveBuildingButton">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Enregistrer les modifications
+                    </button>
+                </div>
+
+            </form>
+        </main>
+
     </div>
-
-    <a href="{% url 'batiments' %}" class="btn btn-light rounded-4 px-4">
-        <i class="fa-solid fa-arrow-left"></i>
-        Retour
-    </a>
 </div>
 
-<div class="form-box">
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById(
+            "buildingEditForm"
+        );
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} rounded-4">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
+        const button = document.getElementById(
+            "saveBuildingButton"
+        );
 
-    <form method="POST">
-        {% csrf_token %}
+        if (!form || !button) {
+            return;
+        }
 
-        <div class="row g-4">
+        form.addEventListener("submit", function () {
+            button.disabled = true;
 
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Code bâtiment</label>
-                <div class="input-icon">
-                    <i class="fa-solid fa-barcode"></i>
-                    <input type="text" name="code_batiment"
-                           value="{{ batiment.code_batiment }}"
-                           class="form-control form-control-lg" required>
-                </div>
-            </div>
-
-            <div class="col-md-8">
-                <label class="form-label fw-bold">Nom du bâtiment</label>
-                <div class="input-icon">
-                    <i class="fa-solid fa-building"></i>
-                    <input type="text" name="nom"
-                           value="{{ batiment.nom }}"
-                           class="form-control form-control-lg" required>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold">Propriétaire</label>
-                <div class="input-icon">
-                    <i class="fa-solid fa-user-tie"></i>
-                    <select name="proprietaire" class="form-select form-select-lg" required>
-                        {% for p in proprietaires %}
-                            <option value="{{ p.id }}" {% if p.id == batiment.proprietaire.id %}selected{% endif %}>
-                                {{ p.nom }} {{ p.prenom }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold">Ville</label>
-                <div class="input-icon">
-                    <i class="fa-solid fa-city"></i>
-                    <input type="text" name="ville"
-                           value="{{ batiment.ville }}"
-                           class="form-control form-control-lg" required>
-                </div>
-            </div>
-
-            <div class="col-md-12">
-                <label class="form-label fw-bold">Adresse complète</label>
-                <div class="input-icon">
-                    <i class="fa-solid fa-location-dot"></i>
-                    <input type="text" name="adresse"
-                           value="{{ batiment.adresse }}"
-                           class="form-control form-control-lg" required>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Nombre de logements</label>
-                <div class="input-icon">
-                    <i class="fa-solid fa-door-open"></i>
-                    <input type="number" name="nombre_logements"
-                           value="{{ batiment.nombre_logements }}"
-                           min="1"
-                           class="form-control form-control-lg">
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Statut</label>
-                <div class="input-icon">
-                    <i class="fa-solid fa-circle-check"></i>
-                    <select name="actif" class="form-select form-select-lg">
-                        <option value="True" {% if batiment.actif %}selected{% endif %}>Actif</option>
-                        <option value="False" {% if not batiment.actif %}selected{% endif %}>Inactif</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="col-md-12">
-                <label class="form-label fw-bold">Description</label>
-                <textarea name="description" rows="5" class="form-control">{{ batiment.description }}</textarea>
-            </div>
-
-        </div>
-
-        <hr class="my-4">
-
-        <div class="d-flex justify-content-end gap-3 flex-wrap">
-            <a href="{% url 'batiments' %}" class="btn btn-light btn-lg rounded-4">
-                Annuler
-            </a>
-
-            <button type="submit" class="btn btn-primary btn-lg rounded-4 px-5">
-                <i class="fa-solid fa-floppy-disk"></i>
-                Enregistrer
-            </button>
-        </div>
-
-    </form>
-</div>
+            button.innerHTML =
+                '<i class="fa-solid fa-spinner fa-spin"></i>' +
+                ' Enregistrement...';
+        });
+    });
+</script>
 
 {% endblock %}

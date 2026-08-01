@@ -3,330 +3,1703 @@
 {% block content %}
 
 <style>
-.page-header{
-    background:white;
-    border-radius:22px;
-    padding:25px;
-    box-shadow:0 12px 30px rgba(15,23,42,.08);
+:root {
+    --bat-primary: #2563eb;
+    --bat-primary-dark: #1d4ed8;
+    --bat-purple: #7c3aed;
+    --bat-orange: #ea580c;
+    --bat-success: #059669;
+    --bat-danger: #dc2626;
+    --bat-warning: #d97706;
+    --bat-text: #0f172a;
+    --bat-muted: #64748b;
+    --bat-border: #e2e8f0;
+    --bat-background: #f8fafc;
+    --bat-white: #ffffff;
 }
 
-.card-modern{
-    background:white;
-    border-radius:22px;
-    padding:22px;
-    box-shadow:0 12px 30px rgba(15,23,42,.08);
+.buildings-page {
+    width: min(1450px, 100%);
+    margin: 0 auto;
+    padding: 28px 14px 60px;
 }
 
-.stat-icon{
-    width:50px;
-    height:50px;
-    border-radius:16px;
-    background:#eff6ff;
-    color:#2563eb;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:22px;
-    margin-bottom:12px;
+/* =========================
+   EN-TÊTE
+========================= */
+
+.buildings-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    padding: 30px;
+    color: #ffffff;
+    border-radius: 28px;
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(255, 255, 255, 0.20),
+            transparent 34%
+        ),
+        linear-gradient(
+            135deg,
+            #0f172a 0%,
+            #1e3a8a 48%,
+            #2563eb 100%
+        );
+    box-shadow: 0 20px 45px rgba(30, 64, 175, 0.20);
 }
 
-.stat-number{
-    font-size:30px;
-    font-weight:900;
-    color:#0f172a;
+.buildings-header::after {
+    position: absolute;
+    right: -60px;
+    bottom: -100px;
+    width: 250px;
+    height: 250px;
+    content: "";
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 50%;
 }
 
-.card-modern p{
-    color:#64748b;
-    font-weight:700;
-    margin-bottom:5px;
+.header-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 17px;
 }
 
-.status-detail{
-    font-size:12px;
-    color:#64748b;
-    margin-top:5px;
+.header-icon {
+    display: grid;
+    flex: 0 0 auto;
+    width: 60px;
+    height: 60px;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 19px;
+    background: rgba(255, 255, 255, 0.14);
+    font-size: 25px;
+    backdrop-filter: blur(10px);
 }
 
-.action-group{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
+.buildings-header h1 {
+    margin: 0;
+    font-size: clamp(27px, 4vw, 40px);
+    font-weight: 950;
+    letter-spacing: -0.04em;
 }
 
-.occupation-box{
-    background:#f8fafc;
-    border:1px solid #e2e8f0;
-    border-radius:14px;
-    padding:10px;
-    margin-top:8px;
+.buildings-header p {
+    max-width: 700px;
+    margin: 7px 0 0;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 15px;
 }
 
-.occupation-title{
-    font-size:13px;
-    font-weight:900;
-    color:#1e40af;
+.add-building-button {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    flex: 0 0 auto;
+    min-height: 52px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 21px;
+    color: #1e3a8a;
+    border: none;
+    border-radius: 16px;
+    background: #ffffff;
+    text-decoration: none;
+    font-weight: 900;
+    box-shadow: 0 12px 25px rgba(15, 23, 42, 0.18);
+    transition: 0.2s ease;
 }
 
-.occupation-user{
-    font-size:13px;
-    color:#0f172a;
-    margin-top:5px;
+.add-building-button:hover {
+    color: #1d4ed8;
+    background: #eff6ff;
+    transform: translateY(-2px);
 }
 
-.family-box{
-    font-size:12px;
-    color:#64748b;
-    margin-top:4px;
+/* =========================
+   STATISTIQUES
+========================= */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 15px;
+    margin-bottom: 24px;
 }
 
-.table th{
-    color:#475569;
-    font-size:13px;
-    text-transform:uppercase;
+.stat-card {
+    position: relative;
+    overflow: hidden;
+    min-height: 150px;
+    padding: 19px;
+    border: 1px solid var(--bat-border);
+    border-radius: 21px;
+    background: var(--bat-white);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+    transition: 0.2s ease;
 }
 
-@media(max-width:768px){
-    .page-header{
-        flex-direction:column;
-        align-items:flex-start !important;
-        gap:15px;
+.stat-card:hover {
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.10);
+    transform: translateY(-3px);
+}
+
+.stat-card::after {
+    position: absolute;
+    right: -25px;
+    bottom: -36px;
+    width: 90px;
+    height: 90px;
+    content: "";
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.05;
+}
+
+.stat-icon {
+    display: grid;
+    width: 46px;
+    height: 46px;
+    margin-bottom: 14px;
+    place-items: center;
+    border-radius: 15px;
+    font-size: 19px;
+}
+
+.stat-card p {
+    margin: 0 0 4px;
+    color: var(--bat-muted);
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.stat-number {
+    color: var(--bat-text);
+    font-size: 29px;
+    font-weight: 950;
+    line-height: 1;
+}
+
+.stat-buildings {
+    color: var(--bat-primary);
+}
+
+.stat-buildings .stat-icon {
+    background: #dbeafe;
+}
+
+.stat-apartments {
+    color: #0891b2;
+}
+
+.stat-apartments .stat-icon {
+    background: #cffafe;
+}
+
+.stat-studios {
+    color: var(--bat-purple);
+}
+
+.stat-studios .stat-icon {
+    background: #ede9fe;
+}
+
+.stat-shops {
+    color: var(--bat-orange);
+}
+
+.stat-shops .stat-icon {
+    background: #ffedd5;
+}
+
+.stat-occupied {
+    color: var(--bat-danger);
+}
+
+.stat-occupied .stat-icon {
+    background: #fee2e2;
+}
+
+.stat-free {
+    color: var(--bat-success);
+}
+
+.stat-free .stat-icon {
+    background: #d1fae5;
+}
+
+/* =========================
+   RECHERCHE
+========================= */
+
+.search-panel {
+    margin-bottom: 24px;
+    padding: 20px;
+    border: 1px solid var(--bat-border);
+    border-radius: 21px;
+    background: var(--bat-white);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.search-input-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+.search-input-wrapper > i {
+    position: absolute;
+    top: 50%;
+    left: 17px;
+    color: #94a3b8;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.search-input {
+    width: 100%;
+    min-height: 52px;
+    padding: 12px 17px 12px 48px;
+    color: var(--bat-text);
+    border: 1px solid var(--bat-border);
+    border-radius: 16px;
+    background: #f8fafc;
+    outline: none;
+    transition: 0.2s ease;
+}
+
+.search-input:focus {
+    border-color: var(--bat-primary);
+    background: #ffffff;
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.13);
+}
+
+.search-button,
+.reset-button {
+    display: inline-flex;
+    min-height: 52px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 12px 20px;
+    border-radius: 16px;
+    text-decoration: none;
+    font-weight: 850;
+}
+
+.search-button {
+    color: #ffffff;
+    border: none;
+    background: linear-gradient(
+        135deg,
+        var(--bat-primary),
+        var(--bat-primary-dark)
+    );
+}
+
+.search-button:hover {
+    color: #ffffff;
+}
+
+.reset-button {
+    color: #475569;
+    border: 1px solid var(--bat-border);
+    background: #ffffff;
+}
+
+/* =========================
+   TITRE DE LA LISTE
+========================= */
+
+.list-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 17px;
+}
+
+.list-heading h2 {
+    margin: 0;
+    color: var(--bat-text);
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.list-heading p {
+    margin: 4px 0 0;
+    color: var(--bat-muted);
+    font-size: 14px;
+}
+
+.results-count {
+    padding: 8px 13px;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
+    background: #eff6ff;
+    font-size: 13px;
+    font-weight: 850;
+}
+
+/* =========================
+   CARTES DES BÂTIMENTS
+========================= */
+
+.buildings-list {
+    display: grid;
+    gap: 20px;
+}
+
+.building-card {
+    overflow: hidden;
+    border: 1px solid var(--bat-border);
+    border-radius: 24px;
+    background: var(--bat-white);
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.07);
+    transition: 0.2s ease;
+}
+
+.building-card:hover {
+    border-color: #bfdbfe;
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.10);
+    transform: translateY(-2px);
+}
+
+.building-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 23px;
+    border-bottom: 1px solid var(--bat-border);
+    background: linear-gradient(
+        135deg,
+        rgba(239, 246, 255, 0.90),
+        rgba(255, 255, 255, 0.95)
+    );
+}
+
+.building-identity {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.building-avatar {
+    display: grid;
+    flex: 0 0 auto;
+    width: 52px;
+    height: 52px;
+    place-items: center;
+    color: var(--bat-primary);
+    border-radius: 17px;
+    background: #dbeafe;
+    font-size: 21px;
+}
+
+.building-code {
+    display: inline-flex;
+    margin-bottom: 6px;
+    padding: 4px 9px;
+    color: #1e40af;
+    border-radius: 999px;
+    background: #dbeafe;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.building-identity h3 {
+    margin: 0;
+    color: var(--bat-text);
+    font-size: 21px;
+    font-weight: 950;
+}
+
+.building-location {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px 15px;
+    margin-top: 7px;
+    color: var(--bat-muted);
+    font-size: 13px;
+}
+
+.building-location span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.building-status {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.status-empty {
+    color: #475569;
+    background: #e2e8f0;
+}
+
+.status-free {
+    color: #166534;
+    background: #dcfce7;
+}
+
+.status-partial {
+    color: #92400e;
+    background: #fef3c7;
+}
+
+.status-full {
+    color: #991b1b;
+    background: #fee2e2;
+}
+
+.building-card-body {
+    padding: 23px;
+}
+
+.building-information-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1.7fr;
+    gap: 22px;
+}
+
+/* =========================
+   PROPRIÉTAIRE
+========================= */
+
+.owner-panel,
+.occupation-panel {
+    padding: 19px;
+    border: 1px solid var(--bat-border);
+    border-radius: 19px;
+    background: #f8fafc;
+}
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 15px;
+    color: var(--bat-text);
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.owner-name {
+    color: var(--bat-text);
+    font-size: 17px;
+    font-weight: 900;
+}
+
+.owner-subtitle {
+    margin-top: 4px;
+    color: var(--bat-muted);
+    font-size: 13px;
+}
+
+.units-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 9px;
+    margin-top: 17px;
+}
+
+.unit-mini-card {
+    padding: 11px;
+    border: 1px solid var(--bat-border);
+    border-radius: 13px;
+    background: #ffffff;
+    text-align: center;
+}
+
+.unit-mini-card strong {
+    display: block;
+    color: var(--bat-text);
+    font-size: 20px;
+    font-weight: 950;
+}
+
+.unit-mini-card span {
+    display: block;
+    margin-top: 2px;
+    color: var(--bat-muted);
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+/* =========================
+   OCCUPATION
+========================= */
+
+.occupation-top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.occupation-number {
+    color: var(--bat-text);
+    font-size: 22px;
+    font-weight: 950;
+}
+
+.occupation-number small {
+    color: var(--bat-muted);
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.occupation-rate {
+    color: var(--bat-primary);
+    font-size: 17px;
+    font-weight: 950;
+}
+
+.progress-track {
+    overflow: hidden;
+    width: 100%;
+    height: 11px;
+    margin-bottom: 14px;
+    border-radius: 999px;
+    background: #e2e8f0;
+}
+
+.progress-value {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(
+        90deg,
+        #2563eb,
+        #7c3aed
+    );
+    transition: width 0.8s ease;
+}
+
+.occupation-statuses {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.status-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 850;
+}
+
+.counter-occupied {
+    color: #991b1b;
+    background: #fee2e2;
+}
+
+.counter-free {
+    color: #166534;
+    background: #dcfce7;
+}
+
+.counter-reserved {
+    color: #92400e;
+    background: #fef3c7;
+}
+
+.counter-maintenance {
+    color: #475569;
+    background: #e2e8f0;
+}
+
+/* =========================
+   LOCATAIRES
+========================= */
+
+.tenants-details {
+    margin-top: 20px;
+    border: 1px solid var(--bat-border);
+    border-radius: 18px;
+    background: #ffffff;
+}
+
+.tenants-details summary {
+    display: flex;
+    min-height: 52px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 17px;
+    color: var(--bat-text);
+    cursor: pointer;
+    list-style: none;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.tenants-details summary::-webkit-details-marker {
+    display: none;
+}
+
+.tenants-details summary::after {
+    content: "\f078";
+    color: var(--bat-muted);
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    transition: 0.2s ease;
+}
+
+.tenants-details[open] summary::after {
+    transform: rotate(180deg);
+}
+
+.tenants-content {
+    display: grid;
+    gap: 11px;
+    padding: 0 16px 16px;
+}
+
+.tenant-card {
+    display: grid;
+    grid-template-columns: minmax(160px, 1fr) minmax(200px, 1.4fr);
+    gap: 16px;
+    padding: 15px;
+    border: 1px solid var(--bat-border);
+    border-radius: 15px;
+    background: #f8fafc;
+}
+
+.unit-title {
+    color: var(--bat-text);
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.unit-type {
+    display: inline-flex;
+    margin-top: 5px;
+    padding: 4px 8px;
+    color: #1e40af;
+    border-radius: 999px;
+    background: #dbeafe;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.unit-meta {
+    display: grid;
+    gap: 5px;
+    margin-top: 9px;
+    color: var(--bat-muted);
+    font-size: 12px;
+}
+
+.unit-meta span {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+}
+
+.tenant-information {
+    padding-left: 16px;
+    border-left: 1px solid var(--bat-border);
+}
+
+.tenant-name {
+    color: var(--bat-text);
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.tenant-name i {
+    margin-right: 5px;
+    color: var(--bat-success);
+}
+
+.tenant-meta {
+    display: grid;
+    gap: 5px;
+    margin-top: 9px;
+    color: var(--bat-muted);
+    font-size: 12px;
+}
+
+.no-active-lease {
+    color: var(--bat-warning);
+    font-size: 12px;
+    font-weight: 750;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+.building-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 17px 23px;
+    border-top: 1px solid var(--bat-border);
+    background: #f8fafc;
+}
+
+.building-activity {
+    color: var(--bat-muted);
+    font-size: 12px;
+}
+
+.actions-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.action-button {
+    display: inline-flex;
+    min-height: 39px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 12px;
+    border: 1px solid;
+    border-radius: 12px;
+    background: #ffffff;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 850;
+    transition: 0.2s ease;
+}
+
+.action-button:hover {
+    transform: translateY(-1px);
+}
+
+.action-view {
+    color: var(--bat-primary);
+    border-color: #bfdbfe;
+}
+
+.action-view:hover {
+    color: #ffffff;
+    background: var(--bat-primary);
+}
+
+.action-edit {
+    color: var(--bat-warning);
+    border-color: #fde68a;
+}
+
+.action-edit:hover {
+    color: #ffffff;
+    background: var(--bat-warning);
+}
+
+.action-delete {
+    color: var(--bat-danger);
+    border-color: #fecaca;
+}
+
+.action-delete:hover {
+    color: #ffffff;
+    background: var(--bat-danger);
+}
+
+.delete-building-form {
+    display: inline-flex;
+    margin: 0;
+}
+
+button.action-button {
+    cursor: pointer;
+    font-family: inherit;
+}
+
+button.action-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.68;
+    transform: none;
+}
+
+/* =========================
+   ÉTAT VIDE
+========================= */
+
+.empty-state {
+    padding: 65px 25px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 24px;
+    background: #ffffff;
+    text-align: center;
+}
+
+.empty-state-icon {
+    display: grid;
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 17px;
+    place-items: center;
+    color: var(--bat-primary);
+    border-radius: 22px;
+    background: #dbeafe;
+    font-size: 28px;
+}
+
+.empty-state h3 {
+    margin: 0;
+    color: var(--bat-text);
+    font-size: 21px;
+    font-weight: 900;
+}
+
+.empty-state p {
+    max-width: 500px;
+    margin: 8px auto 20px;
+    color: var(--bat-muted);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1250px) {
+    .stats-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 950px) {
+    .building-information-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 750px) {
+    .buildings-page {
+        padding: 14px 5px 40px;
+    }
+
+    .buildings-header {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 23px 19px;
+        border-radius: 22px;
+    }
+
+    .header-content {
+        align-items: flex-start;
+    }
+
+    .header-icon {
+        width: 50px;
+        height: 50px;
+    }
+
+    .add-building-button {
+        width: 100%;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .search-form {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .search-button,
+    .reset-button {
+        width: 100%;
+    }
+
+    .list-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .building-card-header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 19px;
+    }
+
+    .building-status {
+        align-self: flex-start;
+    }
+
+    .building-card-body {
+        padding: 19px;
+    }
+
+    .tenant-card {
+        grid-template-columns: 1fr;
+    }
+
+    .tenant-information {
+        padding-top: 13px;
+        padding-left: 0;
+        border-top: 1px solid var(--bat-border);
+        border-left: 0;
+    }
+
+    .building-card-footer {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 16px 19px;
+    }
+
+    .actions-group {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        width: 100%;
+    }
+
+    .action-button {
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        min-height: auto;
+    }
+
+    .units-mini-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .actions-group {
+        grid-template-columns: 1fr;
     }
 }
 </style>
 
-<div class="page-header d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 class="fw-bold">
-            <i class="fa-solid fa-building text-primary"></i>
-            Gestion des bâtiments
-        </h2>
-        <p class="text-muted mb-0">Gestion complète du parc immobilier</p>
-    </div>
+<div class="container-fluid">
 
-    <a href="{% url 'ajouter_batiment' %}" class="btn btn-primary btn-lg rounded-4">
-        <i class="fa-solid fa-plus"></i> Ajouter bâtiment
-    </a>
-</div>
+    <main class="buildings-page">
 
-<div class="row g-4 mb-4">
+        <header class="buildings-header">
 
-    <div class="col-md-3">
-        <div class="card-modern">
-            <div class="stat-icon"><i class="fa-solid fa-building"></i></div>
-            <p>Total bâtiments</p>
-            <div class="stat-number">{{ total_batiments }}</div>
+            <div class="header-content">
+
+                <div class="header-icon">
+                    <i class="fa-solid fa-building"></i>
+                </div>
+
+                <div>
+                    <h1>Gestion des bâtiments</h1>
+
+                    <p>
+                        Gérez les appartements, les studios, les magasins,
+                        les propriétaires et l’occupation de votre parc immobilier.
+                    </p>
+                </div>
+
+            </div>
+
+            <a href="{% url 'ajouter_batiment' %}"
+               class="add-building-button">
+
+                <i class="fa-solid fa-plus"></i>
+                Ajouter un bâtiment
+
+            </a>
+
+        </header>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} rounded-4 mb-4">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <section class="stats-grid">
+
+            <article class="stat-card stat-buildings">
+                <div class="stat-icon">
+                    <i class="fa-solid fa-building"></i>
+                </div>
+
+                <p>Total des bâtiments</p>
+
+                <div class="stat-number">
+                    {{ total_batiments|default:0 }}
+                </div>
+            </article>
+
+            <article class="stat-card stat-apartments">
+                <div class="stat-icon">
+                    <i class="fa-solid fa-house-chimney"></i>
+                </div>
+
+                <p>Appartements</p>
+
+                <div class="stat-number">
+                    {{ total_appartements|default:0 }}
+                </div>
+            </article>
+
+            <article class="stat-card stat-studios">
+                <div class="stat-icon">
+                    <i class="fa-solid fa-door-open"></i>
+                </div>
+
+                <p>Studios</p>
+
+                <div class="stat-number">
+                    {{ total_studios|default:0 }}
+                </div>
+            </article>
+
+            <article class="stat-card stat-shops">
+                <div class="stat-icon">
+                    <i class="fa-solid fa-store"></i>
+                </div>
+
+                <p>Magasins</p>
+
+                <div class="stat-number">
+                    {{ total_magasins|default:0 }}
+                </div>
+            </article>
+
+            <article class="stat-card stat-occupied">
+                <div class="stat-icon">
+                    <i class="fa-solid fa-key"></i>
+                </div>
+
+                <p>Unités occupées</p>
+
+                <div class="stat-number">
+                    {{ unites_occupees|default:0 }}
+                </div>
+            </article>
+
+            <article class="stat-card stat-free">
+                <div class="stat-icon">
+                    <i class="fa-solid fa-door-open"></i>
+                </div>
+
+                <p>Unités disponibles</p>
+
+                <div class="stat-number">
+                    {{ unites_libres|default:0 }}
+                </div>
+            </article>
+
+        </section>
+
+        <section class="search-panel">
+
+            <form method="GET"
+                  class="search-form">
+
+                <div class="search-input-wrapper">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="search"
+                        name="q"
+                        value="{{ q }}"
+                        class="search-input"
+                        placeholder="Rechercher par bâtiment, propriétaire, ville, adresse ou unité..."
+                        aria-label="Rechercher un bâtiment"
+                    >
+
+                </div>
+
+                <button type="submit"
+                        class="search-button">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    Rechercher
+
+                </button>
+
+                {% if q %}
+                    <a href="{% url 'batiments' %}"
+                       class="reset-button">
+
+                        <i class="fa-solid fa-xmark"></i>
+                        Réinitialiser
+
+                    </a>
+                {% endif %}
+
+            </form>
+
+        </section>
+
+        <div class="list-heading">
+
+            <div>
+                <h2>Bâtiments enregistrés</h2>
+
+                <p>
+                    Consultez les unités, les locataires et le taux
+                    d’occupation de chaque bâtiment.
+                </p>
+            </div>
+
+            <span class="results-count">
+                {{ total_batiments|default:0 }} résultat(s)
+            </span>
+
         </div>
-    </div>
 
-    <div class="col-md-3">
-        <div class="card-modern">
-            <div class="stat-icon"><i class="fa-solid fa-house"></i></div>
-            <p>Total logements/chambres</p>
-            <div class="stat-number">{{ total_logements }}</div>
-        </div>
-    </div>
+        <section class="buildings-list">
 
-    <div class="col-md-3">
-        <div class="card-modern">
-            <div class="stat-icon"><i class="fa-solid fa-key"></i></div>
-            <p>Occupés</p>
-            <div class="stat-number">{{ logements_occupes }}</div>
-        </div>
-    </div>
+            {% for b in batiments %}
 
-    <div class="col-md-3">
-        <div class="card-modern">
-            <div class="stat-icon"><i class="fa-solid fa-door-open"></i></div>
-            <p>Disponibles</p>
-            <div class="stat-number">{{ logements_libres }}</div>
-        </div>
-    </div>
+                <article class="building-card">
 
-</div>
+                    <div class="building-card-header">
 
-<div class="card-modern mb-4">
-    <form method="GET">
-        <div class="input-group">
-            <input type="text"
-                   name="q"
-                   value="{{ q }}"
-                   class="form-control"
-                   placeholder="Rechercher un bâtiment, propriétaire, ville...">
+                        <div class="building-identity">
 
-            <button class="btn btn-primary">
-                <i class="fa-solid fa-magnifying-glass"></i> Rechercher
-            </button>
-        </div>
-    </form>
-</div>
+                            <div class="building-avatar">
+                                <i class="fa-solid fa-building"></i>
+                            </div>
 
-<div class="card-modern">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
+                            <div>
 
-            <thead>
-                <tr>
-                    <th>Code</th>
-                    <th>Bâtiment</th>
-                    <th>Propriétaire</th>
-                    <th>Ville</th>
-                    <th>Adresse</th>
-                    <th>Occupation détaillée</th>
-                    <th>Statut</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
+                                <span class="building-code">
+                                    {{ b.code_batiment|default:b.id }}
+                                </span>
 
-            <tbody>
-                {% for b in batiments %}
-                <tr>
-                    <td>
-                        <span class="badge bg-primary">
-                            {{ b.code_batiment|default:b.id }}
-                        </span>
-                    </td>
+                                <h3>{{ b.nom }}</h3>
 
-                    <td>
-                        <strong>{{ b.nom }}</strong>
-                    </td>
+                                <div class="building-location">
 
-                    <td>
-                        {{ b.proprietaire.nom }} {{ b.proprietaire.prenom }}
-                    </td>
+                                    <span>
+                                        <i class="fa-solid fa-location-dot"></i>
+                                        {{ b.ville|default:"Ville non indiquée" }}
+                                    </span>
 
-                    <td>{{ b.ville|default:"-" }}</td>
+                                    <span>
+                                        <i class="fa-solid fa-map"></i>
+                                        {{ b.adresse|default:"Adresse non indiquée" }}
+                                    </span>
 
-                    <td>{{ b.adresse|default:"-" }}</td>
+                                </div>
 
-                    <td style="min-width:300px;">
-                        <strong>
-                            {{ b.chambres_occupees }}/{{ b.chambres_total }}
-                        </strong>
+                            </div>
 
-                        <div class="status-detail">
-                            chambres/logements occupés
                         </div>
 
-                        {% if b.details_occupation %}
-                            {% for d in b.details_occupation %}
-                                <div class="occupation-box">
+                        {% if b.total_unites_affiche == 0 %}
 
-                                    <div class="occupation-title">
-                                        <i class="fa-solid fa-door-closed"></i>
-                                        {{ d.chambre.nom|default:"Chambre/Logement" }}
-                                        — N° {{ d.chambre.numero }}
+                            <span class="building-status status-empty">
+                                <i class="fa-solid fa-circle-minus"></i>
+                                Aucune unité
+                            </span>
+
+                        {% elif b.unites_occupees_affiche == b.total_unites_affiche %}
+
+                            <span class="building-status status-full">
+                                <i class="fa-solid fa-circle"></i>
+                                Tout occupé
+                            </span>
+
+                        {% elif b.unites_occupees_affiche > 0 %}
+
+                            <span class="building-status status-partial">
+                                <i class="fa-solid fa-circle-half-stroke"></i>
+                                Partiellement occupé
+                            </span>
+
+                        {% else %}
+
+                            <span class="building-status status-free">
+                                <i class="fa-solid fa-circle-check"></i>
+                                Libre
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                    <div class="building-card-body">
+
+                        <div class="building-information-grid">
+
+                            <div class="owner-panel">
+
+                                <div class="panel-title">
+                                    <i class="fa-solid fa-user-tie text-primary"></i>
+                                    Propriétaire
+                                </div>
+
+                                <div class="owner-name">
+                                    {{ b.proprietaire.nom }}
+                                    {{ b.proprietaire.prenom }}
+                                </div>
+
+                                <div class="owner-subtitle">
+                                    Propriétaire du bâtiment
+                                    {{ b.code_batiment }}
+                                </div>
+
+                                <div class="units-mini-grid">
+
+                                    <div class="unit-mini-card">
+                                        <strong>
+                                            {{ b.appartements_affiche|default:0 }}
+                                        </strong>
+
+                                        <span>Appartements</span>
                                     </div>
 
-                                    <div class="mt-1">
-                                        <span class="badge bg-danger">Occupé</span>
-                                        <span class="badge bg-success">Bail actif</span>
+                                    <div class="unit-mini-card">
+                                        <strong>
+                                            {{ b.studios_affiche|default:0 }}
+                                        </strong>
+
+                                        <span>Studios</span>
                                     </div>
 
-                                    <div class="occupation-user">
-                                        <i class="fa-solid fa-user text-success"></i>
-                                        <strong>Locataire :</strong>
-                                        {{ d.locataire.nom }} {{ d.locataire.prenom }}
+                                    <div class="unit-mini-card">
+                                        <strong>
+                                            {{ b.magasins_affiche|default:0 }}
+                                        </strong>
+
+                                        <span>Magasins</span>
                                     </div>
 
-                                    {% if d.location.numero_appartement %}
-                                        <div class="family-box">
-                                            <i class="fa-solid fa-house"></i>
-                                            Appartement :
-                                            {{ d.location.numero_appartement }}
-                                        </div>
+                                </div>
+
+                            </div>
+
+                            <div class="occupation-panel">
+
+                                <div class="panel-title">
+                                    <i class="fa-solid fa-chart-pie text-primary"></i>
+                                    Occupation des unités
+                                </div>
+
+                                <div class="occupation-top">
+
+                                    <div class="occupation-number">
+
+                                        {{ b.unites_occupees_affiche|default:0 }}
+                                        /
+                                        {{ b.total_unites_affiche|default:0 }}
+
+                                        <small>unités occupées</small>
+
+                                    </div>
+
+                                    <div class="occupation-rate">
+                                        {{ b.taux_occupation_affiche|default:0 }} %
+                                    </div>
+
+                                </div>
+
+                                <div class="progress-track"
+                                     role="progressbar"
+                                     aria-label="Taux d’occupation"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100">
+
+                                    <div
+                                        class="progress-value"
+                                        data-progress="{{ b.taux_occupation_affiche|default:0 }}"
+                                    ></div>
+
+                                </div>
+
+                                <div class="occupation-statuses">
+
+                                    <span class="status-counter counter-occupied">
+                                        <i class="fa-solid fa-key"></i>
+                                        Occupées :
+                                        {{ b.unites_occupees_affiche|default:0 }}
+                                    </span>
+
+                                    <span class="status-counter counter-free">
+                                        <i class="fa-solid fa-door-open"></i>
+                                        Libres :
+                                        {{ b.unites_libres_affiche|default:0 }}
+                                    </span>
+
+                                    {% if b.unites_reservees_affiche %}
+                                        <span class="status-counter counter-reserved">
+                                            <i class="fa-solid fa-clock"></i>
+                                            Réservées :
+                                            {{ b.unites_reservees_affiche }}
+                                        </span>
                                     {% endif %}
 
-                                    {% if d.location.loyer %}
-                                        <div class="family-box">
-                                            <i class="fa-solid fa-dollar-sign"></i>
-                                            Loyer :
-                                            {{ d.location.loyer }} $
-                                        </div>
-                                    {% endif %}
-
-                                    {% if d.location.date_debut %}
-                                        <div class="family-box">
-                                            <i class="fa-solid fa-calendar"></i>
-                                            Bail actif depuis :
-                                            {{ d.location.date_debut|date:"d/m/Y" }}
-                                        </div>
+                                    {% if b.unites_maintenance_affiche %}
+                                        <span class="status-counter counter-maintenance">
+                                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                                            Maintenance :
+                                            {{ b.unites_maintenance_affiche }}
+                                        </span>
                                     {% endif %}
 
                                 </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="status-detail text-success fw-bold">
-                                <i class="fa-solid fa-circle-check"></i>
-                                Aucun locataire actif
+
                             </div>
-                        {% endif %}
-                    </td>
 
-                    <td>
-                        {% if b.chambres_total == 0 %}
-                            <span class="badge bg-secondary">Aucun logement</span>
-
-                        {% elif b.est_libre %}
-                            <span class="badge bg-success">Libre</span>
-
-                        {% elif b.est_totalement_occupe %}
-                            <span class="badge bg-danger">Tout occupé</span>
-
-                        {% elif b.est_partiellement_occupe %}
-                            <span class="badge bg-warning text-dark">Partiellement occupé</span>
-                        {% endif %}
-
-                        <div class="status-detail">
-                            {{ b.chambres_occupees }}/{{ b.chambres_total }} occupés
                         </div>
-                    </td>
 
-                    <td>
-                        <div class="action-group">
+                        {% if b.details_occupation %}
+
+                            <details class="tenants-details">
+
+                                <summary>
+                                    <span>
+                                        <i class="fa-solid fa-users text-primary"></i>
+                                        Voir les unités occupées et les locataires
+                                    </span>
+                                </summary>
+
+                                <div class="tenants-content">
+
+                                    {% for d in b.details_occupation %}
+
+                                        <article class="tenant-card">
+
+                                            <div>
+
+                                                <div class="unit-title">
+                                                    <i class="fa-solid fa-house"></i>
+                                                    {{ d.unite.numero }}
+                                                </div>
+
+                                                <span class="unit-type">
+                                                    {{ d.unite.get_type_unite_display }}
+                                                </span>
+
+                                                <div class="unit-meta">
+
+                                                    {% if d.unite.type_unite == "APPARTEMENT" %}
+                                                        <span>
+                                                            <i class="fa-solid fa-bed"></i>
+                                                            {{ d.unite.nombre_chambres }}
+                                                            chambre(s)
+                                                        </span>
+                                                    {% endif %}
+
+                                                    <span>
+                                                        <i class="fa-solid fa-restroom"></i>
+                                                        {{ d.unite.get_type_toilette_display }}
+                                                    </span>
+
+                                                    {% if d.unite.type_unite == "MAGASIN" and d.unite.usage_commercial %}
+                                                        <span>
+                                                            <i class="fa-solid fa-store"></i>
+                                                            {{ d.unite.get_usage_commercial_display }}
+                                                        </span>
+                                                    {% endif %}
+
+                                                    <span>
+                                                        <i class="fa-solid fa-money-bill-wave"></i>
+                                                        {{ d.unite.prix_mensuel|floatformat:0 }}
+                                                        FCFA par mois
+                                                    </span>
+
+                                                </div>
+
+                                            </div>
+
+                                            <div class="tenant-information">
+
+                                                {% if d.locataire %}
+
+                                                    <div class="tenant-name">
+
+                                                        <i class="fa-solid fa-user-check"></i>
+
+                                                        {{ d.locataire.nom }}
+                                                        {{ d.locataire.prenom }}
+
+                                                    </div>
+
+                                                    <div class="tenant-meta">
+
+                                                        {% if d.location.date_debut %}
+                                                            <span>
+                                                                <i class="fa-solid fa-calendar"></i>
+                                                                Bail actif depuis le
+                                                                {{ d.location.date_debut|date:"d/m/Y" }}
+                                                            </span>
+                                                        {% endif %}
+
+                                                        {% if d.location.loyer %}
+                                                            <span>
+                                                                <i class="fa-solid fa-receipt"></i>
+                                                                Loyer du contrat :
+                                                                {{ d.location.loyer|floatformat:0 }}
+                                                                FCFA
+                                                            </span>
+                                                        {% endif %}
+
+                                                        <span>
+                                                            <i class="fa-solid fa-circle-check text-success"></i>
+                                                            Bail actuellement actif
+                                                        </span>
+
+                                                    </div>
+
+                                                {% else %}
+
+                                                    <div class="no-active-lease">
+
+                                                        <i class="fa-solid fa-triangle-exclamation"></i>
+
+                                                        Cette unité porte le statut
+                                                        « occupé », mais aucun bail actif
+                                                        n’est actuellement lié.
+
+                                                    </div>
+
+                                                {% endif %}
+
+                                            </div>
+
+                                        </article>
+
+                                    {% endfor %}
+
+                                </div>
+
+                            </details>
+
+                        {% else %}
+
+                            <div class="mt-3 text-success fw-bold"
+                                 style="font-size: 13px;">
+
+                                <i class="fa-solid fa-circle-check"></i>
+                                Aucun locataire actif dans ce bâtiment.
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <footer class="building-card-footer">
+
+                        <div class="building-activity">
+
+                            {% if b.actif %}
+                                <i class="fa-solid fa-circle text-success"></i>
+                                Bâtiment actif
+                            {% else %}
+                                <i class="fa-solid fa-circle text-secondary"></i>
+                                Bâtiment inactif
+                            {% endif %}
+
+                        </div>
+
+                        <div class="actions-group">
 
                             <a href="{% url 'detail_batiment' b.id %}"
-                               class="btn btn-sm btn-outline-primary"
-                               title="Voir détails">
-                                <i class="fa-solid fa-eye"></i>
-                            </a>
+                               class="action-button action-view">
 
-                            <a href="{% url 'ajouter_chambre' b.id %}"
-                               class="btn btn-sm btn-outline-success"
-                               title="Ajouter logement/chambre">
-                                <i class="fa-solid fa-door-open"></i>
+                                <i class="fa-solid fa-eye"></i>
+                                Détails
+
                             </a>
 
                             <a href="{% url 'modifier_batiment' b.id %}"
-                               class="btn btn-sm btn-outline-warning"
-                               title="Modifier">
+                               class="action-button action-edit">
+
                                 <i class="fa-solid fa-pen"></i>
+                                Modifier
+
                             </a>
 
-                            <a href="{% url 'supprimer_batiment' b.id %}"
-                               class="btn btn-sm btn-outline-danger"
-                               title="Supprimer"
-                               onclick="return confirm('Voulez-vous vraiment supprimer ce bâtiment ?');">
-                                <i class="fa-solid fa-trash"></i>
-                            </a>
+                            <form method="post"
+                                  action="{% url 'supprimer_batiment' b.id %}"
+                                  class="delete-building-form"
+                                  onsubmit="return confirmerSuppressionBatiment(
+                                      this,
+                                      '{{ b.nom|escapejs }}',
+                                      '{{ b.total_unites_affiche|default:0 }}'
+                                  );">
+
+                                {% csrf_token %}
+
+                                <button type="submit"
+                                        class="action-button action-delete">
+
+                                    <i class="fa-solid fa-trash"></i>
+                                    Supprimer
+
+                                </button>
+
+                            </form>
 
                         </div>
-                    </td>
-                </tr>
 
-                {% empty %}
-                <tr>
-                    <td colspan="8" class="text-center text-muted py-5">
-                        <i class="fa-solid fa-building fa-2x mb-3"></i>
-                        <br>
-                        Aucun bâtiment enregistré
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
+                    </footer>
 
-        </table>
-    </div>
+                </article>
+
+            {% empty %}
+
+                <div class="empty-state">
+
+                    <div class="empty-state-icon">
+                        <i class="fa-solid fa-building-circle-xmark"></i>
+                    </div>
+
+                    {% if q %}
+
+                        <h3>Aucun résultat trouvé</h3>
+
+                        <p>
+                            Aucun bâtiment ne correspond à la recherche
+                            « {{ q }} ».
+                        </p>
+
+                        <a href="{% url 'batiments' %}"
+                           class="btn btn-outline-primary rounded-4">
+
+                            <i class="fa-solid fa-arrow-left"></i>
+                            Afficher tous les bâtiments
+
+                        </a>
+
+                    {% else %}
+
+                        <h3>Aucun bâtiment enregistré</h3>
+
+                        <p>
+                            Commencez par enregistrer un bâtiment avec ses
+                            appartements, ses studios ou ses magasins.
+                        </p>
+
+                        <a href="{% url 'ajouter_batiment' %}"
+                           class="btn btn-primary rounded-4">
+
+                            <i class="fa-solid fa-plus"></i>
+                            Ajouter le premier bâtiment
+
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        </section>
+
+    </main>
+
 </div>
+
+<script>
+function confirmerSuppressionBatiment(formulaire, nomBatiment, totalUnites) {
+    const nombreUnites = Number(totalUnites || 0);
+
+    let message =
+        'Voulez-vous vraiment supprimer le bâtiment « ' +
+        nomBatiment +
+        ' » ?';
+
+    if (nombreUnites > 0) {
+        message +=
+            '\n\nCe bâtiment contient ' +
+            nombreUnites +
+            ' unité(s). La suppression sera refusée si un bail actif existe.';
+    }
+
+    message +=
+        '\n\nCette action est définitive pour le bâtiment et ses unités sans bail actif.';
+
+    if (!window.confirm(message)) {
+        return false;
+    }
+
+    const bouton = formulaire.querySelector(
+        'button[type="submit"]'
+    );
+
+    if (bouton) {
+        bouton.disabled = true;
+        bouton.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Suppression...';
+    }
+
+    return true;
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const progressBars = document.querySelectorAll(
+        ".progress-value[data-progress]"
+    );
+
+    progressBars.forEach(function (progressBar) {
+        let percentage = parseFloat(
+            progressBar.dataset.progress
+        );
+
+        if (!Number.isFinite(percentage)) {
+            percentage = 0;
+        }
+
+        percentage = Math.max(
+            0,
+            Math.min(100, percentage)
+        );
+
+        progressBar.style.width = percentage + "%";
+
+        const progressTrack = progressBar.closest(
+            ".progress-track"
+        );
+
+        if (progressTrack) {
+            progressTrack.setAttribute(
+                "aria-valuenow",
+                percentage
+            );
+        }
+    });
+});
+</script>
 
 {% endblock %}

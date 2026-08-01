@@ -1,0 +1,705 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Affecter un locataire — Unité {{ unite.numero }}
+{% endblock %}
+
+{% block content %}
+
+<style>
+    :root {
+        --assign-primary: #2563eb;
+        --assign-primary-dark: #1d4ed8;
+        --assign-success: #059669;
+        --assign-danger: #dc2626;
+        --assign-text: #0f172a;
+        --assign-muted: #64748b;
+        --assign-border: #e2e8f0;
+        --assign-background: #f4f7fb;
+        --assign-surface: #ffffff;
+        --assign-radius-xl: 28px;
+        --assign-radius-lg: 20px;
+        --assign-shadow:
+            0 20px 50px rgba(15, 23, 42, 0.09);
+    }
+
+    .assign-page {
+        min-height: 100vh;
+        padding: 28px 0 60px;
+        background:
+            radial-gradient(
+                circle at top right,
+                rgba(37, 99, 235, 0.13),
+                transparent 32%
+            ),
+            var(--assign-background);
+    }
+
+    .assign-container {
+        width: min(1050px, calc(100% - 28px));
+        margin: 0 auto;
+    }
+
+    .assign-hero {
+        position: relative;
+        overflow: hidden;
+        padding: clamp(24px, 4vw, 38px);
+        border-radius: var(--assign-radius-xl);
+        color: #ffffff;
+        background:
+            linear-gradient(
+                135deg,
+                #0f172a,
+                #1d4ed8
+            );
+        box-shadow: var(--assign-shadow);
+    }
+
+    .assign-hero::after {
+        content: "";
+        position: absolute;
+        width: 260px;
+        height: 260px;
+        right: -100px;
+        top: -140px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.11);
+    }
+
+    .assign-hero-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .assign-heading {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .assign-main-icon {
+        width: 68px;
+        height: 68px;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        border-radius: 21px;
+        color: var(--assign-primary-dark);
+        background: #ffffff;
+        font-size: 27px;
+    }
+
+    .assign-eyebrow {
+        margin: 0 0 5px;
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 12px;
+        font-weight: 850;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
+
+    .assign-title {
+        margin: 0;
+        font-size: clamp(25px, 4vw, 38px);
+        font-weight: 950;
+    }
+
+    .assign-subtitle {
+        margin: 7px 0 0;
+        color: rgba(255, 255, 255, 0.76);
+    }
+
+    .assign-back {
+        min-height: 44px;
+        padding: 10px 15px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        border-radius: 14px;
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.10);
+        text-decoration: none;
+        font-weight: 850;
+    }
+
+    .assign-back:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.18);
+    }
+
+    .assign-layout {
+        display: grid;
+        grid-template-columns: 0.72fr 1.28fr;
+        gap: 18px;
+        margin-top: 22px;
+        align-items: start;
+    }
+
+    .assign-card {
+        padding: 23px;
+        border: 1px solid var(--assign-border);
+        border-radius: var(--assign-radius-lg);
+        background: var(--assign-surface);
+        box-shadow: var(--assign-shadow);
+    }
+
+    .assign-unit-card {
+        position: sticky;
+        top: 20px;
+    }
+
+    .assign-unit-icon {
+        width: 58px;
+        height: 58px;
+        display: grid;
+        place-items: center;
+        border-radius: 18px;
+        color: var(--assign-success);
+        background: #d1fae5;
+        font-size: 24px;
+    }
+
+    .assign-unit-title {
+        margin: 17px 0 4px;
+        color: var(--assign-text);
+        font-size: 25px;
+        font-weight: 950;
+    }
+
+    .assign-unit-type {
+        margin: 0;
+        color: var(--assign-muted);
+        font-weight: 700;
+    }
+
+    .assign-available {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        margin-top: 15px;
+        padding: 8px 11px;
+        border-radius: 999px;
+        color: #065f46;
+        background: #d1fae5;
+        font-size: 12px;
+        font-weight: 900;
+    }
+
+    .assign-unit-details {
+        display: grid;
+        gap: 10px;
+        margin-top: 18px;
+    }
+
+    .assign-unit-detail {
+        padding: 13px;
+        border: 1px solid var(--assign-border);
+        border-radius: 14px;
+        background: #f8fafc;
+    }
+
+    .assign-detail-label {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--assign-muted);
+        font-size: 11px;
+        font-weight: 850;
+        text-transform: uppercase;
+    }
+
+    .assign-detail-value {
+        color: var(--assign-text);
+        font-size: 15px;
+        font-weight: 900;
+        overflow-wrap: anywhere;
+    }
+
+    .assign-form-title {
+        margin: 0;
+        color: var(--assign-text);
+        font-size: 23px;
+        font-weight: 950;
+    }
+
+    .assign-form-text {
+        margin: 6px 0 20px;
+        color: var(--assign-muted);
+        font-size: 14px;
+    }
+
+    .assign-fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .assign-field {
+        min-width: 0;
+    }
+
+    .assign-field.full {
+        grid-column: 1 / -1;
+    }
+
+    .assign-label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--assign-text);
+        font-size: 13px;
+        font-weight: 850;
+    }
+
+    .assign-required {
+        color: var(--assign-danger);
+    }
+
+    .assign-control {
+        width: 100%;
+        min-height: 50px;
+        padding: 11px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 14px;
+        color: var(--assign-text);
+        background: #ffffff;
+        outline: none;
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    textarea.assign-control {
+        min-height: 105px;
+        resize: vertical;
+    }
+
+    .assign-control:focus {
+        border-color: var(--assign-primary);
+        box-shadow:
+            0 0 0 4px rgba(37, 99, 235, 0.11);
+    }
+
+    .assign-help {
+        margin: 7px 0 0;
+        color: var(--assign-muted);
+        font-size: 12px;
+    }
+
+    .assign-check {
+        min-height: 50px;
+        padding: 13px 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 14px;
+        background: #ffffff;
+    }
+
+    .assign-check input {
+        width: 19px;
+        height: 19px;
+    }
+
+    .assign-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 11px;
+        flex-wrap: wrap;
+        margin-top: 22px;
+    }
+
+    .assign-button {
+        min-height: 48px;
+        padding: 11px 18px;
+        border: 1px solid transparent;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+        font-weight: 900;
+    }
+
+    .assign-button.cancel {
+        color: #334155;
+        border-color: #cbd5e1;
+        background: #ffffff;
+    }
+
+    .assign-button.submit {
+        color: #ffffff;
+        background:
+            linear-gradient(
+                135deg,
+                var(--assign-primary),
+                var(--assign-primary-dark)
+            );
+        box-shadow:
+            0 12px 25px rgba(37, 99, 235, 0.22);
+    }
+
+    .assign-button.submit:hover {
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 850px) {
+        .assign-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .assign-unit-card {
+            position: static;
+        }
+    }
+
+    @media (max-width: 650px) {
+        .assign-page {
+            padding-top: 14px;
+        }
+
+        .assign-container {
+            width: min(100% - 18px, 1050px);
+        }
+
+        .assign-fields {
+            grid-template-columns: 1fr;
+        }
+
+        .assign-field.full {
+            grid-column: auto;
+        }
+
+        .assign-card {
+            padding: 18px 14px;
+        }
+
+        .assign-actions {
+            flex-direction: column-reverse;
+        }
+
+        .assign-button {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="assign-page">
+    <div class="assign-container">
+
+        <header class="assign-hero">
+            <div class="assign-hero-content">
+                <div class="assign-heading">
+                    <div class="assign-main-icon">
+                        <i class="fa-solid fa-user-key"></i>
+                    </div>
+
+                    <div>
+                        <p class="assign-eyebrow">
+                            Nouvelle affectation
+                        </p>
+
+                        <h1 class="assign-title">
+                            Affecter un locataire
+                        </h1>
+
+                        <p class="assign-subtitle">
+                            {{ batiment.nom }} —
+                            unité n° {{ unite.numero }}
+                        </p>
+                    </div>
+                </div>
+
+                <a href="{% url 'detail_batiment' batiment.id %}"
+                   class="assign-back">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Retour
+                </a>
+            </div>
+        </header>
+
+        <div class="assign-layout">
+
+            <aside class="assign-card assign-unit-card">
+                <div class="assign-unit-icon">
+                    {% if unite.type_unite == "MAGASIN" %}
+                        <i class="fa-solid fa-shop"></i>
+                    {% elif unite.type_unite == "STUDIO" %}
+                        <i class="fa-solid fa-house"></i>
+                    {% else %}
+                        <i class="fa-solid fa-building"></i>
+                    {% endif %}
+                </div>
+
+                <h2 class="assign-unit-title">
+                    Unité n° {{ unite.numero }}
+                </h2>
+
+                <p class="assign-unit-type">
+                    {{ unite.get_type_unite_display }}
+                </p>
+
+                <span class="assign-available">
+                    <i class="fa-solid fa-circle-check"></i>
+                    Disponible
+                </span>
+
+                <div class="assign-unit-details">
+                    <div class="assign-unit-detail">
+                        <span class="assign-detail-label">
+                            Prix mensuel
+                        </span>
+                        <span class="assign-detail-value">
+                            {{ unite.prix_mensuel|floatformat:0 }}
+                            FCFA
+                        </span>
+                    </div>
+
+                    {% if unite.type_unite == "APPARTEMENT" %}
+                        <div class="assign-unit-detail">
+                            <span class="assign-detail-label">
+                                Nombre de chambres
+                            </span>
+                            <span class="assign-detail-value">
+                                {{ unite.nombre_chambres }}
+                            </span>
+                        </div>
+                    {% endif %}
+
+                    <div class="assign-unit-detail">
+                        <span class="assign-detail-label">
+                            Toilette
+                        </span>
+                        <span class="assign-detail-value">
+                            {{ unite.get_type_toilette_display }}
+                        </span>
+                    </div>
+
+                    <div class="assign-unit-detail">
+                        <span class="assign-detail-label">
+                            Bâtiment
+                        </span>
+                        <span class="assign-detail-value">
+                            {{ batiment.nom }}
+                        </span>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="assign-card">
+                <h2 class="assign-form-title">
+                    Informations du bail
+                </h2>
+
+                <p class="assign-form-text">
+                    Sélectionnez le locataire et complétez les
+                    informations du contrat.
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="assign-fields">
+                        <div class="assign-field full">
+                            <label class="assign-label"
+                                   for="idLocataire">
+                                Locataire
+                                <span class="assign-required">*</span>
+                            </label>
+
+                            <select id="idLocataire"
+                                    name="locataire_id"
+                                    class="assign-control"
+                                    required>
+                                <option value="">
+                                    Sélectionner un locataire
+                                </option>
+
+                                {% for locataire in locataires %}
+                                    <option value="{{ locataire.id }}"
+                                        {% if request.POST.locataire_id == locataire.id|stringformat:"s" %}
+                                            selected
+                                        {% endif %}>
+                                        {{ locataire.nom }}
+                                        {{ locataire.prenom }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="assign-field">
+                            <label class="assign-label"
+                                   for="idDateDebut">
+                                Date de début
+                                <span class="assign-required">*</span>
+                            </label>
+
+                            <input id="idDateDebut"
+                                   type="date"
+                                   name="date_debut"
+                                   class="assign-control"
+                                   value="{% if request.POST.date_debut %}{{ request.POST.date_debut }}{% else %}{{ date_du_jour|date:'Y-m-d' }}{% endif %}"
+                                   required>
+                        </div>
+
+                        <div class="assign-field">
+                            <label class="assign-label"
+                                   for="idDateFin">
+                                Date de fin
+                            </label>
+
+                            <input id="idDateFin"
+                                   type="date"
+                                   name="date_fin"
+                                   class="assign-control"
+                                   value="{{ request.POST.date_fin }}">
+
+                            <p class="assign-help">
+                                Laissez vide pour une durée indéterminée.
+                            </p>
+                        </div>
+
+                        <div class="assign-field">
+                            <label class="assign-label"
+                                   for="idLoyer">
+                                Loyer mensuel en FCFA
+                                <span class="assign-required">*</span>
+                            </label>
+
+                            <input id="idLoyer"
+                                   type="number"
+                                   min="0"
+                                   step="1"
+                                   name="loyer"
+                                   class="assign-control"
+                                   value="{{ request.POST.loyer|default:unite.prix_mensuel|floatformat:0 }}"
+                                   required>
+                        </div>
+
+                        <div class="assign-field">
+                            <label class="assign-label"
+                                   for="idCaution">
+                                Caution en FCFA
+                            </label>
+
+                            <input id="idCaution"
+                                   type="number"
+                                   min="0"
+                                   step="1"
+                                   name="caution"
+                                   class="assign-control"
+                                   value="{{ request.POST.caution|default:'0' }}">
+                        </div>
+
+                        <div class="assign-field">
+                            <label class="assign-label">
+                                Paiement de la caution
+                            </label>
+
+                            <div class="assign-check">
+                                <input id="idCautionPayee"
+                                       type="checkbox"
+                                       name="caution_payee"
+                                       {% if request.POST.caution_payee %}
+                                           checked
+                                       {% endif %}>
+
+                                <label for="idCautionPayee"
+                                       class="mb-0 fw-bold">
+                                    Caution déjà payée
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="assign-field"
+                             id="dateCautionField">
+                            <label class="assign-label"
+                                   for="idDateCaution">
+                                Date de la caution
+                            </label>
+
+                            <input id="idDateCaution"
+                                   type="date"
+                                   name="date_caution"
+                                   class="assign-control"
+                                   value="{{ request.POST.date_caution }}">
+                        </div>
+
+                        <div class="assign-field full">
+                            <label class="assign-label"
+                                   for="idObservation">
+                                Observation
+                            </label>
+
+                            <textarea id="idObservation"
+                                      name="observation_caution"
+                                      class="assign-control"
+                                      placeholder="Mode de paiement, référence ou information utile...">{{ request.POST.observation_caution }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="assign-actions">
+                        <a href="{% url 'detail_batiment' batiment.id %}"
+                           class="assign-button cancel">
+                            Annuler
+                        </a>
+
+                        <button type="submit"
+                                class="assign-button submit">
+                            <i class="fa-solid fa-file-signature"></i>
+                            Affecter et créer le bail
+                        </button>
+                    </div>
+                </form>
+            </main>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const checkbox = document.getElementById(
+            "idCautionPayee"
+        );
+
+        const dateField = document.getElementById(
+            "dateCautionField"
+        );
+
+        const dateInput = document.getElementById(
+            "idDateCaution"
+        );
+
+        function mettreAJourCaution() {
+            const visible = checkbox.checked;
+
+            dateField.style.display = visible
+                ? "block"
+                : "none";
+
+            dateInput.required = visible;
+
+            if (!visible) {
+                dateInput.value = "";
+            }
+        }
+
+        checkbox.addEventListener(
+            "change",
+            mettreAJourCaution
+        );
+
+        mettreAJourCaution();
+    });
+</script>
+
+{% endblock %}

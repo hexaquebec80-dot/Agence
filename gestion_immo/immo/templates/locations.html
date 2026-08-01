@@ -1,303 +1,1443 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
 
-<title>Locations</title>
+{% block title %}
+    Gestion des locations
+{% endblock %}
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+{% block content %}
 
 <style>
-body{
-    background:#f4f7fc;
-    font-family:Arial,sans-serif;
-    padding:25px;
-}
-
-.page-header{
-    background:linear-gradient(135deg,#071a3d,#0057ff);
-    color:white;
-    border-radius:28px;
-    padding:30px;
-    margin-bottom:25px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:15px;
-}
-
-.page-header h1{
-    font-weight:900;
-    margin:0;
-}
-
-.btn-dashboard{
-    background:white;
-    color:#071a3d;
-    padding:13px 20px;
-    border-radius:14px;
-    text-decoration:none;
-    font-weight:900;
-}
-
-.btn-dashboard:hover{
-    color:#0057ff;
-}
-
-.location-card{
-    background:white;
-    border-radius:24px;
-    padding:24px;
-    margin-bottom:22px;
-    box-shadow:0 14px 35px rgba(15,23,42,.08);
-    border:1px solid #e5ecf6;
-}
-
-.card-title{
-    font-weight:900;
-    color:#071a3d;
-    margin-bottom:18px;
-}
-
-.info-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:15px;
-}
-
-.info-box{
-    background:#f8fbff;
-    border:1px solid #e5ecf6;
-    border-radius:16px;
-    padding:15px;
-}
-
-.info-box small{
-    color:#64748b;
-    font-weight:800;
-}
-
-.info-box h4{
-    margin-top:7px;
-    font-size:16px;
-    color:#071a3d;
-    font-weight:900;
-}
-
-.caution-box{
-    margin-top:22px;
-    background:#fff7ed;
-    border:1px solid #fed7aa;
-    border-radius:18px;
-    padding:20px;
-}
-
-.caution-title{
-    color:#c2410c;
-    font-weight:900;
-    margin-bottom:15px;
-}
-
-.status-active,
-.status-end,
-.status-paid,
-.status-unpaid{
-    padding:8px 13px;
-    border-radius:999px;
-    font-weight:900;
-    display:inline-block;
-}
-
-.status-active,
-.status-paid{
-    background:#dcfce7;
-    color:#15803d;
-}
-
-.status-end,
-.status-unpaid{
-    background:#fee2e2;
-    color:#b91c1c;
-}
-
-.empty{
-    text-align:center;
-    background:white;
-    border-radius:24px;
-    padding:60px;
-    color:#64748b;
-}
-
-@media(max-width:900px){
-    .info-grid{
-        grid-template-columns:1fr 1fr;
-    }
-}
-
-@media(max-width:600px){
-    body{
-        padding:15px;
+    :root {
+        --rent-primary: #2563eb;
+        --rent-primary-dark: #1d4ed8;
+        --rent-success: #059669;
+        --rent-danger: #dc2626;
+        --rent-warning: #d97706;
+        --rent-purple: #7c3aed;
+        --rent-text: #0f172a;
+        --rent-muted: #64748b;
+        --rent-border: #e2e8f0;
+        --rent-bg: #f4f7fb;
+        --rent-surface: #ffffff;
+        --rent-radius-xl: 28px;
+        --rent-radius-lg: 20px;
+        --rent-radius-md: 14px;
+        --rent-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
     }
 
-    .page-header{
-        flex-direction:column;
-        align-items:flex-start;
+    .rent-page {
+        min-height: 100vh;
+        padding: 26px 0 60px;
+        background:
+            radial-gradient(
+                circle at top right,
+                rgba(37, 99, 235, 0.12),
+                transparent 32%
+            ),
+            var(--rent-bg);
     }
 
-    .info-grid{
-        grid-template-columns:1fr;
+    .rent-container {
+        width: min(1500px, calc(100% - 30px));
+        margin: 0 auto;
     }
 
-    .btn-dashboard{
-        width:100%;
-        text-align:center;
+    .rent-hero {
+        position: relative;
+        overflow: hidden;
+        padding: clamp(24px, 4vw, 38px);
+        border-radius: var(--rent-radius-xl);
+        color: #ffffff;
+        background:
+            linear-gradient(
+                135deg,
+                #0f172a 0%,
+                #1e3a8a 52%,
+                #2563eb 100%
+            );
+        box-shadow: var(--rent-shadow);
     }
-}
+
+    .rent-hero::before,
+    .rent-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 999px;
+        pointer-events: none;
+    }
+
+    .rent-hero::before {
+        width: 300px;
+        height: 300px;
+        right: -100px;
+        top: -160px;
+        background: rgba(255, 255, 255, 0.10);
+    }
+
+    .rent-hero::after {
+        width: 190px;
+        height: 190px;
+        right: 220px;
+        bottom: -135px;
+        background: rgba(56, 189, 248, 0.14);
+    }
+
+    .rent-hero-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 22px;
+        flex-wrap: wrap;
+    }
+
+    .rent-hero-identity {
+        display: flex;
+        align-items: center;
+        gap: 17px;
+        min-width: 0;
+    }
+
+    .rent-hero-icon {
+        width: 74px;
+        height: 74px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        border-radius: 23px;
+        color: var(--rent-primary-dark);
+        background: #ffffff;
+        font-size: 30px;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+    }
+
+    .rent-eyebrow {
+        margin: 0 0 5px;
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 12px;
+        font-weight: 850;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+    }
+
+    .rent-title {
+        margin: 0;
+        font-size: clamp(28px, 4vw, 43px);
+        font-weight: 950;
+        line-height: 1.1;
+    }
+
+    .rent-subtitle {
+        max-width: 720px;
+        margin: 8px 0 0;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 14px;
+    }
+
+    .rent-hero-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .rent-hero-button {
+        min-height: 47px;
+        padding: 11px 16px;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.10);
+        text-decoration: none;
+        font-weight: 850;
+        transition: 0.2s ease;
+    }
+
+    .rent-hero-button:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.18);
+        transform: translateY(-1px);
+    }
+
+    .rent-hero-button.primary {
+        color: var(--rent-primary-dark);
+        border-color: transparent;
+        background: #ffffff;
+    }
+
+    .rent-hero-button.primary:hover {
+        color: var(--rent-primary-dark);
+        background: #eff6ff;
+    }
+
+    .rent-stats {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 20px;
+    }
+
+    .rent-stat {
+        min-width: 0;
+        padding: 18px;
+        border: 1px solid var(--rent-border);
+        border-radius: var(--rent-radius-lg);
+        background: var(--rent-surface);
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+    }
+
+    .rent-stat-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .rent-stat-icon {
+        width: 46px;
+        height: 46px;
+        display: grid;
+        place-items: center;
+        border-radius: 15px;
+        font-size: 18px;
+    }
+
+    .rent-stat-icon.primary {
+        color: var(--rent-primary);
+        background: #dbeafe;
+    }
+
+    .rent-stat-icon.success {
+        color: var(--rent-success);
+        background: #d1fae5;
+    }
+
+    .rent-stat-icon.danger {
+        color: var(--rent-danger);
+        background: #fee2e2;
+    }
+
+    .rent-stat-icon.warning {
+        color: var(--rent-warning);
+        background: #fef3c7;
+    }
+
+    .rent-stat-icon.purple {
+        color: var(--rent-purple);
+        background: #ede9fe;
+    }
+
+    .rent-stat-value {
+        margin: 15px 0 3px;
+        color: var(--rent-text);
+        font-size: clamp(23px, 3vw, 31px);
+        font-weight: 950;
+        line-height: 1;
+        overflow-wrap: anywhere;
+    }
+
+    .rent-stat-label {
+        margin: 0;
+        color: var(--rent-muted);
+        font-size: 12px;
+        font-weight: 750;
+    }
+
+    .rent-filter-panel {
+        margin-top: 20px;
+        padding: 20px;
+        border: 1px solid var(--rent-border);
+        border-radius: var(--rent-radius-xl);
+        background: var(--rent-surface);
+        box-shadow: var(--rent-shadow);
+    }
+
+    .rent-filter-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+
+    .rent-filter-title {
+        margin: 0;
+        color: var(--rent-text);
+        font-size: 18px;
+        font-weight: 900;
+    }
+
+    .rent-results-count {
+        padding: 7px 11px;
+        border-radius: 999px;
+        color: #1e40af;
+        background: #eff6ff;
+        font-size: 12px;
+        font-weight: 850;
+    }
+
+    .rent-filter-form {
+        display: grid;
+        grid-template-columns: minmax(250px, 2fr) repeat(4, minmax(145px, 1fr)) auto;
+        gap: 12px;
+        align-items: end;
+    }
+
+    .rent-filter-field {
+        min-width: 0;
+    }
+
+    .rent-filter-label {
+        display: block;
+        margin-bottom: 7px;
+        color: var(--rent-text);
+        font-size: 11px;
+        font-weight: 850;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .rent-input-wrap {
+        position: relative;
+    }
+
+    .rent-input-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--rent-primary);
+        pointer-events: none;
+    }
+
+    .rent-control {
+        width: 100%;
+        min-height: 48px;
+        padding: 10px 13px;
+        border: 1px solid #cbd5e1;
+        border-radius: 14px;
+        color: var(--rent-text);
+        background: #ffffff;
+        outline: none;
+    }
+
+    .rent-control.with-icon {
+        padding-left: 43px;
+    }
+
+    .rent-control:focus {
+        border-color: var(--rent-primary);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+    }
+
+    .rent-filter-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .rent-filter-button {
+        min-height: 48px;
+        padding: 10px 15px;
+        border: 1px solid transparent;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        text-decoration: none;
+        font-weight: 850;
+        white-space: nowrap;
+    }
+
+    .rent-filter-button.submit {
+        color: #ffffff;
+        background: linear-gradient(
+            135deg,
+            var(--rent-primary),
+            var(--rent-primary-dark)
+        );
+    }
+
+    .rent-filter-button.reset {
+        color: #475569;
+        border-color: #cbd5e1;
+        background: #ffffff;
+    }
+
+    .rent-list-panel {
+        margin-top: 20px;
+        overflow: hidden;
+        border: 1px solid var(--rent-border);
+        border-radius: var(--rent-radius-xl);
+        background: var(--rent-surface);
+        box-shadow: var(--rent-shadow);
+    }
+
+    .rent-list-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 20px 22px;
+        border-bottom: 1px solid var(--rent-border);
+        background: #fbfdff;
+        flex-wrap: wrap;
+    }
+
+    .rent-list-title {
+        margin: 0;
+        color: var(--rent-text);
+        font-size: 20px;
+        font-weight: 900;
+    }
+
+    .rent-list-description {
+        margin: 4px 0 0;
+        color: var(--rent-muted);
+        font-size: 13px;
+    }
+
+    .rent-table-wrap {
+        overflow-x: auto;
+    }
+
+    .rent-table {
+        width: 100%;
+        min-width: 1180px;
+        border-collapse: collapse;
+    }
+
+    .rent-table thead th {
+        padding: 13px 15px;
+        color: #475569;
+        border-bottom: 1px solid var(--rent-border);
+        background: #f8fafc;
+        font-size: 11px;
+        font-weight: 900;
+        text-align: left;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+    }
+
+    .rent-table tbody td {
+        padding: 15px;
+        border-bottom: 1px solid #edf2f7;
+        color: var(--rent-text);
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .rent-table tbody tr {
+        transition: background 0.2s ease;
+    }
+
+    .rent-table tbody tr:hover {
+        background: #f8fbff;
+    }
+
+    .rent-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .rent-tenant {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 190px;
+    }
+
+    .rent-avatar {
+        width: 42px;
+        height: 42px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        border-radius: 14px;
+        color: var(--rent-primary);
+        background: #dbeafe;
+        font-size: 13px;
+        font-weight: 950;
+        text-transform: uppercase;
+    }
+
+    .rent-name {
+        margin: 0;
+        font-weight: 900;
+        color: var(--rent-text);
+    }
+
+    .rent-subtext {
+        margin: 3px 0 0;
+        color: var(--rent-muted);
+        font-size: 11px;
+    }
+
+    .rent-unit-code {
+        display: inline-flex;
+        padding: 5px 9px;
+        border-radius: 999px;
+        color: #1e40af;
+        background: #dbeafe;
+        font-size: 11px;
+        font-weight: 900;
+    }
+
+    .rent-money {
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+    .rent-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 9px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+    .rent-status.active,
+    .rent-status.paid {
+        color: #065f46;
+        background: #d1fae5;
+    }
+
+    .rent-status.ended,
+    .rent-status.unpaid {
+        color: #991b1b;
+        background: #fee2e2;
+    }
+
+    .rent-status.pending {
+        color: #92400e;
+        background: #fef3c7;
+    }
+
+    .rent-row-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .rent-action {
+        width: 37px;
+        height: 37px;
+        display: inline-grid;
+        place-items: center;
+        border: 1px solid;
+        border-radius: 11px;
+        background: #ffffff;
+        text-decoration: none;
+        transition: 0.2s ease;
+    }
+
+    .rent-action:hover {
+        transform: translateY(-1px);
+    }
+
+    .rent-action.view {
+        color: var(--rent-primary);
+        border-color: #bfdbfe;
+    }
+
+    .rent-action.edit {
+        color: var(--rent-warning);
+        border-color: #fde68a;
+    }
+
+    .rent-action.contract {
+        color: var(--rent-purple);
+        border-color: #ddd6fe;
+    }
+
+    .rent-mobile-list {
+        display: none;
+        padding: 14px;
+    }
+
+    .rent-mobile-card {
+        padding: 17px;
+        border: 1px solid var(--rent-border);
+        border-radius: 18px;
+        background: #ffffff;
+    }
+
+    .rent-mobile-card + .rent-mobile-card {
+        margin-top: 12px;
+    }
+
+    .rent-mobile-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .rent-mobile-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+        margin-top: 14px;
+    }
+
+    .rent-mobile-info {
+        min-width: 0;
+        padding: 11px;
+        border-radius: 13px;
+        background: #f8fafc;
+    }
+
+    .rent-mobile-label {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--rent-muted);
+        font-size: 10px;
+        font-weight: 850;
+        text-transform: uppercase;
+    }
+
+    .rent-mobile-value {
+        color: var(--rent-text);
+        font-size: 12px;
+        font-weight: 850;
+        overflow-wrap: anywhere;
+    }
+
+    .rent-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 17px 20px;
+        border-top: 1px solid var(--rent-border);
+        background: #fbfdff;
+        flex-wrap: wrap;
+    }
+
+    .rent-pagination-text {
+        color: var(--rent-muted);
+        font-size: 12px;
+    }
+
+    .rent-pagination-links {
+        display: flex;
+        gap: 7px;
+        flex-wrap: wrap;
+    }
+
+    .rent-page-link {
+        min-width: 38px;
+        height: 38px;
+        padding: 0 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #cbd5e1;
+        border-radius: 11px;
+        color: #334155;
+        background: #ffffff;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 850;
+    }
+
+    .rent-page-link:hover,
+    .rent-page-link.current {
+        color: #ffffff;
+        border-color: var(--rent-primary);
+        background: var(--rent-primary);
+    }
+
+    .rent-empty {
+        padding: 65px 20px;
+        text-align: center;
+    }
+
+    .rent-empty-icon {
+        width: 72px;
+        height: 72px;
+        margin: 0 auto 16px;
+        display: grid;
+        place-items: center;
+        border-radius: 23px;
+        color: var(--rent-primary);
+        background: #dbeafe;
+        font-size: 29px;
+    }
+
+    .rent-empty-title {
+        margin: 0;
+        color: var(--rent-text);
+        font-size: 21px;
+        font-weight: 900;
+    }
+
+    .rent-empty-text {
+        max-width: 540px;
+        margin: 8px auto 0;
+        color: var(--rent-muted);
+        font-size: 13px;
+    }
+
+    @media (max-width: 1250px) {
+        .rent-stats {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .rent-filter-form {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .rent-filter-field.search {
+            grid-column: span 2;
+        }
+    }
+
+    @media (max-width: 850px) {
+        .rent-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .rent-filter-form {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .rent-filter-field.search {
+            grid-column: 1 / -1;
+        }
+
+        .rent-table-wrap {
+            display: none;
+        }
+
+        .rent-mobile-list {
+            display: block;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .rent-page {
+            padding-top: 14px;
+        }
+
+        .rent-container {
+            width: min(100% - 18px, 1500px);
+        }
+
+        .rent-hero {
+            padding: 21px 17px;
+        }
+
+        .rent-hero-content,
+        .rent-hero-identity {
+            align-items: flex-start;
+        }
+
+        .rent-hero-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 19px;
+            font-size: 24px;
+        }
+
+        .rent-hero-actions {
+            width: 100%;
+        }
+
+        .rent-hero-button {
+            flex: 1 1 140px;
+        }
+
+        .rent-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .rent-filter-form {
+            grid-template-columns: 1fr;
+        }
+
+        .rent-filter-field.search {
+            grid-column: auto;
+        }
+
+        .rent-filter-actions {
+            flex-direction: column;
+        }
+
+        .rent-filter-button {
+            width: 100%;
+        }
+
+        .rent-mobile-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .rent-pagination {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .rent-pagination-links {
+            justify-content: center;
+        }
+    }
 </style>
-</head>
 
-<body>
+<div class="rent-page">
+    <div class="rent-container">
 
-<div class="page-header">
-    <div>
-        <h1>
-            <i class="fa-solid fa-key"></i>
-            Liste des locations
-        </h1>
-        <p class="mb-0">Suivi complet des contrats, loyers et cautions</p>
-    </div>
+        <header class="rent-hero">
+            <div class="rent-hero-content">
 
-    <a href="{% url 'dashboard' %}" class="btn-dashboard">
-        <i class="fa-solid fa-gauge-high"></i>
-        Tableau de bord
-    </a>
-</div>
+                <div class="rent-hero-identity">
+                    <div class="rent-hero-icon">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
 
-{% for location in locations %}
+                    <div>
+                        <p class="rent-eyebrow">
+                            Gestion immobilière
+                        </p>
 
-<div class="location-card">
+                        <h1 class="rent-title">
+                            Locations et contrats
+                        </h1>
 
-    <h3 class="card-title">
-        <i class="fa-solid fa-house-user text-primary"></i>
-        {{ location.locataire.nom }} — {{ location.batiment.nom }}
-    </h3>
+                        <p class="rent-subtitle">
+                            Consultez rapidement plusieurs milliers de locations,
+                            les loyers, les cautions, les unités et les contrats actifs.
+                        </p>
+                    </div>
+                </div>
 
-    <div class="info-grid">
+                <div class="rent-hero-actions">
+                    <a href="{% url 'dashboard' %}"
+                       class="rent-hero-button">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        Tableau de bord
+                    </a>
 
-        <div class="info-box">
-            <small>Locataire</small>
-            <h4>
-                {{ location.locataire.prenom|default:"" }}
-                {{ location.locataire.nom }}
-            </h4>
-        </div>
+                    {% url "ajouter_location" as ajouter_location_url %}
+                    {% if ajouter_location_url %}
+                        <a href="{{ ajouter_location_url }}"
+                           class="rent-hero-button primary">
+                            <i class="fa-solid fa-plus"></i>
+                            Nouvelle location
+                        </a>
+                    {% endif %}
+                </div>
 
-        <div class="info-box">
-            <small>Téléphone</small>
-            <h4>{{ location.locataire.telephone|default:"Non défini" }}</h4>
-        </div>
+            </div>
+        </header>
 
-        <div class="info-box">
-            <small>Email</small>
-            <h4>{{ location.locataire.email|default:"Non défini" }}</h4>
-        </div>
+        {% if messages %}
+            <div style="margin-top:18px;">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags|default:'info' }} rounded-4">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
-        <div class="info-box">
-            <small>Bâtiment</small>
-            <h4>{{ location.batiment.nom }}</h4>
-        </div>
+        <section class="rent-stats">
+            <article class="rent-stat">
+                <div class="rent-stat-top">
+                    <div class="rent-stat-icon primary">
+                        <i class="fa-solid fa-file-contract"></i>
+                    </div>
+                </div>
 
-        <div class="info-box">
-            <small>Adresse bâtiment</small>
-            <h4>{{ location.batiment.adresse|default:"Non définie" }}</h4>
-        </div>
+                <p class="rent-stat-value">
+                    {{ total_locations|default:0 }}
+                </p>
+                <p class="rent-stat-label">
+                    Toutes les locations
+                </p>
+            </article>
 
-        <div class="info-box">
-            <small>N° appartement</small>
-            <h4>{{ location.numero_appartement|default:"Non défini" }}</h4>
-        </div>
+            <article class="rent-stat">
+                <div class="rent-stat-top">
+                    <div class="rent-stat-icon success">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                </div>
 
-        <div class="info-box">
-            <small>Date début</small>
-            <h4>{{ location.date_debut|date:"d/m/Y" }}</h4>
-        </div>
+                <p class="rent-stat-value">
+                    {{ total_actives|default:0 }}
+                </p>
+                <p class="rent-stat-label">
+                    Baux actuellement actifs
+                </p>
+            </article>
 
-        <div class="info-box">
-            <small>Loyer mensuel</small>
-            <h4>{{ location.loyer }} FCFA</h4>
-        </div>
+            <article class="rent-stat">
+                <div class="rent-stat-top">
+                    <div class="rent-stat-icon danger">
+                        <i class="fa-solid fa-circle-stop"></i>
+                    </div>
+                </div>
 
-        <div class="info-box">
-            <small>Statut location</small>
-            <h4>
-                {% if location.active %}
-                    <span class="status-active">Active</span>
-                {% else %}
-                    <span class="status-end">Terminée</span>
+                <p class="rent-stat-value">
+                    {{ total_terminees|default:0 }}
+                </p>
+                <p class="rent-stat-label">
+                    Locations terminées
+                </p>
+            </article>
+
+            <article class="rent-stat">
+                <div class="rent-stat-top">
+                    <div class="rent-stat-icon warning">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                </div>
+
+                <p class="rent-stat-value">
+                    {{ cautions_non_payees|default:0 }}
+                </p>
+                <p class="rent-stat-label">
+                    Cautions non payées
+                </p>
+            </article>
+
+            <article class="rent-stat">
+                <div class="rent-stat-top">
+                    <div class="rent-stat-icon purple">
+                        <i class="fa-solid fa-coins"></i>
+                    </div>
+                </div>
+
+                <p class="rent-stat-value">
+                    {{ revenus_mensuels_actifs|default:0|floatformat:0 }}
+                    <small style="font-size:13px;">FCFA</small>
+                </p>
+                <p class="rent-stat-label">
+                    Loyers mensuels actifs
+                </p>
+            </article>
+        </section>
+
+        <section class="rent-filter-panel">
+            <div class="rent-filter-heading">
+                <h2 class="rent-filter-title">
+                    <i class="fa-solid fa-filter text-primary"></i>
+                    Rechercher et filtrer
+                </h2>
+
+                <span class="rent-results-count">
+                    {{ page_obj.paginator.count|default:0 }} résultat(s)
+                </span>
+            </div>
+
+            <form method="get"
+                  class="rent-filter-form">
+
+                <div class="rent-filter-field search">
+                    <label class="rent-filter-label" for="idSearch">
+                        Recherche
+                    </label>
+
+                    <div class="rent-input-wrap">
+                        <i class="fa-solid fa-magnifying-glass rent-input-icon"></i>
+
+                        <input id="idSearch"
+                               type="search"
+                               name="q"
+                               value="{{ q }}"
+                               class="rent-control with-icon"
+                               placeholder="Locataire, téléphone, bâtiment, adresse, unité...">
+                    </div>
+                </div>
+
+                <div class="rent-filter-field">
+                    <label class="rent-filter-label" for="idStatut">
+                        Statut
+                    </label>
+
+                    <select id="idStatut"
+                            name="statut"
+                            class="rent-control">
+                        <option value="">Tous les statuts</option>
+                        <option value="active" {% if statut == "active" %}selected{% endif %}>
+                            Actives
+                        </option>
+                        <option value="terminee" {% if statut == "terminee" %}selected{% endif %}>
+                            Terminées
+                        </option>
+                    </select>
+                </div>
+
+                <div class="rent-filter-field">
+                    <label class="rent-filter-label" for="idCaution">
+                        Caution
+                    </label>
+
+                    <select id="idCaution"
+                            name="caution"
+                            class="rent-control">
+                        <option value="">Toutes les cautions</option>
+                        <option value="payee" {% if caution == "payee" %}selected{% endif %}>
+                            Payées
+                        </option>
+                        <option value="non_payee" {% if caution == "non_payee" %}selected{% endif %}>
+                            Non payées
+                        </option>
+                    </select>
+                </div>
+
+                <div class="rent-filter-field">
+                    <label class="rent-filter-label" for="idBatiment">
+                        Bâtiment
+                    </label>
+
+                    <select id="idBatiment"
+                            name="batiment"
+                            class="rent-control">
+                        <option value="">Tous les bâtiments</option>
+
+                        {% for batiment in batiments_filtre %}
+                            <option value="{{ batiment.id }}"
+                                {% if batiment_id == batiment.id|stringformat:"s" %}
+                                    selected
+                                {% endif %}>
+                                {{ batiment.nom }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="rent-filter-field">
+                    <label class="rent-filter-label" for="idTri">
+                        Trier
+                    </label>
+
+                    <select id="idTri"
+                            name="tri"
+                            class="rent-control">
+                        <option value="-date_debut" {% if tri == "-date_debut" %}selected{% endif %}>
+                            Plus récentes
+                        </option>
+                        <option value="date_debut" {% if tri == "date_debut" %}selected{% endif %}>
+                            Plus anciennes
+                        </option>
+                        <option value="locataire" {% if tri == "locataire" %}selected{% endif %}>
+                            Nom du locataire
+                        </option>
+                        <option value="batiment" {% if tri == "batiment" %}selected{% endif %}>
+                            Nom du bâtiment
+                        </option>
+                        <option value="-loyer" {% if tri == "-loyer" %}selected{% endif %}>
+                            Loyer décroissant
+                        </option>
+                        <option value="loyer" {% if tri == "loyer" %}selected{% endif %}>
+                            Loyer croissant
+                        </option>
+                    </select>
+                </div>
+
+                <div class="rent-filter-actions">
+                    <button type="submit"
+                            class="rent-filter-button submit">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        Appliquer
+                    </button>
+
+                    {% if q or statut or caution or batiment_id %}
+                        <a href="{% url 'locations' %}"
+                           class="rent-filter-button reset">
+                            <i class="fa-solid fa-xmark"></i>
+                        </a>
+                    {% endif %}
+                </div>
+
+            </form>
+        </section>
+
+        <section class="rent-list-panel">
+            <div class="rent-list-head">
+                <div>
+                    <h2 class="rent-list-title">
+                        Registre des locations
+                    </h2>
+
+                    <p class="rent-list-description">
+                        Affichage limité à {{ page_obj.paginator.per_page }}
+                        résultats par page pour garder une navigation rapide.
+                    </p>
+                </div>
+            </div>
+
+            {% if locations %}
+
+                <div class="rent-table-wrap">
+                    <table class="rent-table">
+                        <thead>
+                            <tr>
+                                <th>Locataire</th>
+                                <th>Bâtiment et unité</th>
+                                <th>Début / fin</th>
+                                <th>Loyer</th>
+                                <th>Caution</th>
+                                <th>Statut</th>
+                                <th>Contrat</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for location in locations %}
+                                {% url "detail_locataire" location.locataire.id as detail_locataire_url %}
+                                {% url "modifier_location" location.id as modifier_location_url %}
+
+                                <tr>
+                                    <td>
+                                        <div class="rent-tenant">
+                                            <div class="rent-avatar">
+                                                {{ location.locataire.nom|slice:":1" }}
+                                                {{ location.locataire.prenom|slice:":1" }}
+                                            </div>
+
+                                            <div>
+                                                <p class="rent-name">
+                                                    {{ location.locataire.nom }}
+                                                    {{ location.locataire.prenom }}
+                                                </p>
+
+                                                <p class="rent-subtext">
+                                                    {{ location.locataire.telephone|default:"Téléphone non renseigné" }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <strong>{{ location.batiment.nom }}</strong>
+
+                                        <div class="rent-subtext">
+                                            {{ location.batiment.ville|default:"Ville non renseignée" }}
+                                        </div>
+
+                                        <div style="margin-top:6px;">
+                                            {% if location.unite %}
+                                                <span class="rent-unit-code">
+                                                    {{ location.unite.get_type_unite_display }}
+                                                    n° {{ location.unite.numero }}
+                                                </span>
+                                            {% elif location.numero_appartement %}
+                                                <span class="rent-unit-code">
+                                                    Appartement n° {{ location.numero_appartement }}
+                                                </span>
+                                            {% elif location.chambre %}
+                                                <span class="rent-unit-code">
+                                                    Chambre n° {{ location.chambre.numero }}
+                                                </span>
+                                            {% else %}
+                                                <span class="rent-subtext">
+                                                    Unité non renseignée
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <strong>
+                                            {{ location.date_debut|date:"d/m/Y" }}
+                                        </strong>
+
+                                        <div class="rent-subtext">
+                                            {% if location.date_fin %}
+                                                Fin : {{ location.date_fin|date:"d/m/Y" }}
+                                            {% else %}
+                                                Durée indéterminée
+                                            {% endif %}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span class="rent-money">
+                                            {{ location.loyer|default:0|floatformat:0 }}
+                                            FCFA
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <div class="rent-money">
+                                            {{ location.caution|default:0|floatformat:0 }}
+                                            FCFA
+                                        </div>
+
+                                        <div style="margin-top:5px;">
+                                            {% if location.caution_payee %}
+                                                <span class="rent-status paid">
+                                                    <i class="fa-solid fa-check"></i>
+                                                    Payée
+                                                </span>
+                                            {% else %}
+                                                <span class="rent-status unpaid">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                    Non payée
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        {% if location.active %}
+                                            <span class="rent-status active">
+                                                <i class="fa-solid fa-circle-check"></i>
+                                                Active
+                                            </span>
+                                        {% else %}
+                                            <span class="rent-status ended">
+                                                <i class="fa-solid fa-circle-stop"></i>
+                                                Terminée
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if location.contrat_bail_numerique %}
+                                            <a href="{{ location.contrat_bail_numerique.url }}"
+                                               target="_blank"
+                                               rel="noopener"
+                                               class="rent-status paid"
+                                               style="text-decoration:none;">
+                                                <i class="fa-solid fa-file-contract"></i>
+                                                Disponible
+                                            </a>
+                                        {% else %}
+                                            <span class="rent-status pending">
+                                                <i class="fa-solid fa-clock"></i>
+                                                Non généré
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        <div class="rent-row-actions">
+                                            {% if detail_locataire_url %}
+                                                <a href="{{ detail_locataire_url }}"
+                                                   class="rent-action view"
+                                                   title="Voir le locataire">
+                                                    <i class="fa-solid fa-user"></i>
+                                                </a>
+                                            {% endif %}
+
+                                            {% if modifier_location_url %}
+                                                <a href="{{ modifier_location_url }}"
+                                                   class="rent-action edit"
+                                                   title="Modifier la location">
+                                                    <i class="fa-solid fa-pen"></i>
+                                                </a>
+                                            {% endif %}
+
+                                            {% if location.contrat_bail_numerique %}
+                                                <a href="{{ location.contrat_bail_numerique.url }}"
+                                                   target="_blank"
+                                                   rel="noopener"
+                                                   class="rent-action contract"
+                                                   title="Voir le contrat">
+                                                    <i class="fa-solid fa-file-contract"></i>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="rent-mobile-list">
+                    {% for location in locations %}
+                        {% url "detail_locataire" location.locataire.id as detail_locataire_url %}
+                        {% url "modifier_location" location.id as modifier_location_url %}
+
+                        <article class="rent-mobile-card">
+                            <div class="rent-mobile-top">
+                                <div class="rent-tenant">
+                                    <div class="rent-avatar">
+                                        {{ location.locataire.nom|slice:":1" }}
+                                        {{ location.locataire.prenom|slice:":1" }}
+                                    </div>
+
+                                    <div>
+                                        <p class="rent-name">
+                                            {{ location.locataire.nom }}
+                                            {{ location.locataire.prenom }}
+                                        </p>
+                                        <p class="rent-subtext">
+                                            {{ location.batiment.nom }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {% if location.active %}
+                                    <span class="rent-status active">
+                                        Active
+                                    </span>
+                                {% else %}
+                                    <span class="rent-status ended">
+                                        Terminée
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <div class="rent-mobile-grid">
+                                <div class="rent-mobile-info">
+                                    <span class="rent-mobile-label">
+                                        Unité
+                                    </span>
+                                    <span class="rent-mobile-value">
+                                        {% if location.unite %}
+                                            {{ location.unite.get_type_unite_display }}
+                                            n° {{ location.unite.numero }}
+                                        {% elif location.numero_appartement %}
+                                            Appartement n° {{ location.numero_appartement }}
+                                        {% else %}
+                                            Non renseignée
+                                        {% endif %}
+                                    </span>
+                                </div>
+
+                                <div class="rent-mobile-info">
+                                    <span class="rent-mobile-label">
+                                        Loyer mensuel
+                                    </span>
+                                    <span class="rent-mobile-value">
+                                        {{ location.loyer|default:0|floatformat:0 }}
+                                        FCFA
+                                    </span>
+                                </div>
+
+                                <div class="rent-mobile-info">
+                                    <span class="rent-mobile-label">
+                                        Date de début
+                                    </span>
+                                    <span class="rent-mobile-value">
+                                        {{ location.date_debut|date:"d/m/Y" }}
+                                    </span>
+                                </div>
+
+                                <div class="rent-mobile-info">
+                                    <span class="rent-mobile-label">
+                                        Caution
+                                    </span>
+                                    <span class="rent-mobile-value">
+                                        {{ location.caution|default:0|floatformat:0 }}
+                                        FCFA —
+                                        {% if location.caution_payee %}
+                                            payée
+                                        {% else %}
+                                            non payée
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="rent-row-actions"
+                                 style="margin-top:13px;">
+                                {% if detail_locataire_url %}
+                                    <a href="{{ detail_locataire_url }}"
+                                       class="rent-action view"
+                                       title="Voir le locataire">
+                                        <i class="fa-solid fa-user"></i>
+                                    </a>
+                                {% endif %}
+
+                                {% if modifier_location_url %}
+                                    <a href="{{ modifier_location_url }}"
+                                       class="rent-action edit"
+                                       title="Modifier la location">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                {% endif %}
+
+                                {% if location.contrat_bail_numerique %}
+                                    <a href="{{ location.contrat_bail_numerique.url }}"
+                                       target="_blank"
+                                       rel="noopener"
+                                       class="rent-action contract">
+                                        <i class="fa-solid fa-file-contract"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+
+                {% if page_obj.paginator.num_pages > 1 %}
+                    <nav class="rent-pagination"
+                         aria-label="Pagination des locations">
+
+                        <div class="rent-pagination-text">
+                            Page {{ page_obj.number }}
+                            sur {{ page_obj.paginator.num_pages }} —
+                            {{ page_obj.paginator.count }} résultat(s)
+                        </div>
+
+                        <div class="rent-pagination-links">
+                            {% if page_obj.has_previous %}
+                                <a class="rent-page-link"
+                                   href="?page=1&q={{ q|urlencode }}&statut={{ statut }}&caution={{ caution }}&batiment={{ batiment_id }}&tri={{ tri }}">
+                                    <i class="fa-solid fa-angles-left"></i>
+                                </a>
+
+                                <a class="rent-page-link"
+                                   href="?page={{ page_obj.previous_page_number }}&q={{ q|urlencode }}&statut={{ statut }}&caution={{ caution }}&batiment={{ batiment_id }}&tri={{ tri }}">
+                                    <i class="fa-solid fa-angle-left"></i>
+                                </a>
+                            {% endif %}
+
+                            <span class="rent-page-link current">
+                                {{ page_obj.number }}
+                            </span>
+
+                            {% if page_obj.has_next %}
+                                <a class="rent-page-link"
+                                   href="?page={{ page_obj.next_page_number }}&q={{ q|urlencode }}&statut={{ statut }}&caution={{ caution }}&batiment={{ batiment_id }}&tri={{ tri }}">
+                                    <i class="fa-solid fa-angle-right"></i>
+                                </a>
+
+                                <a class="rent-page-link"
+                                   href="?page={{ page_obj.paginator.num_pages }}&q={{ q|urlencode }}&statut={{ statut }}&caution={{ caution }}&batiment={{ batiment_id }}&tri={{ tri }}">
+                                    <i class="fa-solid fa-angles-right"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </nav>
                 {% endif %}
-            </h4>
-        </div>
+
+            {% else %}
+                <div class="rent-empty">
+                    <div class="rent-empty-icon">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+
+                    <h3 class="rent-empty-title">
+                        Aucune location trouvée
+                    </h3>
+
+                    <p class="rent-empty-text">
+                        Modifiez vos critères de recherche ou enregistrez
+                        une nouvelle location.
+                    </p>
+                </div>
+            {% endif %}
+        </section>
 
     </div>
-
-    <div class="caution-box">
-
-        <div class="caution-title">
-            <i class="fa-solid fa-shield-halved"></i>
-            Partie caution de location
-        </div>
-
-        <div class="info-grid">
-
-            <div class="info-box">
-                <small>Montant caution</small>
-                <h4>{{ location.caution|default:"0" }} FCFA</h4>
-            </div>
-
-            <div class="info-box">
-                <small>Caution payée</small>
-                <h4>
-                    {% if location.caution_payee %}
-                        <span class="status-paid">Oui</span>
-                    {% else %}
-                        <span class="status-unpaid">Non</span>
-                    {% endif %}
-                </h4>
-            </div>
-
-            <div class="info-box">
-                <small>Date caution</small>
-                <h4>
-                    {% if location.date_caution %}
-                        {{ location.date_caution|date:"d/m/Y" }}
-                    {% else %}
-                        Non définie
-                    {% endif %}
-                </h4>
-            </div>
-
-            <div class="info-box">
-                <small>Observation caution</small>
-                <h4>{{ location.observation_caution|default:"Aucune" }}</h4>
-            </div>
-
-        </div>
-
-    </div>
-
 </div>
 
-{% empty %}
-
-<div class="empty">
-    <i class="fa-solid fa-folder-open fa-3x mb-3"></i>
-    <h3>Aucune location enregistrée</h3>
-    <p>Ajoutez une location pour commencer le suivi.</p>
-</div>
-
-{% endfor %}
-
-</body>
-</html>
+{% endblock %}

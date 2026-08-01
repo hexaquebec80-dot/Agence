@@ -1,5 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models import Sum
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
+from django.utils import timezone
+
+
+
+
 
 
 class Agence(models.Model):
@@ -40,60 +50,474 @@ from django.db import models
 
 
 
+
+
 class Batiment(models.Model):
     agence = models.ForeignKey(
-        Agence,
+        "Agence",
         on_delete=models.CASCADE,
-        related_name="batiments"
+        related_name="batiments",
     )
 
     proprietaire = models.ForeignKey(
-        Proprietaire,
+        "Proprietaire",
         on_delete=models.CASCADE,
-        related_name="batiments"
+        related_name="batiments",
     )
 
-    code_batiment = models.CharField(max_length=30, unique=True)
-    nom = models.CharField(max_length=150)
-    adresse = models.CharField(max_length=255)
-    ville = models.CharField(max_length=100)
-    nombre_logements = models.PositiveIntegerField(default=1)
+    code_batiment = models.CharField(
+        max_length=30,
+        unique=True,
+    )
 
-    description = models.TextField(blank=True, null=True)
-    actif = models.BooleanField(default=True)
-    date_creation = models.DateTimeField(auto_now_add=True)
+    nom = models.CharField(
+        max_length=150,
+    )
+
+    adresse = models.CharField(
+        max_length=255,
+    )
+
+    ville = models.CharField(
+        max_length=100,
+    )
+
+    # Ce champ sera calculé automatiquement.
+    # Il contient seulement les appartements et les studios.
+    # Les magasins ne sont pas comptés comme logements d’habitation.
+    nombre_logements = models.PositiveIntegerField(
+        default=0,
+        editable=False,
+    )
+
+    description = models.TextField(
+        blank=True,
+        null=True,
+    )
+
+    actif = models.BooleanField(
+        default=True,
+    )
+
+    date_creation = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    # ---------------------------------------------------------
+    # UNITÉS DU BÂTIMENT
+    # ---------------------------------------------------------
+
+    def unites_actives(self):
+        """
+        Retourne toutes les unités actives :
+        appartements, studios et magasins.
+        """
+        return self.unites_locatives.filter(actif=True)
+
+    def unites_total(self):
+        """
+        Nombre total d’unités dans le bâtiment.
+        """
+        return self.unites_actives().count()
+
+    def logements_habitation(self):
+        """
+        Retourne seulement les appartements et les studios.
+        """
+        return self.unites_actives().filter(
+            type_unite__in=[
+                UniteLocative.TypeUnite.APPARTEMENT,
+                UniteLocative.TypeUnite.STUDIO,
+            ]
+        )
+
+    def logements_total(self):
+        """
+        Nombre d’appartements et de studios.
+        """
+        return self.logements_habitation().count()
+
+    def appartements_total(self):
+        return self.unites_actives().filter(
+            type_unite=UniteLocative.TypeUnite.APPARTEMENT
+        ).count()
+
+    def studios_total(self):
+        return self.unites_actives().filter(
+            type_unite=UniteLocative.TypeUnite.STUDIO
+        ).count()
+
+    def magasins_total(self):
+        return self.unites_actives().filter(
+            type_unite=UniteLocative.TypeUnite.MAGASIN
+        ).count()
+
+    # ---------------------------------------------------------
+    # NOMBRE DE CHAMBRES
+    # ---------------------------------------------------------
 
     def chambres_total(self):
-        return self.chambres.count()
+        """
+        Calcule le nombre total de chambres présentes
+        dans tous les appartements.
+
+        Les studios et les magasins ne sont pas comptés
+        comme des chambres.
+        """
+        resultat = self.unites_actives().filter(
+            type_unite=UniteLocative.TypeUnite.APPARTEMENT
+        ).aggregate(
+            total=Sum("nombre_chambres")
+        )
+
+        return resultat["total"] or 0
 
     def chambres_occupees(self):
-        return self.chambres.filter(locations__active=True).distinct().count()
+        """
+        Calcule le nombre total de chambres contenues
+        dans les appartements actuellement occupés.
+        """
+        resultat = self.unites_actives().filter(
+            type_unite=UniteLocative.TypeUnite.APPARTEMENT,
+            statut=UniteLocative.Statut.OCCUPE,
+        ).aggregate(
+            total=Sum("nombre_chambres")
+        )
+
+        return resultat["total"] or 0
+
+    # ---------------------------------------------------------
+    # OCCUPATION DES UNITÉS
+    # ---------------------------------------------------------
+
+    def unites_occupees(self):
+        return self.unites_actives().filter(
+            statut=UniteLocative.Statut.OCCUPE
+        ).count()
+
+    def unites_libres(self):
+        return self.unites_actives().filter(
+            statut=UniteLocative.Statut.LIBRE
+        ).count()
+
+    def unites_reservees(self):
+        return self.unites_actives().filter(
+            statut=UniteLocative.Statut.RESERVE
+        ).count()
+
+    def unites_en_maintenance(self):
+        return self.unites_actives().filter(
+            statut=UniteLocative.Statut.MAINTENANCE
+        ).count()
 
     def est_totalement_occupe(self):
-        return self.chambres_total() > 0 and self.chambres_occupees() == self.chambres_total()
+        total = self.unites_total()
+
+        return (
+            total > 0
+            and self.unites_occupees() == total
+        )
 
     def est_partiellement_occupe(self):
-        return 0 < self.chambres_occupees() < self.chambres_total()
+        total = self.unites_total()
+        occupees = self.unites_occupees()
+
+        return (
+            total > 0
+            and 0 < occupees < total
+        )
 
     def est_libre(self):
-        return self.chambres_occupees() == 0
+        return (
+            self.unites_total() > 0
+            and self.unites_occupees() == 0
+        )
 
     def statut_occupation(self):
+        if self.unites_total() == 0:
+            return "Aucune unité"
+
         if self.est_totalement_occupe():
             return "Tout occupé"
-        elif self.est_partiellement_occupe():
+
+        if self.est_partiellement_occupe():
             return "Partiellement occupé"
+
         return "Libre"
 
     def locataires_actifs(self):
+        """
+        Cette méthode reste compatible avec votre système actuel
+        si Location contient toujours une relation vers Batiment.
+        """
         return Locataire.objects.filter(
             locations__batiment=self,
-            locations__active=True
+            locations__active=True,
         ).distinct()
 
     def __str__(self):
         return f"{self.code_batiment} - {self.nom}"
-    
+
+
+class UniteLocative(models.Model):
+
+    class TypeUnite(models.TextChoices):
+        APPARTEMENT = "APPARTEMENT", "Appartement"
+        STUDIO = "STUDIO", "Studio"
+        MAGASIN = "MAGASIN", "Magasin / local commercial"
+
+    class TypeToilette(models.TextChoices):
+        COMMUNE_APPARTEMENT = (
+            "COMMUNE_APPARTEMENT",
+            "Toilette commune dans l’appartement",
+        )
+
+        UNE_PAR_CHAMBRE = (
+            "UNE_PAR_CHAMBRE",
+            "Une toilette dans chaque chambre",
+        )
+
+        PRIVEE_STUDIO = (
+            "PRIVEE_STUDIO",
+            "Toilette privée dans le studio",
+        )
+
+        PRIVEE_MAGASIN = (
+            "PRIVEE_MAGASIN",
+            "Toilette privée dans le magasin",
+        )
+
+        COMMUNE_BATIMENT = (
+            "COMMUNE_BATIMENT",
+            "Toilette commune au bâtiment",
+        )
+
+        AUCUNE = (
+            "AUCUNE",
+            "Aucune toilette",
+        )
+
+    class UsageCommercial(models.TextChoices):
+        BOUTIQUE = "BOUTIQUE", "Boutique"
+        SALON_COIFFURE = "SALON_COIFFURE", "Salon de coiffure"
+        BUREAU = "BUREAU", "Bureau"
+        RESTAURANT = "RESTAURANT", "Restaurant"
+        ATELIER = "ATELIER", "Atelier"
+        PHARMACIE = "PHARMACIE", "Pharmacie"
+        ENTREPOT = "ENTREPOT", "Entrepôt"
+        AUTRE = "AUTRE", "Autre activité"
+
+    class Statut(models.TextChoices):
+        LIBRE = "LIBRE", "Libre"
+        OCCUPE = "OCCUPE", "Occupé"
+        RESERVE = "RESERVE", "Réservé"
+        MAINTENANCE = "MAINTENANCE", "En maintenance"
+
+    batiment = models.ForeignKey(
+        Batiment,
+        on_delete=models.CASCADE,
+        related_name="unites_locatives",
+    )
+
+    numero = models.CharField(
+        max_length=100,
+        verbose_name="Nom ou numéro de l’unité",
+        help_text=(
+            "Exemple : Appartement 1, Studio 1 ou Magasin 1."
+        ),
+    )
+
+    type_unite = models.CharField(
+        max_length=20,
+        choices=TypeUnite.choices,
+        default=TypeUnite.APPARTEMENT,
+    )
+
+    nombre_chambres = models.PositiveIntegerField(
+        default=0,
+        help_text=(
+            "À renseigner uniquement pour les appartements."
+        ),
+    )
+
+    type_toilette = models.CharField(
+        max_length=30,
+        choices=TypeToilette.choices,
+        default=TypeToilette.COMMUNE_APPARTEMENT,
+    )
+
+    prix_mensuel = models.DecimalField(
+        max_digits=12,
+        decimal_places=0,
+        verbose_name="Loyer mensuel en FCFA",
+    )
+
+    usage_commercial = models.CharField(
+        max_length=30,
+        choices=UsageCommercial.choices,
+        blank=True,
+        default="",
+        help_text=(
+            "À renseigner uniquement pour un magasin."
+        ),
+    )
+
+    statut = models.CharField(
+        max_length=20,
+        choices=Statut.choices,
+        default=Statut.LIBRE,
+    )
+
+    description = models.TextField(
+        blank=True,
+        null=True,
+    )
+
+    actif = models.BooleanField(
+        default=True,
+    )
+
+    date_creation = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    class Meta:
+        ordering = [
+            "batiment",
+            "type_unite",
+            "numero",
+        ]
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=[
+                    "batiment",
+                    "numero",
+                ],
+                name="numero_unite_unique_par_batiment",
+            )
+        ]
+
+        verbose_name = "Unité locative"
+        verbose_name_plural = "Unités locatives"
+
+    def clean(self):
+        erreurs = {}
+
+        if self.prix_mensuel is not None and self.prix_mensuel < 0:
+            erreurs["prix_mensuel"] = (
+                "Le prix mensuel ne peut pas être négatif."
+            )
+
+        # Appartement
+        if self.type_unite == self.TypeUnite.APPARTEMENT:
+            if self.nombre_chambres < 1:
+                erreurs["nombre_chambres"] = (
+                    "Un appartement doit avoir au moins une chambre."
+                )
+
+            toilettes_autorisees = [
+                self.TypeToilette.COMMUNE_APPARTEMENT,
+                self.TypeToilette.UNE_PAR_CHAMBRE,
+                self.TypeToilette.COMMUNE_BATIMENT,
+                self.TypeToilette.AUCUNE,
+            ]
+
+            if self.type_toilette not in toilettes_autorisees:
+                erreurs["type_toilette"] = (
+                    "Ce type de toilette ne convient pas "
+                    "à un appartement."
+                )
+
+            self.usage_commercial = ""
+
+        # Studio
+        elif self.type_unite == self.TypeUnite.STUDIO:
+            self.nombre_chambres = 0
+            self.usage_commercial = ""
+
+            toilettes_autorisees = [
+                self.TypeToilette.PRIVEE_STUDIO,
+                self.TypeToilette.COMMUNE_BATIMENT,
+                self.TypeToilette.AUCUNE,
+            ]
+
+            if self.type_toilette not in toilettes_autorisees:
+                erreurs["type_toilette"] = (
+                    "Un studio peut avoir une toilette privée, "
+                    "une toilette commune au bâtiment ou aucune toilette."
+                )
+
+        # Magasin
+        elif self.type_unite == self.TypeUnite.MAGASIN:
+            self.nombre_chambres = 0
+
+            if not self.usage_commercial:
+                erreurs["usage_commercial"] = (
+                    "Indiquez l’utilisation du magasin : boutique, "
+                    "salon de coiffure, bureau, etc."
+                )
+
+            toilettes_autorisees = [
+                self.TypeToilette.PRIVEE_MAGASIN,
+                self.TypeToilette.COMMUNE_BATIMENT,
+                self.TypeToilette.AUCUNE,
+            ]
+
+            if self.type_toilette not in toilettes_autorisees:
+                erreurs["type_toilette"] = (
+                    "Ce type de toilette ne convient pas "
+                    "à un magasin."
+                )
+
+        if erreurs:
+            raise ValidationError(erreurs)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def est_habitation(self):
+        return self.type_unite in [
+            self.TypeUnite.APPARTEMENT,
+            self.TypeUnite.STUDIO,
+        ]
+
+    def est_commercial(self):
+        return self.type_unite == self.TypeUnite.MAGASIN
+
+    def __str__(self):
+        return (
+            f"{self.numero} - "
+            f"{self.get_type_unite_display()} - "
+            f"{self.batiment.nom}"
+        )
+
+
+@receiver([post_save, post_delete], sender=UniteLocative)
+def synchroniser_nombre_logements(sender, instance, **kwargs):
+    """
+    Met automatiquement à jour nombre_logements dans Batiment.
+
+    Seuls les appartements et les studios sont comptés.
+    Les magasins ne sont pas des logements d’habitation.
+    """
+    nombre = UniteLocative.objects.filter(
+        batiment_id=instance.batiment_id,
+        actif=True,
+        type_unite__in=[
+            UniteLocative.TypeUnite.APPARTEMENT,
+            UniteLocative.TypeUnite.STUDIO,
+        ],
+    ).count()
+
+    Batiment.objects.filter(
+        pk=instance.batiment_id
+    ).update(
+        nombre_logements=nombre
+    )
+
+
 
 class ChambreLogement(models.Model):
     batiment = models.ForeignKey(
@@ -279,62 +703,562 @@ class Employe(models.Model):
 
 
 
+from pathlib import Path
+
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.utils import timezone
+from django.utils.text import get_valid_filename
+
+
+def chemin_contrat_bail(instance, filename):
+    """
+    Classe automatiquement les contrats de bail par agence,
+    bâtiment et location.
+
+    Exemple :
+    media/contrats_bail/agence_1/batiment_3/
+    location_12_contrat-bail.pdf
+    """
+
+    fichier = Path(filename)
+
+    nom_fichier = get_valid_filename(
+        fichier.stem
+    ) or "contrat-bail"
+
+    extension = fichier.suffix.lower() or ".pdf"
+
+    agence_id = (
+        instance.agence_id
+        if instance.agence_id
+        else "sans_agence"
+    )
+
+    batiment_id = (
+        instance.batiment_id
+        if instance.batiment_id
+        else "sans_batiment"
+    )
+
+    location_id = (
+        instance.pk
+        if instance.pk
+        else "nouvelle"
+    )
+
+    return (
+        f"contrats_bail/"
+        f"agence_{agence_id}/"
+        f"batiment_{batiment_id}/"
+        f"location_{location_id}_{nom_fichier}{extension}"
+    )
+
+
 class Location(models.Model):
     agence = models.ForeignKey(
         Agence,
         on_delete=models.CASCADE,
-        related_name="locations"
+        related_name="locations",
+        verbose_name="Agence",
     )
 
     batiment = models.ForeignKey(
         Batiment,
         on_delete=models.CASCADE,
-        related_name="locations"
+        related_name="locations",
+        verbose_name="Bâtiment",
     )
 
     locataire = models.ForeignKey(
         Locataire,
         on_delete=models.CASCADE,
-        related_name="locations"
+        related_name="locations",
+        verbose_name="Locataire",
     )
 
+    # Nouveau système :
+    # appartement, studio ou magasin complet.
+    unite = models.ForeignKey(
+        "UniteLocative",
+        on_delete=models.SET_NULL,
+        related_name="locations",
+        null=True,
+        blank=True,
+        verbose_name="Appartement, studio ou magasin",
+        help_text=(
+            "Sélectionnez l’unité complète attribuée "
+            "au locataire."
+        ),
+    )
+
+    # Ancien système conservé temporairement afin de ne pas
+    # perdre les anciennes locations déjà enregistrées.
     chambre = models.ForeignKey(
         ChambreLogement,
         on_delete=models.SET_NULL,
         related_name="locations",
         null=True,
-        blank=True
+        blank=True,
+        verbose_name="Ancien logement ou chambre",
+        help_text=(
+            "Ancien champ conservé temporairement pour "
+            "les locations déjà enregistrées."
+        ),
     )
 
-    numero_appartement = models.CharField(max_length=50)
+    numero_appartement = models.CharField(
+        max_length=100,
+        blank=True,
+        default="",
+        verbose_name="Numéro de l’appartement ou de l’unité",
+        help_text=(
+            "Ce champ est automatiquement rempli lorsqu’une "
+            "unité locative est sélectionnée."
+        ),
+    )
 
+    # Null et blank permettent d’utiliser automatiquement
+    # le prix défini dans UniteLocative.
     loyer = models.DecimalField(
-        max_digits=10,
-        decimal_places=2
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="Loyer mensuel",
+        help_text=(
+            "Montant mensuel en FCFA. Laissez vide pour "
+            "utiliser automatiquement le prix de l’unité."
+        ),
     )
 
     caution = models.DecimalField(
-        max_digits=10,
+        max_digits=12,
         decimal_places=2,
-        default=0
+        default=0,
+        verbose_name="Montant de la caution",
+        help_text="Montant de la caution en FCFA.",
     )
 
-    caution_payee = models.BooleanField(default=False)
+    caution_payee = models.BooleanField(
+        default=False,
+        verbose_name="Caution payée",
+    )
 
-    date_caution = models.DateField(null=True, blank=True)
+    date_caution = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name="Date de paiement de la caution",
+    )
 
-    observation_caution = models.TextField(blank=True, null=True)
+    observation_caution = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Observation sur la caution",
+    )
 
-    date_debut = models.DateField()
+    date_debut = models.DateField(
+        verbose_name="Date de début du bail",
+    )
 
-    active = models.BooleanField(default=True)
+    date_fin = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name="Date de fin du bail",
+        help_text=(
+            "Laissez vide si le contrat est à durée "
+            "indéterminée."
+        ),
+    )
+
+    active = models.BooleanField(
+        default=True,
+        verbose_name="Bail actif",
+    )
+
+    # Contrat PDF créé automatiquement après l’affectation
+    # d’un locataire à une unité.
+    contrat_bail_numerique = models.FileField(
+        upload_to=chemin_contrat_bail,
+        null=True,
+        blank=True,
+        verbose_name="Contrat de bail numérique",
+    )
+
+    date_generation_contrat = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Date de génération du contrat",
+    )
+
+    # Ne pas utiliser auto_now_add=True pour ce nouveau champ,
+    # car la table contient déjà des locations.
+    # timezone.now fournit une date valide aux anciennes lignes.
+    date_creation = models.DateTimeField(
+        default=timezone.now,
+        editable=False,
+        verbose_name="Date de création",
+    )
+
+    # null=True évite une erreur lors de l’ajout du champ
+    # aux anciennes locations.
+    date_modification = models.DateTimeField(
+        auto_now=True,
+        null=True,
+        blank=True,
+        verbose_name="Dernière modification",
+    )
+
+    class Meta:
+        ordering = (
+            "-active",
+            "-date_debut",
+            "-id",
+        )
+
+        verbose_name = "Location"
+        verbose_name_plural = "Locations"
+
+        indexes = [
+            models.Index(
+                fields=[
+                    "agence",
+                    "active",
+                ],
+                name="location_agence_active_idx",
+            ),
+            models.Index(
+                fields=[
+                    "batiment",
+                    "active",
+                ],
+                name="location_bat_active_idx",
+            ),
+            models.Index(
+                fields=[
+                    "unite",
+                    "active",
+                ],
+                name="location_unite_active_idx",
+            ),
+        ]
+
+    def clean(self):
+        """
+        Vérifie la cohérence de la location avant
+        son enregistrement.
+        """
+
+        erreurs = {}
+
+        # Une unité ou une ancienne chambre doit être indiquée.
+        if not self.unite_id and not self.chambre_id:
+            erreurs["unite"] = (
+                "Sélectionnez un appartement, un studio "
+                "ou un magasin."
+            )
+
+        # Vérifier que l’unité appartient au bâtiment.
+        if (
+            self.unite_id
+            and self.batiment_id
+            and self.unite.batiment_id != self.batiment_id
+        ):
+            erreurs["unite"] = (
+                "L’unité sélectionnée n’appartient pas "
+                "à ce bâtiment."
+            )
+
+        # Vérifier que l’ancienne chambre appartient
+        # également au bâtiment.
+        if (
+            self.chambre_id
+            and self.batiment_id
+            and self.chambre.batiment_id != self.batiment_id
+        ):
+            erreurs["chambre"] = (
+                "L’ancien logement sélectionné n’appartient "
+                "pas à ce bâtiment."
+            )
+
+        # Vérifier que le bâtiment appartient à l’agence.
+        if (
+            self.batiment_id
+            and self.agence_id
+            and self.batiment.agence_id != self.agence_id
+        ):
+            erreurs["batiment"] = (
+                "Le bâtiment sélectionné n’appartient pas "
+                "à cette agence."
+            )
+
+        # Vérifier le locataire si son modèle possède agence_id.
+        if (
+            self.locataire_id
+            and self.agence_id
+            and hasattr(self.locataire, "agence_id")
+            and self.locataire.agence_id
+            and self.locataire.agence_id != self.agence_id
+        ):
+            erreurs["locataire"] = (
+                "Le locataire sélectionné n’appartient pas "
+                "à cette agence."
+            )
+
+        if self.loyer is not None and self.loyer < 0:
+            erreurs["loyer"] = (
+                "Le montant du loyer ne peut pas être négatif."
+            )
+
+        if self.caution is not None and self.caution < 0:
+            erreurs["caution"] = (
+                "Le montant de la caution ne peut pas "
+                "être négatif."
+            )
+
+        if (
+            self.date_fin
+            and self.date_debut
+            and self.date_fin < self.date_debut
+        ):
+            erreurs["date_fin"] = (
+                "La date de fin ne peut pas être antérieure "
+                "à la date de début."
+            )
+
+        if self.caution_payee and not self.date_caution:
+            erreurs["date_caution"] = (
+                "Indiquez la date de paiement de la caution."
+            )
+
+        # Empêcher deux baux actifs sur la même unité.
+        if self.active and self.unite_id:
+            locations_actives = Location.objects.filter(
+                unite_id=self.unite_id,
+                active=True,
+            )
+
+            if self.pk:
+                locations_actives = locations_actives.exclude(
+                    pk=self.pk
+                )
+
+            if locations_actives.exists():
+                erreurs["unite"] = (
+                    "Cette unité possède déjà un bail actif. "
+                    "Terminez l’ancien bail avant d’en créer "
+                    "un nouveau."
+                )
+
+        # Vérification pour les anciennes chambres.
+        if self.active and self.chambre_id and not self.unite_id:
+            anciennes_locations_actives = (
+                Location.objects.filter(
+                    chambre_id=self.chambre_id,
+                    active=True,
+                )
+            )
+
+            if self.pk:
+                anciennes_locations_actives = (
+                    anciennes_locations_actives.exclude(
+                        pk=self.pk
+                    )
+                )
+
+            if anciennes_locations_actives.exists():
+                erreurs["chambre"] = (
+                    "Cet ancien logement possède déjà "
+                    "un bail actif."
+                )
+
+        if erreurs:
+            raise ValidationError(erreurs)
+
+    def save(self, *args, **kwargs):
+        """
+        Enregistre la location et met automatiquement
+        à jour le statut de l’unité.
+        """
+
+        ancienne_unite_id = None
+
+        if self.pk:
+            ancienne_location = (
+                Location.objects.filter(
+                    pk=self.pk
+                )
+                .values(
+                    "unite_id",
+                    "active",
+                )
+                .first()
+            )
+
+            if ancienne_location:
+                ancienne_unite_id = (
+                    ancienne_location["unite_id"]
+                )
+
+        # Nouveau système.
+        if self.unite_id:
+            self.numero_appartement = self.unite.numero
+
+            if self.loyer is None:
+                self.loyer = self.unite.prix_mensuel
+
+        # Ancien système.
+        elif self.chambre_id and not self.numero_appartement:
+            self.numero_appartement = (
+                self.chambre.numero
+                or self.chambre.nom
+                or ""
+            )
+
+        # Applique les validations avant la sauvegarde.
+        self.full_clean()
+
+        super().save(*args, **kwargs)
+
+        # Mettre la nouvelle unité au statut occupé.
+        if self.unite_id and self.active:
+            UniteLocative.objects.filter(
+                pk=self.unite_id
+            ).update(
+                statut=UniteLocative.Statut.OCCUPE
+            )
+
+        # Libérer l’unité lorsqu’un bail devient inactif.
+        if self.unite_id and not self.active:
+            autre_bail_actif = Location.objects.filter(
+                unite_id=self.unite_id,
+                active=True,
+            ).exclude(
+                pk=self.pk
+            ).exists()
+
+            if not autre_bail_actif:
+                UniteLocative.objects.filter(
+                    pk=self.unite_id,
+                    statut=UniteLocative.Statut.OCCUPE,
+                ).update(
+                    statut=UniteLocative.Statut.LIBRE
+                )
+
+        # Si l’unité a été remplacée, libérer l’ancienne unité.
+        if (
+            ancienne_unite_id
+            and ancienne_unite_id != self.unite_id
+        ):
+            ancien_bail_actif = Location.objects.filter(
+                unite_id=ancienne_unite_id,
+                active=True,
+            ).exists()
+
+            if not ancien_bail_actif:
+                UniteLocative.objects.filter(
+                    pk=ancienne_unite_id,
+                    statut=UniteLocative.Statut.OCCUPE,
+                ).update(
+                    statut=UniteLocative.Statut.LIBRE
+                )
+
+    def delete(self, *args, **kwargs):
+        """
+        Libère automatiquement l’unité lorsque la location
+        est supprimée.
+        """
+
+        unite_id = self.unite_id
+
+        resultat = super().delete(*args, **kwargs)
+
+        if unite_id:
+            autre_bail_actif = Location.objects.filter(
+                unite_id=unite_id,
+                active=True,
+            ).exists()
+
+            if not autre_bail_actif:
+                UniteLocative.objects.filter(
+                    pk=unite_id,
+                    statut=UniteLocative.Statut.OCCUPE,
+                ).update(
+                    statut=UniteLocative.Statut.LIBRE
+                )
+
+        return resultat
+
+    @property
+    def numero_contrat(self):
+        if not self.pk:
+            return "BAIL-NOUVEAU"
+
+        return f"BAIL-{self.pk:06d}"
+
+    @property
+    def contrat_disponible(self):
+        return bool(
+            self.contrat_bail_numerique
+        )
+
+    @property
+    def unite_affichee(self):
+        """
+        Retourne la nouvelle unité ou l’ancien logement.
+        """
+
+        if self.unite_id:
+            return self.unite
+
+        if self.chambre_id:
+            return self.chambre
+
+        return None
+
+    @property
+    def montant_mensuel(self):
+        if self.loyer is not None:
+            return self.loyer
+
+        if self.unite_id:
+            return self.unite.prix_mensuel
+
+        return 0
+
+    @property
+    def est_nouveau_systeme(self):
+        return bool(self.unite_id)
+
+    @property
+    def est_ancien_systeme(self):
+        return bool(
+            self.chambre_id
+            and not self.unite_id
+        )
 
     def __str__(self):
-        return f"{self.locataire.nom} - {self.batiment.nom}"
-    
+        if self.unite_id:
+            nom_unite = self.unite.numero
 
+        elif self.chambre_id:
+            nom_unite = (
+                self.chambre.nom
+                or self.chambre.numero
+                or "Ancien logement"
+            )
 
+        else:
+            nom_unite = (
+                self.numero_appartement
+                or "Unité non indiquée"
+            )
 
+        return (
+            f"{self.locataire.nom} - "
+            f"{nom_unite} - "
+            f"{self.batiment.nom}"
+        )
     
 class Paiement(models.Model):
     STATUT_CHOICES = [

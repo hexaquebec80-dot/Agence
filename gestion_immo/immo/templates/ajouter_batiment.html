@@ -3,212 +3,1495 @@
 {% block content %}
 
 <style>
-.card-modern{
-    background:white;
-    border-radius:24px;
-    padding:28px;
-    box-shadow:0 14px 35px rgba(15,23,42,.08);
+:root {
+    --bat-primary: #2563eb;
+    --bat-primary-dark: #1d4ed8;
+    --bat-text: #0f172a;
+    --bat-muted: #64748b;
+    --bat-border: #e2e8f0;
+    --bat-bg: #f8fafc;
+    --bat-white: #ffffff;
+    --bat-danger: #dc2626;
+    --bat-success: #059669;
+    --bat-orange: #ea580c;
+    --bat-purple: #7c3aed;
 }
 
-.form-label{
-    color:#0f172a;
+.add-building-page {
+    width: min(1400px, 100%);
+    margin: 0 auto;
+    padding: 28px 12px 60px;
+}
+
+.card-modern {
+    overflow: hidden;
+    background: var(--bat-white);
+    border: 1px solid var(--bat-border);
+    border-radius: 28px;
+    box-shadow: 0 18px 55px rgba(15, 23, 42, 0.09);
+}
+
+/* En-tête */
+
+.building-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    padding: 28px 30px;
+    color: #ffffff;
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(255, 255, 255, 0.22),
+            transparent 32%
+        ),
+        linear-gradient(
+            135deg,
+            #0f172a 0%,
+            #1e3a8a 48%,
+            #2563eb 100%
+        );
+}
+
+.building-header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.building-header-icon {
+    display: grid;
+    flex: 0 0 auto;
+    width: 58px;
+    height: 58px;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 19px;
+    background: rgba(255, 255, 255, 0.14);
+    font-size: 24px;
+    backdrop-filter: blur(10px);
+}
+
+.building-header h1 {
+    margin: 0;
+    font-size: clamp(26px, 4vw, 37px);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+}
+
+.building-header p {
+    max-width: 700px;
+    margin: 7px 0 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 15px;
+}
+
+.back-button {
+    display: inline-flex;
+    flex: 0 0 auto;
+    min-height: 47px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 10px 18px;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.12);
+    text-decoration: none;
+    font-weight: 800;
+    transition: 0.2s ease;
+}
+
+.back-button:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.22);
+    transform: translateY(-1px);
+}
+
+/* Corps */
+
+.building-body {
+    padding: 30px;
+}
+
+.info-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 25px;
+    padding: 18px 20px;
+    color: #1e3a8a;
+    border: 1px solid #bfdbfe;
+    border-radius: 19px;
+    background: #eff6ff;
+}
+
+.info-box > i {
+    margin-top: 2px;
+    font-size: 20px;
+}
+
+.info-box strong {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 850;
+}
+
+.info-box p {
+    margin: 0;
+    line-height: 1.55;
+}
+
+.section-card {
+    margin-bottom: 26px;
+    padding: 24px;
+    border: 1px solid var(--bat-border);
+    border-radius: 22px;
+    background: var(--bat-bg);
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 22px;
+}
+
+.section-heading-icon {
+    display: grid;
+    flex: 0 0 auto;
+    width: 46px;
+    height: 46px;
+    place-items: center;
+    color: var(--bat-primary);
+    border-radius: 15px;
+    background: #dbeafe;
+    font-size: 18px;
+}
+
+.section-heading h2 {
+    margin: 0;
+    color: var(--bat-text);
+    font-size: 21px;
+    font-weight: 900;
+}
+
+.section-heading p {
+    margin: 4px 0 0;
+    color: var(--bat-muted);
+    font-size: 14px;
+}
+
+/* Formulaire */
+
+.form-label {
+    margin-bottom: 8px;
+    color: var(--bat-text);
+    font-weight: 800;
+}
+
+.required-star {
+    color: var(--bat-danger);
 }
 
 .form-control,
-.form-select{
-    border:1px solid #e5e7eb;
+.form-select {
+    min-height: 52px;
+    color: var(--bat-text);
+    border: 1px solid #dbe3ee;
+    border-radius: 15px;
+    background: #ffffff;
+}
+
+textarea.form-control {
+    min-height: 105px;
+    resize: vertical;
 }
 
 .form-control:focus,
-.form-select:focus{
-    border-color:#2563eb;
-    box-shadow:0 0 0 .2rem rgba(37,99,235,.15);
+.form-select:focus {
+    border-color: var(--bat-primary);
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.14);
 }
 
-.help-text{
-    font-size:13px;
-    color:#64748b;
-    margin-top:6px;
+.help-text {
+    margin-top: 7px;
+    color: var(--bat-muted);
+    font-size: 13px;
+    line-height: 1.45;
 }
 
-.info-box{
-    background:#eff6ff;
-    color:#1e3a8a;
-    border:1px solid #bfdbfe;
-    border-radius:18px;
-    padding:16px 18px;
-    margin-bottom:22px;
-    font-weight:600;
+/* Boutons d’ajout */
+
+.unit-add-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 23px;
+}
+
+.add-unit-button {
+    display: flex;
+    min-height: 76px;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 13px;
+    padding: 15px 17px;
+    border: 1px solid var(--bat-border);
+    border-radius: 18px;
+    background: #ffffff;
+    text-align: left;
+    transition: 0.2s ease;
+}
+
+.add-unit-button:hover {
+    box-shadow: 0 11px 25px rgba(15, 23, 42, 0.09);
+    transform: translateY(-2px);
+}
+
+.add-unit-button-icon {
+    display: grid;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border-radius: 14px;
+    font-size: 18px;
+}
+
+.add-unit-button strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.add-unit-button small {
+    display: block;
+    margin-top: 3px;
+    color: var(--bat-muted);
+    font-size: 12px;
+}
+
+.add-apartment {
+    color: #1d4ed8;
+}
+
+.add-apartment .add-unit-button-icon {
+    background: #dbeafe;
+}
+
+.add-studio {
+    color: var(--bat-purple);
+}
+
+.add-studio .add-unit-button-icon {
+    background: #ede9fe;
+}
+
+.add-shop {
+    color: #c2410c;
+}
+
+.add-shop .add-unit-button-icon {
+    background: #ffedd5;
+}
+
+/* Liste des unités */
+
+.units-empty {
+    padding: 42px 20px;
+    color: var(--bat-muted);
+    border: 2px dashed #cbd5e1;
+    border-radius: 20px;
+    background: #ffffff;
+    text-align: center;
+}
+
+.units-empty i {
+    display: block;
+    margin-bottom: 13px;
+    color: #94a3b8;
+    font-size: 40px;
+}
+
+.units-empty strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #334155;
+    font-size: 17px;
+}
+
+.unit-card {
+    position: relative;
+    margin-bottom: 18px;
+    padding: 22px;
+    border: 1px solid var(--bat-border);
+    border-left: 5px solid var(--bat-primary);
+    border-radius: 21px;
+    background: #ffffff;
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.05);
+}
+
+.unit-card[data-type="STUDIO"] {
+    border-left-color: var(--bat-purple);
+}
+
+.unit-card[data-type="MAGASIN"] {
+    border-left-color: var(--bat-orange);
+}
+
+.unit-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 21px;
+}
+
+.unit-card-title {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.unit-card-icon {
+    display: grid;
+    flex: 0 0 auto;
+    width: 45px;
+    height: 45px;
+    place-items: center;
+    color: var(--bat-primary);
+    border-radius: 14px;
+    background: #dbeafe;
+    font-size: 18px;
+}
+
+.unit-card[data-type="STUDIO"] .unit-card-icon {
+    color: var(--bat-purple);
+    background: #ede9fe;
+}
+
+.unit-card[data-type="MAGASIN"] .unit-card-icon {
+    color: #c2410c;
+    background: #ffedd5;
+}
+
+.unit-card-title h3 {
+    margin: 0;
+    color: var(--bat-text);
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.unit-card-title p {
+    margin: 3px 0 0;
+    color: var(--bat-muted);
+    font-size: 13px;
+}
+
+.remove-unit-button {
+    display: inline-flex;
+    width: 43px;
+    height: 43px;
+    align-items: center;
+    justify-content: center;
+    color: var(--bat-danger);
+    border: 1px solid #fecaca;
+    border-radius: 14px;
+    background: #fff1f2;
+    transition: 0.2s ease;
+}
+
+.remove-unit-button:hover {
+    color: #ffffff;
+    border-color: var(--bat-danger);
+    background: var(--bat-danger);
+}
+
+/* Prix */
+
+.price-wrapper {
+    position: relative;
+}
+
+.price-wrapper .form-control {
+    padding-right: 117px;
+}
+
+.price-currency {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    color: var(--bat-muted);
+    font-size: 12px;
+    font-weight: 850;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+/* Résumé */
+
+.units-summary {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 13px;
+    margin-top: 20px;
+}
+
+.summary-card {
+    padding: 17px;
+    border: 1px solid var(--bat-border);
+    border-radius: 17px;
+    background: #ffffff;
+}
+
+.summary-card span {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--bat-muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.summary-card strong {
+    color: var(--bat-text);
+    font-size: 24px;
+    font-weight: 950;
+}
+
+.summary-card-price strong {
+    font-size: 18px;
+}
+
+/* Pied du formulaire */
+
+.form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 13px;
+    padding-top: 4px;
+}
+
+.form-action-button {
+    display: inline-flex;
+    min-height: 53px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 12px 24px;
+    border-radius: 16px;
+    font-weight: 850;
+}
+
+.save-button {
+    min-width: 230px;
+    color: #ffffff;
+    border: none;
+    background: linear-gradient(
+        135deg,
+        var(--bat-primary),
+        var(--bat-primary-dark)
+    );
+    box-shadow: 0 11px 25px rgba(37, 99, 235, 0.24);
+}
+
+.save-button:hover {
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.save-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+}
+
+/* Responsive */
+
+@media (max-width: 1100px) {
+    .units-summary {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 850px) {
+    .unit-add-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    .add-unit-button {
+        justify-content: flex-start;
+    }
+
+    .units-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 650px) {
+    .add-building-page {
+        padding: 12px 4px 40px;
+    }
+
+    .card-modern {
+        border-radius: 21px;
+    }
+
+    .building-header {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 22px 19px;
+    }
+
+    .building-header-content {
+        align-items: flex-start;
+    }
+
+    .building-header-icon {
+        width: 49px;
+        height: 49px;
+    }
+
+    .back-button {
+        width: 100%;
+    }
+
+    .building-body {
+        padding: 17px;
+    }
+
+    .section-card {
+        padding: 17px;
+        border-radius: 19px;
+    }
+
+    .unit-card {
+        padding: 17px;
+    }
+
+    .unit-card-header {
+        align-items: flex-start;
+    }
+
+    .unit-card-title {
+        align-items: flex-start;
+    }
+
+    .units-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        align-items: stretch;
+        flex-direction: column-reverse;
+    }
+
+    .form-action-button {
+        width: 100%;
+    }
 }
 </style>
 
 <div class="container-fluid">
 
-    <div class="card-modern">
+    <div class="add-building-page">
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="card-modern">
 
-            <div>
-                <h2 class="fw-bold mb-1">
-                    <i class="fa-solid fa-building text-primary"></i>
-                    Ajouter un bâtiment
-                </h2>
+            <header class="building-header">
 
-                <p class="text-muted mb-0">
-                    Enregistrer un bâtiment et générer ses logements automatiquement
-                </p>
-            </div>
+                <div class="building-header-content">
 
-            <a href="{% url 'batiments' %}"
-               class="btn btn-outline-secondary rounded-4">
-                <i class="fa-solid fa-arrow-left"></i>
-                Retour
-            </a>
-
-        </div>
-
-        <div class="info-box">
-            <i class="fa-solid fa-circle-info"></i>
-            Le nombre indiqué créera automatiquement les logements du bâtiment :
-            Logement 1, Logement 2, Logement 3, etc.
-        </div>
-
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} rounded-4">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        <form method="POST">
-            {% csrf_token %}
-
-            <div class="row">
-
-                <div class="col-md-4 mb-3">
-                    <label class="form-label fw-bold">Code bâtiment</label>
-
-                    <input type="text"
-                           name="code_batiment"
-                           class="form-control form-control-lg rounded-4"
-                           placeholder="BAT-001"
-                           required>
-                </div>
-
-                <div class="col-md-8 mb-3">
-                    <label class="form-label fw-bold">Nom du bâtiment</label>
-
-                    <input type="text"
-                           name="nom"
-                           class="form-control form-control-lg rounded-4"
-                           placeholder="Résidence Hexa"
-                           required>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold">Propriétaire</label>
-
-                    <select name="proprietaire"
-                            class="form-select form-select-lg rounded-4"
-                            required>
-                        <option value="">Sélectionner un propriétaire</option>
-
-                        {% for p in proprietaires %}
-                            <option value="{{ p.id }}">
-                                {{ p.nom }} {{ p.prenom }}
-                            </option>
-                        {% empty %}
-                            <option value="" disabled>
-                                Aucun propriétaire disponible
-                            </option>
-                        {% endfor %}
-                    </select>
-
-                    {% if not proprietaires %}
-                        <div class="help-text">
-                            Vous devez d'abord ajouter un propriétaire avant de créer un bâtiment.
-                        </div>
-                    {% endif %}
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold">Ville</label>
-
-                    <input type="text"
-                           name="ville"
-                           class="form-control form-control-lg rounded-4"
-                           placeholder="Montréal"
-                           required>
-                </div>
-
-                <div class="col-md-12 mb-3">
-                    <label class="form-label fw-bold">Adresse complète</label>
-
-                    <input type="text"
-                           name="adresse"
-                           class="form-control form-control-lg rounded-4"
-                           placeholder="123 Rue Sainte-Catherine Ouest"
-                           required>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label class="form-label fw-bold">Nombre de logements</label>
-
-                    <input type="number"
-                           name="nombre_logements"
-                           class="form-control form-control-lg rounded-4"
-                           min="1"
-                           value="1"
-                           required>
-
-                    <div class="help-text">
-                        Ce nombre servira à créer les logements et à calculer l’occupation.
+                    <div class="building-header-icon">
+                        <i class="fa-solid fa-building"></i>
                     </div>
+
+                    <div>
+                        <h1>Ajouter un bâtiment</h1>
+
+                        <p>
+                            Enregistrez le bâtiment, puis ajoutez séparément
+                            ses appartements, ses studios et ses magasins.
+                        </p>
+                    </div>
+
                 </div>
-
-                <div class="col-md-4 mb-3">
-                    <label class="form-label fw-bold">Statut</label>
-
-                    <select name="actif"
-                            class="form-select form-select-lg rounded-4">
-                        <option value="True">Actif</option>
-                        <option value="False">Inactif</option>
-                    </select>
-                </div>
-
-                <div class="col-md-12 mb-3">
-                    <label class="form-label fw-bold">Description</label>
-
-                    <textarea name="description"
-                              rows="4"
-                              class="form-control rounded-4"
-                              placeholder="Informations complémentaires..."></textarea>
-                </div>
-
-            </div>
-
-            <hr class="my-4">
-
-            <div class="d-flex justify-content-end gap-3">
 
                 <a href="{% url 'batiments' %}"
-                   class="btn btn-light btn-lg rounded-4">
-                    Annuler
+                   class="back-button">
+
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Retour aux bâtiments
+
                 </a>
 
-                <button type="submit"
-                        class="btn btn-primary btn-lg rounded-4 px-5">
-                    <i class="fa-solid fa-floppy-disk"></i>
-                    Enregistrer
-                </button>
+            </header>
+
+            <div class="building-body">
+
+                <div class="info-box">
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    <div>
+                        <strong>
+                            Gestion adaptée à la location au Mali
+                        </strong>
+
+                        <p>
+                            Un locataire loue un appartement complet ou un
+                            studio. Les chambres sont des caractéristiques de
+                            l’appartement et ne sont pas louées séparément.
+                            Les magasins peuvent servir de boutique, salon de
+                            coiffure, bureau, restaurant ou autre activité.
+                        </p>
+                    </div>
+
+                </div>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} rounded-4">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="POST"
+                      id="buildingForm"
+                      novalidate>
+
+                    {% csrf_token %}
+
+                    <!-- Informations du bâtiment -->
+
+                    <section class="section-card">
+
+                        <div class="section-heading">
+
+                            <div class="section-heading-icon">
+                                <i class="fa-solid fa-address-card"></i>
+                            </div>
+
+                            <div>
+                                <h2>Informations du bâtiment</h2>
+
+                                <p>
+                                    Identité, propriétaire et localisation.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-lg-4 col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Code du bâtiment
+                                    <span class="required-star">*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="code_batiment"
+                                    class="form-control"
+                                    placeholder="BAT-001"
+                                    value="{{ request.POST.code_batiment|default:'' }}"
+                                    maxlength="30"
+                                    required
+                                >
+
+                                <div class="help-text">
+                                    Ce code doit être unique.
+                                </div>
+
+                            </div>
+
+                            <div class="col-lg-8 col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Nom du bâtiment
+                                    <span class="required-star">*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="nom"
+                                    class="form-control"
+                                    placeholder="Immeuble Kamara"
+                                    value="{{ request.POST.nom|default:'' }}"
+                                    maxlength="150"
+                                    required
+                                >
+
+                            </div>
+
+                            <div class="col-lg-6 mb-3">
+
+                                <label class="form-label">
+                                    Propriétaire
+                                    <span class="required-star">*</span>
+                                </label>
+
+                                <select
+                                    name="proprietaire"
+                                    class="form-select"
+                                    required
+                                >
+                                    <option value="">
+                                        Sélectionner un propriétaire
+                                    </option>
+
+                                    {% for p in proprietaires %}
+                                        <option
+                                            value="{{ p.id }}"
+                                            {% if request.POST.proprietaire == p.id|stringformat:"s" %}
+                                                selected
+                                            {% endif %}
+                                        >
+                                            {{ p.nom }} {{ p.prenom }}
+                                        </option>
+                                    {% empty %}
+                                        <option value="" disabled>
+                                            Aucun propriétaire disponible
+                                        </option>
+                                    {% endfor %}
+                                </select>
+
+                                {% if not proprietaires %}
+                                    <div class="help-text text-danger">
+                                        Vous devez d’abord ajouter un
+                                        propriétaire avant de créer un bâtiment.
+                                    </div>
+                                {% endif %}
+
+                            </div>
+
+                            <div class="col-lg-4 col-md-8 mb-3">
+
+                                <label class="form-label">
+                                    Ville
+                                    <span class="required-star">*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="ville"
+                                    class="form-control"
+                                    placeholder="Bamako"
+                                    value="{{ request.POST.ville|default:'' }}"
+                                    maxlength="100"
+                                    required
+                                >
+
+                            </div>
+
+                            <div class="col-lg-2 col-md-4 mb-3">
+
+                                <label class="form-label">
+                                    Statut
+                                </label>
+
+                                <select
+                                    name="actif"
+                                    class="form-select"
+                                >
+                                    <option
+                                        value="True"
+                                        {% if request.POST.actif != "False" %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        Actif
+                                    </option>
+
+                                    <option
+                                        value="False"
+                                        {% if request.POST.actif == "False" %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        Inactif
+                                    </option>
+                                </select>
+
+                            </div>
+
+                            <div class="col-12 mb-3">
+
+                                <label class="form-label">
+                                    Adresse complète
+                                    <span class="required-star">*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="adresse"
+                                    class="form-control"
+                                    placeholder="Quartier, rue, porte et commune"
+                                    value="{{ request.POST.adresse|default:'' }}"
+                                    maxlength="255"
+                                    required
+                                >
+
+                            </div>
+
+                            <div class="col-12">
+
+                                <label class="form-label">
+                                    Description du bâtiment
+                                </label>
+
+                                <textarea
+                                    name="description"
+                                    class="form-control"
+                                    rows="3"
+                                    placeholder="Étage, cour, parking, état général..."
+                                >{{ request.POST.description|default:'' }}</textarea>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <!-- Unités locatives -->
+
+                    <section class="section-card">
+
+                        <div class="section-heading">
+
+                            <div class="section-heading-icon">
+                                <i class="fa-solid fa-house"></i>
+                            </div>
+
+                            <div>
+                                <h2>Unités locatives</h2>
+
+                                <p>
+                                    Ajoutez chaque unité avec son propre loyer
+                                    et ses caractéristiques.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="unit-add-buttons">
+
+                            <button
+                                type="button"
+                                class="add-unit-button add-apartment"
+                                data-add-unit="APPARTEMENT"
+                            >
+
+                                <span class="add-unit-button-icon">
+                                    <i class="fa-solid fa-house-chimney"></i>
+                                </span>
+
+                                <span>
+                                    <strong>Ajouter un appartement</strong>
+                                    <small>
+                                        Une ou plusieurs chambres
+                                    </small>
+                                </span>
+
+                            </button>
+
+                            <button
+                                type="button"
+                                class="add-unit-button add-studio"
+                                data-add-unit="STUDIO"
+                            >
+
+                                <span class="add-unit-button-icon">
+                                    <i class="fa-solid fa-door-open"></i>
+                                </span>
+
+                                <span>
+                                    <strong>Ajouter un studio</strong>
+                                    <small>
+                                        Une pièce principale
+                                    </small>
+                                </span>
+
+                            </button>
+
+                            <button
+                                type="button"
+                                class="add-unit-button add-shop"
+                                data-add-unit="MAGASIN"
+                            >
+
+                                <span class="add-unit-button-icon">
+                                    <i class="fa-solid fa-store"></i>
+                                </span>
+
+                                <span>
+                                    <strong>Ajouter un magasin</strong>
+                                    <small>
+                                        Boutique ou local commercial
+                                    </small>
+                                </span>
+
+                            </button>
+
+                        </div>
+
+                        <div id="unitsContainer"></div>
+
+                        <div id="unitsEmpty"
+                             class="units-empty">
+
+                            <i class="fa-solid fa-building-circle-xmark"></i>
+
+                            <strong>
+                                Aucune unité ajoutée
+                            </strong>
+
+                            <span>
+                                Ajoutez au moins un appartement, un studio
+                                ou un magasin.
+                            </span>
+
+                        </div>
+
+                        <div class="units-summary">
+
+                            <div class="summary-card">
+                                <span>Appartements</span>
+                                <strong id="apartmentsCount">0</strong>
+                            </div>
+
+                            <div class="summary-card">
+                                <span>Studios</span>
+                                <strong id="studiosCount">0</strong>
+                            </div>
+
+                            <div class="summary-card">
+                                <span>Magasins</span>
+                                <strong id="shopsCount">0</strong>
+                            </div>
+
+                            <div class="summary-card">
+                                <span>Total des unités</span>
+                                <strong id="totalUnitsCount">0</strong>
+                            </div>
+
+                            <div class="summary-card summary-card-price">
+                                <span>Total mensuel potentiel</span>
+                                <strong id="totalMonthlyPrice">
+                                    0 FCFA
+                                </strong>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <div class="form-actions">
+
+                        <a href="{% url 'batiments' %}"
+                           class="btn btn-light form-action-button">
+
+                            <i class="fa-solid fa-xmark"></i>
+                            Annuler
+
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="btn save-button form-action-button"
+                            {% if not proprietaires %}disabled{% endif %}
+                        >
+
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Enregistrer le bâtiment
+
+                        </button>
+
+                    </div>
+
+                </form>
 
             </div>
 
-        </form>
+        </div>
 
     </div>
 
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const unitsContainer = document.getElementById("unitsContainer");
+    const unitsEmpty = document.getElementById("unitsEmpty");
+    const buildingForm = document.getElementById("buildingForm");
+
+    let nextUnitIndex = 1;
+
+    const unitConfigurations = {
+        APPARTEMENT: {
+            title: "Appartement",
+            icon: "fa-house-chimney",
+            description: "Logement complet loué à un locataire"
+        },
+
+        STUDIO: {
+            title: "Studio",
+            icon: "fa-door-open",
+            description: "Une pièce principale pour habitation"
+        },
+
+        MAGASIN: {
+            title: "Magasin / local commercial",
+            icon: "fa-store",
+            description: "Boutique, salon, bureau ou autre activité"
+        }
+    };
+
+    document.querySelectorAll("[data-add-unit]").forEach(function (button) {
+        button.addEventListener("click", function () {
+            addUnit(button.dataset.addUnit);
+        });
+    });
+
+    function addUnit(unitType) {
+        const index = nextUnitIndex;
+        nextUnitIndex += 1;
+
+        const configuration = unitConfigurations[unitType];
+        const card = document.createElement("article");
+
+        card.className = "unit-card";
+        card.dataset.type = unitType;
+        card.dataset.index = index;
+
+        card.innerHTML = `
+            <input
+                type="hidden"
+                name="unite_index"
+                value="${index}"
+            >
+
+            <input
+                type="hidden"
+                name="type_unite_${index}"
+                value="${unitType}"
+            >
+
+            <div class="unit-card-header">
+
+                <div class="unit-card-title">
+
+                    <div class="unit-card-icon">
+                        <i class="fa-solid ${configuration.icon}"></i>
+                    </div>
+
+                    <div>
+                        <h3>${configuration.title}</h3>
+                        <p>${configuration.description}</p>
+                    </div>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="remove-unit-button"
+                    title="Supprimer cette unité"
+                    aria-label="Supprimer cette unité"
+                >
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-lg-4 col-md-6 mb-3">
+
+                    <label class="form-label">
+                        Nom ou numéro
+                        <span class="required-star">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        name="numero_${index}"
+                        class="form-control"
+                        value="${generateUnitNumber(unitType)}"
+                        placeholder="Exemple : Appartement 1"
+                        maxlength="100"
+                        required
+                    >
+
+                </div>
+
+                ${getBedroomField(unitType, index)}
+
+                <div class="col-lg-4 col-md-6 mb-3">
+
+                    <label class="form-label">
+                        Type de toilettes
+                        <span class="required-star">*</span>
+                    </label>
+
+                    <select
+                        name="type_toilette_${index}"
+                        class="form-select"
+                        required
+                    >
+                        ${getToiletOptions(unitType)}
+                    </select>
+
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-3">
+
+                    <label class="form-label">
+                        Loyer mensuel
+                        <span class="required-star">*</span>
+                    </label>
+
+                    <div class="price-wrapper">
+
+                        <input
+                            type="number"
+                            name="prix_mensuel_${index}"
+                            class="form-control unit-price-input"
+                            min="0"
+                            step="1"
+                            placeholder="50000"
+                            required
+                        >
+
+                        <span class="price-currency">
+                            FCFA / mois
+                        </span>
+
+                    </div>
+
+                </div>
+
+                ${getCommercialUsageField(unitType, index)}
+
+                <div class="col-12">
+
+                    <label class="form-label">
+                        Description de l’unité
+                    </label>
+
+                    <textarea
+                        name="description_unite_${index}"
+                        class="form-control"
+                        rows="2"
+                        placeholder="Étage, emplacement, équipements, état..."
+                    ></textarea>
+
+                </div>
+
+            </div>
+        `;
+
+        card
+            .querySelector(".remove-unit-button")
+            .addEventListener("click", function () {
+                card.remove();
+                updateSummary();
+            });
+
+        card
+            .querySelector(".unit-price-input")
+            .addEventListener("input", updateSummary);
+
+        unitsContainer.appendChild(card);
+
+        updateSummary();
+
+        card.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+    }
+
+    function getBedroomField(unitType, index) {
+        if (unitType !== "APPARTEMENT") {
+            return `
+                <input
+                    type="hidden"
+                    name="nombre_chambres_${index}"
+                    value="0"
+                >
+            `;
+        }
+
+        return `
+            <div class="col-lg-4 col-md-6 mb-3">
+
+                <label class="form-label">
+                    Nombre de chambres
+                    <span class="required-star">*</span>
+                </label>
+
+                <input
+                    type="number"
+                    name="nombre_chambres_${index}"
+                    class="form-control"
+                    min="1"
+                    value="1"
+                    required
+                >
+
+                <div class="help-text">
+                    Le locataire loue tout l’appartement.
+                </div>
+
+            </div>
+        `;
+    }
+
+    function getToiletOptions(unitType) {
+        if (unitType === "APPARTEMENT") {
+            return `
+                <option value="COMMUNE_APPARTEMENT">
+                    Toilette commune dans l’appartement
+                </option>
+
+                <option value="UNE_PAR_CHAMBRE">
+                    Une toilette dans chaque chambre
+                </option>
+
+                <option value="COMMUNE_BATIMENT">
+                    Toilette commune au bâtiment
+                </option>
+
+                <option value="AUCUNE">
+                    Aucune toilette
+                </option>
+            `;
+        }
+
+        if (unitType === "STUDIO") {
+            return `
+                <option value="PRIVEE_STUDIO">
+                    Toilette privée dans le studio
+                </option>
+
+                <option value="COMMUNE_BATIMENT">
+                    Toilette commune au bâtiment
+                </option>
+
+                <option value="AUCUNE">
+                    Aucune toilette
+                </option>
+            `;
+        }
+
+        return `
+            <option value="PRIVEE_MAGASIN">
+                Toilette privée dans le magasin
+            </option>
+
+            <option value="COMMUNE_BATIMENT">
+                Toilette commune au bâtiment
+            </option>
+
+            <option value="AUCUNE">
+                Aucune toilette
+            </option>
+        `;
+    }
+
+    function getCommercialUsageField(unitType, index) {
+        if (unitType !== "MAGASIN") {
+            return `
+                <input
+                    type="hidden"
+                    name="usage_commercial_${index}"
+                    value=""
+                >
+            `;
+        }
+
+        return `
+            <div class="col-lg-4 col-md-6 mb-3">
+
+                <label class="form-label">
+                    Utilisation du magasin
+                    <span class="required-star">*</span>
+                </label>
+
+                <select
+                    name="usage_commercial_${index}"
+                    class="form-select"
+                    required
+                >
+                    <option value="">
+                        Sélectionner une activité
+                    </option>
+
+                    <option value="BOUTIQUE">
+                        Boutique
+                    </option>
+
+                    <option value="SALON_COIFFURE">
+                        Salon de coiffure
+                    </option>
+
+                    <option value="BUREAU">
+                        Bureau
+                    </option>
+
+                    <option value="RESTAURANT">
+                        Restaurant
+                    </option>
+
+                    <option value="ATELIER">
+                        Atelier
+                    </option>
+
+                    <option value="PHARMACIE">
+                        Pharmacie
+                    </option>
+
+                    <option value="ENTREPOT">
+                        Entrepôt
+                    </option>
+
+                    <option value="AUTRE">
+                        Autre activité
+                    </option>
+                </select>
+
+            </div>
+        `;
+    }
+
+    function generateUnitNumber(unitType) {
+        const existingCount = document.querySelectorAll(
+            `.unit-card[data-type="${unitType}"]`
+        ).length + 1;
+
+        if (unitType === "APPARTEMENT") {
+            return `Appartement ${existingCount}`;
+        }
+
+        if (unitType === "STUDIO") {
+            return `Studio ${existingCount}`;
+        }
+
+        return `Magasin ${existingCount}`;
+    }
+
+    function formatFcfa(amount) {
+        return new Intl.NumberFormat("fr-FR", {
+            maximumFractionDigits: 0
+        }).format(amount) + " FCFA";
+    }
+
+    function updateSummary() {
+        const apartments = document.querySelectorAll(
+            '.unit-card[data-type="APPARTEMENT"]'
+        ).length;
+
+        const studios = document.querySelectorAll(
+            '.unit-card[data-type="STUDIO"]'
+        ).length;
+
+        const shops = document.querySelectorAll(
+            '.unit-card[data-type="MAGASIN"]'
+        ).length;
+
+        const totalUnits = apartments + studios + shops;
+
+        let totalMonthlyPrice = 0;
+
+        document
+            .querySelectorAll(".unit-price-input")
+            .forEach(function (input) {
+                const value = Number(input.value);
+
+                if (Number.isFinite(value) && value > 0) {
+                    totalMonthlyPrice += value;
+                }
+            });
+
+        document.getElementById("apartmentsCount").textContent =
+            apartments;
+
+        document.getElementById("studiosCount").textContent =
+            studios;
+
+        document.getElementById("shopsCount").textContent =
+            shops;
+
+        document.getElementById("totalUnitsCount").textContent =
+            totalUnits;
+
+        document.getElementById("totalMonthlyPrice").textContent =
+            formatFcfa(totalMonthlyPrice);
+
+        unitsEmpty.style.display =
+            totalUnits === 0 ? "block" : "none";
+    }
+
+    buildingForm.addEventListener("submit", function (event) {
+        const totalUnits = document.querySelectorAll(
+            ".unit-card"
+        ).length;
+
+        if (totalUnits === 0) {
+            event.preventDefault();
+
+            alert(
+                "Veuillez ajouter au moins un appartement, " +
+                "un studio ou un magasin."
+            );
+
+            unitsEmpty.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+            return;
+        }
+
+        if (!buildingForm.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const firstInvalidField =
+                buildingForm.querySelector(":invalid");
+
+            if (firstInvalidField) {
+                firstInvalidField.focus();
+
+                firstInvalidField.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+            }
+        }
+
+        buildingForm.classList.add("was-validated");
+    });
+
+    /*
+     * Ajoute automatiquement un appartement lors de
+     * la première ouverture de la page.
+     */
+    if (
+        unitsContainer.children.length === 0
+        && !document.querySelector(".alert-danger")
+    ) {
+        addUnit("APPARTEMENT");
+    }
+
+    updateSummary();
+});
+</script>
 
 {% endblock %}

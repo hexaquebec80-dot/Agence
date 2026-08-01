@@ -42,6 +42,11 @@ urlpatterns = [
     path("paiements/ajouter/",views.ajouter_paiement,name="ajouter_paiement"),
 
     path("locataire/<int:id>/",views.detail_locataire,name="detail_locataire"),
+    path(
+    "location/<int:id>/modifier/",
+    views.modifier_location,
+    name="modifier_location",
+    ),
 
     path("locataire/modifier/<int:id>/",views.modifier_locataire,name="modifier_locataire"),
 
@@ -81,7 +86,11 @@ urlpatterns = [
     views.modifier_locataire,
     name="modifier_locataire"
    ),
-   path("batiment/supprimer/<int:id>/", views.supprimer_batiment, name="supprimer_batiment"),
+   path(
+    "batiment/<int:id>/supprimer/",
+    views.supprimer_batiment,
+    name="supprimer_batiment",
+    ),
    path(
     "batiment/<int:id>/chambre/ajouter/",
     views.ajouter_chambre,
@@ -284,6 +293,26 @@ urlpatterns = [
     "proprietaires/<int:proprietaire_id>/attestation/",
     views.attestation_proprietaire,
     name="attestation_proprietaire"
+    ),
+
+
+    path(
+    "unite/<int:unite_id>/affecter-locataire/",
+    views.affecter_unite_locataire,
+    name="affecter_unite_locataire",
+    ),
+
+
+    path(
+    "location/<int:location_id>/generer-contrat/",
+    views.generer_contrat_bail,
+    name="generer_contrat_bail",
+    ),
+
+    path(
+    "location/<int:location_id>/liberer-unite/",
+    views.liberer_unite_locataire,
+    name="liberer_unite_locataire",
     ),
 
     

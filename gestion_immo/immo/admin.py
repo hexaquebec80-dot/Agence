@@ -8,7 +8,9 @@ from .models import (
     Paiement,
     ChambreLogement,
 )
+from django.utils.html import format_html
 
+from .models import Batiment, UniteLocative
 
 @admin.register(Agence)
 class AgenceAdmin(admin.ModelAdmin):
@@ -51,6 +53,30 @@ class ProprietaireAdmin(admin.ModelAdmin):
         "agence",
         "date_creation",
     )
+
+ 
+class UniteLocativeInline(admin.StackedInline):
+    model = UniteLocative
+    extra = 0
+    show_change_link = True
+
+    fields = (
+        "numero",
+        "type_unite",
+        "nombre_chambres",
+        "type_toilette",
+        "prix_mensuel",
+        "usage_commercial",
+        "statut",
+        "actif",
+        "description",
+    )
+
+    classes = (
+        "collapse",
+    )
+
+
 @admin.register(Batiment)
 class BatimentAdmin(admin.ModelAdmin):
     list_display = (
@@ -58,7 +84,10 @@ class BatimentAdmin(admin.ModelAdmin):
         "nom",
         "proprietaire",
         "ville",
-        "nombre_logements",
+        "afficher_appartements",
+        "afficher_studios",
+        "afficher_magasins",
+        "afficher_total_unites",
         "occupation",
         "actif",
     )
@@ -67,13 +96,418 @@ class BatimentAdmin(admin.ModelAdmin):
         "code_batiment",
         "nom",
         "ville",
+        "adresse",
         "proprietaire__nom",
         "proprietaire__prenom",
+        "unites_locatives__numero",
     )
 
     list_filter = (
         "ville",
         "actif",
+        "unites_locatives__type_unite",
+        "unites_locatives__statut",
+    )
+
+    # nombre_logements est editable=False dans le modèle.
+    # Il doit donc obligatoirement être en lecture seule dans l'admin.
+    readonly_fields = (
+        "nombre_logements",
+        "date_creation",
+        "resume_unites",
+        "resume_occupation",
+    )
+
+    fieldsets = (
+        (
+            "Identification du bâtiment",
+            {
+                "fields": (
+                    "agence",
+                    "proprietaire",
+                    "code_batiment",
+                    "nom",
+                )
+            },
+        ),
+        (
+            "Localisation",
+            {
+                "fields": (
+                    "adresse",
+                    "ville",
+                )
+            },
+        ),
+        (
+            "Informations générales",
+            {
+                "fields": (
+                    "nombre_logements",
+                    "description",
+                    "actif",
+                )
+            },
+        ),
+        (
+            "Résumé des unités",
+            {
+                "fields": (
+                    "resume_unites",
+                    "resume_occupation",
+                ),
+            },
+        ),
+        (
+            "Informations système",
+            {
+                "fields": (
+                    "date_creation",
+                ),
+                "classes": (
+                    "collapse",
+                ),
+            },
+        ),
+    )
+
+    ordering = (
+        "nom",
+    )
+
+    inlines = (
+        UniteLocativeInline,
+    )
+
+    list_select_related = (
+        "agence",
+        "proprietaire",
+    )
+
+    @admin.display(
+        description="Appartements",
+        ordering="nombre_logements",
+    )
+    def afficher_appartements(self, obj):
+        return obj.appartements_total()
+
+    @admin.display(description="Studios")
+    def afficher_studios(self, obj):
+        return obj.studios_total()
+
+    @admin.display(description="Magasins")
+    def afficher_magasins(self, obj):
+        return obj.magasins_total()
+
+    @admin.display(description="Total unités")
+    def afficher_total_unites(self, obj):
+        return obj.unites_total()
+
+    @admin.display(description="Occupation")
+    def occupation(self, obj):
+        total = obj.unites_total()
+        occupees = obj.unites_occupees()
+
+        if total == 0:
+            return format_html(
+                (
+                    '<span style="'
+                    'display:inline-block;'
+                    'padding:5px 10px;'
+                    'border-radius:20px;'
+                    'background:#f1f5f9;'
+                    'color:#64748b;'
+                    'font-weight:700;'
+                    '">'
+                    "{}"
+                    "</span>"
+                ),
+                "Aucune unité",
+            )
+
+        if occupees == 0:
+            return format_html(
+                (
+                    '<span style="'
+                    'display:inline-block;'
+                    'padding:5px 10px;'
+                    'border-radius:20px;'
+                    'background:#dcfce7;'
+                    'color:#166534;'
+                    'font-weight:700;'
+                    '">'
+                    "Libre (0/{})"
+                    "</span>"
+                ),
+                total,
+            )
+
+        if occupees == total:
+            return format_html(
+                (
+                    '<span style="'
+                    'display:inline-block;'
+                    'padding:5px 10px;'
+                    'border-radius:20px;'
+                    'background:#fee2e2;'
+                    'color:#991b1b;'
+                    'font-weight:700;'
+                    '">'
+                    "Tout occupé ({}/{})"
+                    "</span>"
+                ),
+                occupees,
+                total,
+            )
+
+        return format_html(
+            (
+                '<span style="'
+                'display:inline-block;'
+                'padding:5px 10px;'
+                'border-radius:20px;'
+                'background:#fef3c7;'
+                'color:#92400e;'
+                'font-weight:700;'
+                '">'
+                "Partiellement occupé ({}/{})"
+                "</span>"
+            ),
+            occupees,
+            total,
+        )
+
+    @admin.display(description="Résumé des unités")
+    def resume_unites(self, obj):
+        if not obj or not obj.pk:
+            return "Enregistrez d’abord le bâtiment."
+
+        appartements = obj.appartements_total()
+        studios = obj.studios_total()
+        magasins = obj.magasins_total()
+        chambres = obj.chambres_total()
+        total = obj.unites_total()
+
+        return format_html(
+            """
+            <div style="
+                display:grid;
+                grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
+                gap:12px;
+                margin-top:8px;
+            ">
+                <div style="
+                    padding:15px;
+                    border-radius:12px;
+                    background:#eff6ff;
+                    border:1px solid #bfdbfe;
+                ">
+                    <strong style="display:block;color:#1e3a8a;">
+                        Appartements
+                    </strong>
+                    <span style="font-size:24px;font-weight:800;">
+                        {}
+                    </span>
+                </div>
+
+                <div style="
+                    padding:15px;
+                    border-radius:12px;
+                    background:#f5f3ff;
+                    border:1px solid #ddd6fe;
+                ">
+                    <strong style="display:block;color:#6d28d9;">
+                        Studios
+                    </strong>
+                    <span style="font-size:24px;font-weight:800;">
+                        {}
+                    </span>
+                </div>
+
+                <div style="
+                    padding:15px;
+                    border-radius:12px;
+                    background:#fff7ed;
+                    border:1px solid #fed7aa;
+                ">
+                    <strong style="display:block;color:#c2410c;">
+                        Magasins
+                    </strong>
+                    <span style="font-size:24px;font-weight:800;">
+                        {}
+                    </span>
+                </div>
+
+                <div style="
+                    padding:15px;
+                    border-radius:12px;
+                    background:#f8fafc;
+                    border:1px solid #e2e8f0;
+                ">
+                    <strong style="display:block;color:#334155;">
+                        Chambres
+                    </strong>
+                    <span style="font-size:24px;font-weight:800;">
+                        {}
+                    </span>
+                </div>
+
+                <div style="
+                    padding:15px;
+                    border-radius:12px;
+                    background:#ecfdf5;
+                    border:1px solid #a7f3d0;
+                ">
+                    <strong style="display:block;color:#047857;">
+                        Total des unités
+                    </strong>
+                    <span style="font-size:24px;font-weight:800;">
+                        {}
+                    </span>
+                </div>
+            </div>
+            """,
+            appartements,
+            studios,
+            magasins,
+            chambres,
+            total,
+        )
+
+    @admin.display(description="Résumé de l’occupation")
+    def resume_occupation(self, obj):
+        if not obj or not obj.pk:
+            return "Enregistrez d’abord le bâtiment."
+
+        total = obj.unites_total()
+        occupees = obj.unites_occupees()
+        libres = obj.unites_libres()
+        reservees = obj.unites_reservees()
+        maintenance = obj.unites_en_maintenance()
+
+        taux = round(
+            (occupees / total) * 100
+        ) if total else 0
+
+        return format_html(
+            """
+            <div style="
+                max-width:750px;
+                padding:18px;
+                border-radius:14px;
+                background:#ffffff;
+                border:1px solid #e2e8f0;
+            ">
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    gap:15px;
+                    margin-bottom:10px;
+                ">
+                    <strong>Occupation du bâtiment</strong>
+                    <strong>{}%</strong>
+                </div>
+
+                <div style="
+                    height:12px;
+                    overflow:hidden;
+                    border-radius:20px;
+                    background:#e2e8f0;
+                    margin-bottom:15px;
+                ">
+                    <div style="
+                        width:{}%;
+                        height:100%;
+                        border-radius:20px;
+                        background:#2563eb;
+                    "></div>
+                </div>
+
+                <div style="
+                    display:flex;
+                    flex-wrap:wrap;
+                    gap:10px;
+                ">
+                    <span style="
+                        padding:6px 10px;
+                        border-radius:20px;
+                        background:#fee2e2;
+                        color:#991b1b;
+                        font-weight:700;
+                    ">
+                        Occupées : {}
+                    </span>
+
+                    <span style="
+                        padding:6px 10px;
+                        border-radius:20px;
+                        background:#dcfce7;
+                        color:#166534;
+                        font-weight:700;
+                    ">
+                        Libres : {}
+                    </span>
+
+                    <span style="
+                        padding:6px 10px;
+                        border-radius:20px;
+                        background:#fef3c7;
+                        color:#92400e;
+                        font-weight:700;
+                    ">
+                        Réservées : {}
+                    </span>
+
+                    <span style="
+                        padding:6px 10px;
+                        border-radius:20px;
+                        background:#e2e8f0;
+                        color:#334155;
+                        font-weight:700;
+                    ">
+                        Maintenance : {}
+                    </span>
+                </div>
+            </div>
+            """,
+            taux,
+            taux,
+            occupees,
+            libres,
+            reservees,
+            maintenance,
+        )
+
+
+@admin.register(UniteLocative)
+class UniteLocativeAdmin(admin.ModelAdmin):
+    list_display = (
+        "numero",
+        "batiment",
+        "type_unite",
+        "afficher_details",
+        "afficher_prix",
+        "usage_commercial",
+        "statut_colore",
+        "actif",
+    )
+
+    search_fields = (
+        "numero",
+        "batiment__code_batiment",
+        "batiment__nom",
+        "batiment__proprietaire__nom",
+        "batiment__proprietaire__prenom",
+        "description",
+    )
+
+    list_filter = (
+        "type_unite",
+        "statut",
+        "type_toilette",
+        "usage_commercial",
+        "actif",
+        "batiment__ville",
     )
 
     readonly_fields = (
@@ -81,27 +515,130 @@ class BatimentAdmin(admin.ModelAdmin):
     )
 
     ordering = (
-        "nom",
+        "batiment",
+        "type_unite",
+        "numero",
     )
 
-    def occupation(self, obj):
-        total = obj.chambres_total()
-        occupees = obj.chambres_occupees()
+    list_select_related = (
+        "batiment",
+        "batiment__proprietaire",
+    )
 
-        if total == 0:
-            return "Aucune chambre"
+    autocomplete_fields = (
+        "batiment",
+    )
 
-        if occupees == 0:
-            return f"Libre (0/{total})"
+    fieldsets = (
+        (
+            "Unité locative",
+            {
+                "fields": (
+                    "batiment",
+                    "numero",
+                    "type_unite",
+                )
+            },
+        ),
+        (
+            "Caractéristiques",
+            {
+                "fields": (
+                    "nombre_chambres",
+                    "type_toilette",
+                    "usage_commercial",
+                )
+            },
+        ),
+        (
+            "Location",
+            {
+                "fields": (
+                    "prix_mensuel",
+                    "statut",
+                    "actif",
+                )
+            },
+        ),
+        (
+            "Informations supplémentaires",
+            {
+                "fields": (
+                    "description",
+                    "date_creation",
+                )
+            },
+        ),
+    )
 
-        if occupees == total:
-            return f"Tout occupé ({occupees}/{total})"
+    @admin.display(description="Caractéristiques")
+    def afficher_details(self, obj):
+        if obj.type_unite == UniteLocative.TypeUnite.APPARTEMENT:
+            return (
+                f"{obj.nombre_chambres} chambre(s) — "
+                f"{obj.get_type_toilette_display()}"
+            )
 
-        return f"Partiel ({occupees}/{total})"
+        return obj.get_type_toilette_display()
 
-    occupation.short_description = "Occupation"
+    @admin.display(
+        description="Loyer mensuel",
+        ordering="prix_mensuel",
+    )
+    def afficher_prix(self, obj):
+        prix = f"{obj.prix_mensuel:,.0f}".replace(",", " ")
 
+        return f"{prix} FCFA"
 
+    @admin.display(description="Statut")
+    def statut_colore(self, obj):
+        configurations = {
+            UniteLocative.Statut.LIBRE: (
+                "#dcfce7",
+                "#166534",
+                "Libre",
+            ),
+            UniteLocative.Statut.OCCUPE: (
+                "#fee2e2",
+                "#991b1b",
+                "Occupé",
+            ),
+            UniteLocative.Statut.RESERVE: (
+                "#fef3c7",
+                "#92400e",
+                "Réservé",
+            ),
+            UniteLocative.Statut.MAINTENANCE: (
+                "#e2e8f0",
+                "#334155",
+                "Maintenance",
+            ),
+        }
+
+        fond, texte, libelle = configurations.get(
+            obj.statut,
+            (
+                "#f1f5f9",
+                "#475569",
+                obj.get_statut_display(),
+            ),
+        )
+
+        return format_html(
+            '<span style="'
+            'display:inline-block;'
+            'padding:5px 10px;'
+            'border-radius:20px;'
+            'background:{};'
+            'color:{};'
+            'font-weight:700;'
+            '">'
+            "{}"
+            "</span>",
+            fond,
+            texte,
+            libelle,
+        )
 
 
 @admin.register(ChambreLogement)

@@ -1,0 +1,1625 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Modifier la location
+{% endblock %}
+
+{% block content %}
+
+<style>
+    :root {
+        --lease-primary: #2563eb;
+        --lease-primary-dark: #1d4ed8;
+        --lease-success: #059669;
+        --lease-danger: #dc2626;
+        --lease-warning: #d97706;
+        --lease-purple: #7c3aed;
+        --lease-cyan: #0891b2;
+        --lease-text: #0f172a;
+        --lease-muted: #64748b;
+        --lease-border: #e2e8f0;
+        --lease-bg: #f4f7fb;
+        --lease-surface: #ffffff;
+        --lease-radius-xl: 28px;
+        --lease-radius-lg: 20px;
+        --lease-radius-md: 14px;
+        --lease-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+    }
+
+    .lease-edit-page {
+        min-height: 100vh;
+        padding: 26px 0 60px;
+        background:
+            radial-gradient(
+                circle at top right,
+                rgba(37, 99, 235, 0.13),
+                transparent 32%
+            ),
+            var(--lease-bg);
+    }
+
+    .lease-edit-container {
+        width: min(1200px, calc(100% - 30px));
+        margin: 0 auto;
+    }
+
+    .lease-edit-hero {
+        position: relative;
+        overflow: hidden;
+        padding: clamp(24px, 4vw, 38px);
+        color: #ffffff;
+        border-radius: var(--lease-radius-xl);
+        background:
+            linear-gradient(
+                135deg,
+                #0f172a 0%,
+                #1e3a8a 52%,
+                #2563eb 100%
+            );
+        box-shadow: var(--lease-shadow);
+    }
+
+    .lease-edit-hero::before,
+    .lease-edit-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 999px;
+        pointer-events: none;
+    }
+
+    .lease-edit-hero::before {
+        width: 300px;
+        height: 300px;
+        right: -110px;
+        top: -165px;
+        background: rgba(255, 255, 255, 0.10);
+    }
+
+    .lease-edit-hero::after {
+        width: 180px;
+        height: 180px;
+        right: 210px;
+        bottom: -125px;
+        background: rgba(56, 189, 248, 0.14);
+    }
+
+    .lease-edit-hero-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 22px;
+        flex-wrap: wrap;
+    }
+
+    .lease-edit-heading {
+        display: flex;
+        align-items: center;
+        gap: 17px;
+        min-width: 0;
+    }
+
+    .lease-edit-main-icon {
+        width: 74px;
+        height: 74px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        color: var(--lease-primary-dark);
+        border-radius: 23px;
+        background: #ffffff;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+        font-size: 29px;
+    }
+
+    .lease-edit-eyebrow {
+        margin: 0 0 5px;
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 12px;
+        font-weight: 850;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+    }
+
+    .lease-edit-title {
+        margin: 0;
+        font-size: clamp(27px, 4vw, 42px);
+        font-weight: 950;
+        line-height: 1.1;
+        overflow-wrap: anywhere;
+    }
+
+    .lease-edit-subtitle {
+        margin: 8px 0 0;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 14px;
+    }
+
+    .lease-edit-hero-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .lease-edit-hero-button {
+        min-height: 46px;
+        padding: 11px 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.10);
+        text-decoration: none;
+        font-weight: 850;
+        transition: 0.2s ease;
+    }
+
+    .lease-edit-hero-button:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.18);
+        transform: translateY(-1px);
+    }
+
+    .lease-edit-hero-button.primary {
+        color: var(--lease-primary-dark);
+        border-color: transparent;
+        background: #ffffff;
+    }
+
+    .lease-edit-hero-button.primary:hover {
+        color: var(--lease-primary-dark);
+        background: #eff6ff;
+    }
+
+    .lease-edit-summary {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 20px;
+    }
+
+    .lease-summary-card {
+        min-width: 0;
+        padding: 17px;
+        border: 1px solid var(--lease-border);
+        border-radius: 18px;
+        background: var(--lease-surface);
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+    }
+
+    .lease-summary-label {
+        margin: 0 0 6px;
+        color: var(--lease-muted);
+        font-size: 11px;
+        font-weight: 850;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .lease-summary-value {
+        margin: 0;
+        color: var(--lease-text);
+        font-size: 17px;
+        font-weight: 950;
+        overflow-wrap: anywhere;
+    }
+
+    .lease-summary-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 900;
+    }
+
+    .lease-summary-status.active {
+        color: #065f46;
+        background: #d1fae5;
+    }
+
+    .lease-summary-status.ended {
+        color: #991b1b;
+        background: #fee2e2;
+    }
+
+    .lease-edit-alerts {
+        margin-top: 18px;
+    }
+
+    .lease-edit-alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 10px;
+        padding: 14px 16px;
+        border-radius: 15px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .lease-edit-alert.success {
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+        background: #ecfdf5;
+    }
+
+    .lease-edit-alert.error,
+    .lease-edit-alert.danger {
+        color: #991b1b;
+        border: 1px solid #fecaca;
+        background: #fef2f2;
+    }
+
+    .lease-edit-alert.warning {
+        color: #92400e;
+        border: 1px solid #fde68a;
+        background: #fffbeb;
+    }
+
+    .lease-edit-alert.info {
+        color: #075985;
+        border: 1px solid #bae6fd;
+        background: #f0f9ff;
+    }
+
+    .lease-edit-form-card {
+        margin-top: 20px;
+        padding: clamp(20px, 4vw, 32px);
+        border: 1px solid var(--lease-border);
+        border-radius: var(--lease-radius-xl);
+        background: var(--lease-surface);
+        box-shadow: var(--lease-shadow);
+    }
+
+    .lease-edit-section {
+        padding: 22px;
+        border: 1px solid var(--lease-border);
+        border-radius: var(--lease-radius-lg);
+        background: #fbfdff;
+    }
+
+    .lease-edit-section + .lease-edit-section {
+        margin-top: 18px;
+    }
+
+    .lease-edit-section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .lease-edit-section-title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .lease-edit-section-icon {
+        width: 46px;
+        height: 46px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        color: var(--lease-primary);
+        border-radius: 15px;
+        background: #dbeafe;
+        font-size: 18px;
+    }
+
+    .lease-edit-section-title {
+        margin: 0;
+        color: var(--lease-text);
+        font-size: 20px;
+        font-weight: 900;
+    }
+
+    .lease-edit-section-description {
+        margin: 4px 0 0;
+        color: var(--lease-muted);
+        font-size: 13px;
+    }
+
+    .lease-edit-grid {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .lease-edit-field {
+        min-width: 0;
+        grid-column: span 6;
+    }
+
+    .lease-edit-field.col-4 {
+        grid-column: span 4;
+    }
+
+    .lease-edit-field.col-8 {
+        grid-column: span 8;
+    }
+
+    .lease-edit-field.full {
+        grid-column: 1 / -1;
+    }
+
+    .lease-edit-label {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 8px;
+        color: var(--lease-text);
+        font-size: 13px;
+        font-weight: 850;
+    }
+
+    .lease-required {
+        color: var(--lease-danger);
+    }
+
+    .lease-edit-input-wrap {
+        position: relative;
+    }
+
+    .lease-edit-input-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        z-index: 2;
+        transform: translateY(-50%);
+        color: var(--lease-primary);
+        pointer-events: none;
+    }
+
+    .lease-edit-control {
+        width: 100%;
+        min-height: 52px;
+        padding: 11px 14px 11px 46px;
+        color: var(--lease-text);
+        border: 1px solid #cbd5e1;
+        border-radius: 15px;
+        background: #ffffff;
+        outline: none;
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease;
+    }
+
+    select.lease-edit-control {
+        cursor: pointer;
+    }
+
+    textarea.lease-edit-control {
+        min-height: 120px;
+        padding: 15px;
+        resize: vertical;
+    }
+
+    .lease-edit-control:focus {
+        border-color: var(--lease-primary);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.11);
+    }
+
+    .lease-edit-control:disabled {
+        color: #94a3b8;
+        background: #f1f5f9;
+        cursor: not-allowed;
+    }
+
+    .lease-edit-help {
+        margin: 7px 0 0;
+        color: var(--lease-muted);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .lease-edit-unit-preview {
+        display: none;
+        margin-top: 12px;
+        padding: 14px;
+        border: 1px solid #bfdbfe;
+        border-radius: 15px;
+        background: #eff6ff;
+    }
+
+    .lease-edit-unit-preview.visible {
+        display: block;
+    }
+
+    .lease-unit-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .lease-unit-preview-item {
+        min-width: 0;
+        padding: 11px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.80);
+    }
+
+    .lease-unit-preview-label {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--lease-muted);
+        font-size: 10px;
+        font-weight: 850;
+        text-transform: uppercase;
+    }
+
+    .lease-unit-preview-value {
+        color: var(--lease-text);
+        font-size: 12px;
+        font-weight: 900;
+        overflow-wrap: anywhere;
+    }
+
+    .lease-checkbox-card {
+        min-height: 52px;
+        padding: 12px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 15px;
+        background: #ffffff;
+    }
+
+    .lease-checkbox-content {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        min-width: 0;
+    }
+
+    .lease-checkbox-icon {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        color: var(--lease-success);
+        border-radius: 12px;
+        background: #d1fae5;
+    }
+
+    .lease-checkbox-title {
+        margin: 0;
+        color: var(--lease-text);
+        font-size: 13px;
+        font-weight: 900;
+    }
+
+    .lease-checkbox-description {
+        margin: 3px 0 0;
+        color: var(--lease-muted);
+        font-size: 11px;
+    }
+
+    .lease-switch {
+        position: relative;
+        width: 50px;
+        height: 28px;
+        flex-shrink: 0;
+    }
+
+    .lease-switch input {
+        width: 0;
+        height: 0;
+        opacity: 0;
+    }
+
+    .lease-switch-slider {
+        position: absolute;
+        inset: 0;
+        border-radius: 999px;
+        background: #cbd5e1;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .lease-switch-slider::before {
+        content: "";
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        left: 3px;
+        top: 3px;
+        border-radius: 50%;
+        background: #ffffff;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.20);
+        transition: 0.2s ease;
+    }
+
+    .lease-switch input:checked + .lease-switch-slider {
+        background: var(--lease-success);
+    }
+
+    .lease-switch input:checked + .lease-switch-slider::before {
+        transform: translateX(22px);
+    }
+
+    .lease-edit-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 15px;
+        padding: 14px;
+        color: #075985;
+        border: 1px solid #bae6fd;
+        border-radius: 15px;
+        background: #f0f9ff;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .lease-edit-note.warning {
+        color: #92400e;
+        border-color: #fde68a;
+        background: #fffbeb;
+    }
+
+    .lease-contract-panel {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 16px;
+        border: 1px solid #ddd6fe;
+        border-radius: 17px;
+        background: #f5f3ff;
+        flex-wrap: wrap;
+    }
+
+    .lease-contract-identity {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+    }
+
+    .lease-contract-icon {
+        width: 46px;
+        height: 46px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        color: var(--lease-purple);
+        border-radius: 15px;
+        background: #ede9fe;
+        font-size: 18px;
+    }
+
+    .lease-contract-title {
+        margin: 0;
+        color: var(--lease-text);
+        font-size: 14px;
+        font-weight: 900;
+    }
+
+    .lease-contract-text {
+        margin: 4px 0 0;
+        color: var(--lease-muted);
+        font-size: 12px;
+    }
+
+    .lease-contract-link {
+        min-height: 41px;
+        padding: 9px 13px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        color: var(--lease-purple);
+        border: 1px solid #c4b5fd;
+        border-radius: 12px;
+        background: #ffffff;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 850;
+    }
+
+    .lease-edit-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 11px;
+        margin-top: 22px;
+        flex-wrap: wrap;
+    }
+
+    .lease-edit-button {
+        min-height: 49px;
+        padding: 11px 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 1px solid transparent;
+        border-radius: 14px;
+        text-decoration: none;
+        font-weight: 900;
+        transition: 0.2s ease;
+    }
+
+    .lease-edit-button.cancel {
+        color: #334155;
+        border-color: #cbd5e1;
+        background: #ffffff;
+    }
+
+    .lease-edit-button.cancel:hover {
+        color: var(--lease-text);
+        background: #f8fafc;
+    }
+
+    .lease-edit-button.submit {
+        color: #ffffff;
+        background:
+            linear-gradient(
+                135deg,
+                var(--lease-primary),
+                var(--lease-primary-dark)
+            );
+        box-shadow: 0 12px 25px rgba(37, 99, 235, 0.22);
+    }
+
+    .lease-edit-button.submit:hover {
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 15px 30px rgba(37, 99, 235, 0.28);
+    }
+
+    .lease-edit-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.70;
+        transform: none;
+    }
+
+    @media (max-width: 1000px) {
+        .lease-edit-summary {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .lease-edit-field,
+        .lease-edit-field.col-4,
+        .lease-edit-field.col-8 {
+            grid-column: 1 / -1;
+        }
+    }
+
+    @media (max-width: 650px) {
+        .lease-edit-page {
+            padding-top: 14px;
+        }
+
+        .lease-edit-container {
+            width: min(100% - 18px, 1200px);
+        }
+
+        .lease-edit-hero,
+        .lease-edit-form-card,
+        .lease-edit-section {
+            padding: 18px 14px;
+        }
+
+        .lease-edit-hero-content,
+        .lease-edit-heading {
+            align-items: flex-start;
+        }
+
+        .lease-edit-main-icon {
+            width: 59px;
+            height: 59px;
+            border-radius: 19px;
+            font-size: 23px;
+        }
+
+        .lease-edit-hero-actions {
+            width: 100%;
+        }
+
+        .lease-edit-hero-button {
+            flex: 1 1 140px;
+        }
+
+        .lease-edit-summary {
+            grid-template-columns: 1fr;
+        }
+
+        .lease-unit-preview-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .lease-edit-actions {
+            flex-direction: column-reverse;
+        }
+
+        .lease-edit-button {
+            width: 100%;
+        }
+    }
+</style>
+
+{% url "locations" as locations_url %}
+{% url "detail_locataire" location.locataire.id as detail_locataire_url %}
+{% url "detail_batiment" location.batiment.id as detail_batiment_url %}
+
+<div class="lease-edit-page"
+     id="leaseEditPage"
+     data-has-legacy-room="{% if location.chambre_id %}1{% else %}0{% endif %}">
+
+    <div class="lease-edit-container">
+
+        <header class="lease-edit-hero">
+            <div class="lease-edit-hero-content">
+
+                <div class="lease-edit-heading">
+                    <div class="lease-edit-main-icon">
+                        <i class="fa-solid fa-file-pen"></i>
+                    </div>
+
+                    <div>
+                        <p class="lease-edit-eyebrow">
+                            Gestion des contrats
+                        </p>
+
+                        <h1 class="lease-edit-title">
+                            Modifier la location
+                        </h1>
+
+                        <p class="lease-edit-subtitle">
+                            {{ location.locataire.nom }}
+                            {{ location.locataire.prenom }}
+                            —
+                            {{ location.batiment.nom }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="lease-edit-hero-actions">
+                    {% if locations_url %}
+                        <a href="{{ locations_url }}"
+                           class="lease-edit-hero-button">
+                            <i class="fa-solid fa-arrow-left"></i>
+                            Locations
+                        </a>
+                    {% endif %}
+
+                    {% if detail_locataire_url %}
+                        <a href="{{ detail_locataire_url }}"
+                           class="lease-edit-hero-button primary">
+                            <i class="fa-solid fa-user"></i>
+                            Voir le locataire
+                        </a>
+                    {% endif %}
+                </div>
+
+            </div>
+        </header>
+
+        <section class="lease-edit-summary">
+            <article class="lease-summary-card">
+                <p class="lease-summary-label">
+                    Contrat
+                </p>
+
+                <p class="lease-summary-value">
+                    {{ location.numero_contrat|default:"Sans numéro" }}
+                </p>
+            </article>
+
+            <article class="lease-summary-card">
+                <p class="lease-summary-label">
+                    Unité actuelle
+                </p>
+
+                <p class="lease-summary-value">
+                    {% if location.unite %}
+                        {{ location.unite.get_type_unite_display }}
+                        n° {{ location.unite.numero }}
+                    {% elif location.chambre %}
+                        Chambre n° {{ location.chambre.numero }}
+                    {% elif location.numero_appartement %}
+                        Appartement n° {{ location.numero_appartement }}
+                    {% else %}
+                        Non renseignée
+                    {% endif %}
+                </p>
+            </article>
+
+            <article class="lease-summary-card">
+                <p class="lease-summary-label">
+                    Loyer actuel
+                </p>
+
+                <p class="lease-summary-value">
+                    {{ location.loyer|default:0|floatformat:0 }}
+                    FCFA
+                </p>
+            </article>
+
+            <article class="lease-summary-card">
+                <p class="lease-summary-label">
+                    Statut actuel
+                </p>
+
+                <p class="lease-summary-value">
+                    {% if location.active %}
+                        <span class="lease-summary-status active">
+                            <i class="fa-solid fa-circle-check"></i>
+                            Bail actif
+                        </span>
+                    {% else %}
+                        <span class="lease-summary-status ended">
+                            <i class="fa-solid fa-circle-stop"></i>
+                            Bail terminé
+                        </span>
+                    {% endif %}
+                </p>
+            </article>
+        </section>
+
+        {% if messages %}
+            <section class="lease-edit-alerts">
+                {% for message in messages %}
+                    <div class="lease-edit-alert {{ message.tags|default:'info' }}">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </section>
+        {% endif %}
+
+        <main class="lease-edit-form-card">
+            <form method="post"
+                  id="leaseEditForm"
+                  novalidate>
+
+                {% csrf_token %}
+
+                <section class="lease-edit-section">
+                    <div class="lease-edit-section-heading">
+                        <div class="lease-edit-section-title-wrap">
+                            <div class="lease-edit-section-icon">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+
+                            <div>
+                                <h2 class="lease-edit-section-title">
+                                    Parties et bâtiment
+                                </h2>
+
+                                <p class="lease-edit-section-description">
+                                    Sélectionnez le locataire, le bâtiment et l’unité du bail.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lease-edit-grid">
+
+                        <div class="lease-edit-field">
+                            <label class="lease-edit-label"
+                                   for="idLocataire">
+                                Locataire
+                                <span class="lease-required">*</span>
+                            </label>
+
+                            <div class="lease-edit-input-wrap">
+                                <i class="fa-solid fa-user lease-edit-input-icon"></i>
+
+                                <select id="idLocataire"
+                                        name="locataire"
+                                        class="lease-edit-control"
+                                        required>
+
+                                    <option value="">
+                                        Sélectionner un locataire
+                                    </option>
+
+                                    {% for locataire in locataires %}
+                                        <option value="{{ locataire.id }}"
+                                            {% if request.method == "POST" %}
+                                                {% if request.POST.locataire == locataire.id|stringformat:"s" %}
+                                                    selected
+                                                {% endif %}
+                                            {% elif location.locataire_id == locataire.id %}
+                                                selected
+                                            {% endif %}>
+
+                                            {{ locataire.nom }}
+                                            {{ locataire.prenom }}
+
+                                            {% if locataire.telephone %}
+                                                — {{ locataire.telephone }}
+                                            {% endif %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="lease-edit-field">
+                            <label class="lease-edit-label"
+                                   for="idBatiment">
+                                Bâtiment
+                                <span class="lease-required">*</span>
+                            </label>
+
+                            <div class="lease-edit-input-wrap">
+                                <i class="fa-solid fa-building lease-edit-input-icon"></i>
+
+                                <select id="idBatiment"
+                                        name="batiment"
+                                        class="lease-edit-control"
+                                        required>
+
+                                    <option value="">
+                                        Sélectionner un bâtiment
+                                    </option>
+
+                                    {% for batiment in batiments %}
+                                        <option value="{{ batiment.id }}"
+                                            {% if request.method == "POST" %}
+                                                {% if request.POST.batiment == batiment.id|stringformat:"s" %}
+                                                    selected
+                                                {% endif %}
+                                            {% elif location.batiment_id == batiment.id %}
+                                                selected
+                                            {% endif %}>
+
+                                            {{ batiment.nom }}
+
+                                            {% if batiment.code_batiment %}
+                                                — {{ batiment.code_batiment }}
+                                            {% endif %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <p class="lease-edit-help">
+                                Les unités affichées ci-dessous correspondent au bâtiment chargé par la vue.
+                            </p>
+                        </div>
+
+                        <div class="lease-edit-field full">
+                            <label class="lease-edit-label"
+                                   for="idUnite">
+                                Unité locative
+                                <span class="lease-required"
+                                      id="unitRequiredMark">*</span>
+                            </label>
+
+                            <div class="lease-edit-input-wrap">
+                                <i class="fa-solid fa-door-open lease-edit-input-icon"></i>
+
+                                <select id="idUnite"
+                                        name="unite"
+                                        class="lease-edit-control">
+
+                                    <option value="">
+                                        Sélectionner une unité
+                                    </option>
+
+                                    {% for unite in unites %}
+                                        <option value="{{ unite.id }}"
+                                                data-number="{{ unite.numero }}"
+                                                data-type="{{ unite.get_type_unite_display|escape }}"
+                                                data-price="{{ unite.prix_mensuel|default:0 }}"
+                                                data-status="{{ unite.get_statut_display|default:'Disponible'|escape }}"
+                                            {% if request.method == "POST" %}
+                                                {% if request.POST.unite == unite.id|stringformat:"s" %}
+                                                    selected
+                                                {% endif %}
+                                            {% elif location.unite_id == unite.id %}
+                                                selected
+                                            {% endif %}>
+
+                                            {{ unite.get_type_unite_display }}
+                                            n° {{ unite.numero }}
+                                            —
+                                            {{ unite.prix_mensuel|default:0|floatformat:0 }}
+                                            FCFA
+
+                                            {% if location.unite_id == unite.id %}
+                                                — unité actuelle
+                                            {% endif %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            {% if not unites %}
+                                <p class="lease-edit-help"
+                                   style="color:#b45309;">
+                                    Aucune unité libre n’est disponible dans le bâtiment sélectionné.
+                                </p>
+                            {% else %}
+                                <p class="lease-edit-help">
+                                    L’unité actuelle reste proposée même si son statut est occupé.
+                                </p>
+                            {% endif %}
+
+                            <div class="lease-edit-unit-preview"
+                                 id="unitPreview">
+
+                                <div class="lease-unit-preview-grid">
+                                    <div class="lease-unit-preview-item">
+                                        <span class="lease-unit-preview-label">
+                                            Numéro
+                                        </span>
+                                        <span class="lease-unit-preview-value"
+                                              id="previewUnitNumber">
+                                            —
+                                        </span>
+                                    </div>
+
+                                    <div class="lease-unit-preview-item">
+                                        <span class="lease-unit-preview-label">
+                                            Type
+                                        </span>
+                                        <span class="lease-unit-preview-value"
+                                              id="previewUnitType">
+                                            —
+                                        </span>
+                                    </div>
+
+                                    <div class="lease-unit-preview-item">
+                                        <span class="lease-unit-preview-label">
+                                            Prix enregistré
+                                        </span>
+                                        <span class="lease-unit-preview-value"
+                                              id="previewUnitPrice">
+                                            —
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if location.chambre or not location.unite %}
+                            <div class="lease-edit-field full"
+                                 id="legacyNumberField">
+                                <label class="lease-edit-label"
+                                       for="idNumeroAppartement">
+                                    Ancien numéro d’appartement ou de chambre
+                                </label>
+
+                                <div class="lease-edit-input-wrap">
+                                    <i class="fa-solid fa-hashtag lease-edit-input-icon"></i>
+
+                                    <input id="idNumeroAppartement"
+                                           type="text"
+                                           name="numero_appartement"
+                                           class="lease-edit-control"
+                                           value="{% if request.method == 'POST' %}{{ request.POST.numero_appartement }}{% else %}{{ location.numero_appartement|default:'' }}{% endif %}"
+                                           maxlength="100"
+                                           placeholder="Exemple : A-12">
+                                </div>
+
+                                <p class="lease-edit-help">
+                                    Ce champ sert uniquement aux anciennes locations qui ne sont pas encore liées à une unité moderne.
+                                </p>
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                    <div class="lease-edit-note warning">
+                        <i class="fa-solid fa-triangle-exclamation mt-1"></i>
+
+                        <div>
+                            Lorsque vous remplacez l’unité, l’ancienne unité sera remise automatiquement dans la liste des unités libres. Une unité ne peut pas avoir deux baux actifs.
+                        </div>
+                    </div>
+                </section>
+
+                <section class="lease-edit-section">
+                    <div class="lease-edit-section-heading">
+                        <div class="lease-edit-section-title-wrap">
+                            <div class="lease-edit-section-icon">
+                                <i class="fa-solid fa-coins"></i>
+                            </div>
+
+                            <div>
+                                <h2 class="lease-edit-section-title">
+                                    Conditions financières
+                                </h2>
+
+                                <p class="lease-edit-section-description">
+                                    Modifiez le loyer mensuel et les informations de caution.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lease-edit-grid">
+
+                        <div class="lease-edit-field">
+                            <label class="lease-edit-label"
+                                   for="idLoyer">
+                                Loyer mensuel
+                                <span class="lease-required">*</span>
+                            </label>
+
+                            <div class="lease-edit-input-wrap">
+                                <i class="fa-solid fa-money-bill-wave lease-edit-input-icon"></i>
+
+                                <input id="idLoyer"
+                                       type="number"
+                                       name="loyer"
+                                       class="lease-edit-control"
+                                       value="{% if request.method == 'POST' %}{{ request.POST.loyer }}{% else %}{{ location.loyer|default:0 }}{% endif %}"
+                                       min="1"
+                                       step="1"
+                                       inputmode="decimal"
+                                       required>
+                            </div>
+
+                            <p class="lease-edit-help">
+                                Montant mensuel en francs CFA.
+                            </p>
+                        </div>
+
+                        <div class="lease-edit-field">
+                            <label class="lease-edit-label"
+                                   for="idCaution">
+                                Montant de la caution
+                            </label>
+
+                            <div class="lease-edit-input-wrap">
+                                <i class="fa-solid fa-shield-halved lease-edit-input-icon"></i>
+
+                                <input id="idCaution"
+                                       type="number"
+                                       name="caution"
+                                       class="lease-edit-control"
+                                       value="{% if request.method == 'POST' %}{{ request.POST.caution }}{% else %}{{ location.caution|default:0 }}{% endif %}"
+                                       min="0"
+                                       step="1"
+                                       inputmode="decimal">
+                            </div>
+                        </div>
+
+                        <div class="lease-edit-field">
+                            <label class="lease-edit-label">
+                                État de la caution
+                            </label>
+
+                            <div class="lease-checkbox-card">
+                                <div class="lease-checkbox-content">
+                                    <div class="lease-checkbox-icon">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                    </div>
+
+                                    <div>
+                                        <p class="lease-checkbox-title">
+                                            Caution payée
+                                        </p>
+
+                                        <p class="lease-checkbox-description">
+                                            Activez lorsque le montant a été reçu.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <label class="lease-switch">
+                                    <input id="idCautionPayee"
+                                           type="checkbox"
+                                           name="caution_payee"
+                                        {% if request.method == "POST" %}
+                                            {% if request.POST.caution_payee %}
+                                                checked
+                                            {% endif %}
+                                        {% elif location.caution_payee %}
+                                            checked
+                                        {% endif %}>
+
+                                    <span class="lease-switch-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="lease-edit-field">
+                            <label class="lease-edit-label"
+                                   for="idDateCaution">
+                                Date de paiement de la caution
+                            </label>
+
+                            <div class="lease-edit-input-wrap">
+                                <i class="fa-solid fa-calendar-check lease-edit-input-icon"></i>
+
+                                <input id="idDateCaution"
+                                       type="date"
+                                       name="date_caution"
+                                       class="lease-edit-control"
+                                       value="{% if request.method == 'POST' %}{{ request.POST.date_caution }}{% elif location.date_caution %}{{ location.date_caution|date:'Y-m-d' }}{% endif %}">
+                            </div>
+                        </div>
+
+                        <div class="lease-edit-field full">
+                            <label class="lease-edit-label"
+                                   for="idObservationCaution">
+                                Observation sur la caution
+                            </label>
+
+                            <textarea id="idObservationCaution"
+                                      name="observation_caution"
+                                      class="lease-edit-control"
+                                      placeholder="Exemple : caution payée en deux versements, reçu remis au locataire...">{% if request.method == "POST" %}{{ request.POST.observation_caution }}{% else %}{{ location.observation_caution|default:"" }}{% endif %}</textarea>
+                        </div>
+
+                    </div>
+                </section>
+
+                <section class="lease-edit-section">
+                    <div class="lease-edit-section-heading">
+                        <div class="lease-edit-section-title-wrap">
+                            <div class="lease-edit-section-icon">
+                                <i class="fa-solid fa-calendar-days"></i>
+                            </div>
+
+                            <div>
+                                <h2 class="lease-edit-section-title">
+                                    Durée et statut du bail
+                                </h2>
+
+                                <p class="lease-edit-section-description">
+                                    Gérez la date de début, la date de fin et l’état du contrat.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lease-edit-grid">
+
+                        <div class="lease-edit-field col-4">
+                            <label class="lease-edit-label"
+                                   for="idDateDebut">
+                                Date de début
+                                <span class="lease-required">*</span>
+                            </label>
+
+                            <div class="lease-edit-input-wrap">
+                                <i class="fa-solid fa-calendar-plus lease-edit-input-icon"></i>
+
+                                <input id="idDateDebut"
+                                       type="date"
+                                       name="date_debut"
+                                       class="lease-edit-control"
+                                       value="{% if request.method == 'POST' %}{{ request.POST.date_debut }}{% elif location.date_debut %}{{ location.date_debut|date:'Y-m-d' }}{% endif %}"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="lease-edit-field col-4">
+                            <label class="lease-edit-label"
+                                   for="idDateFin">
+                                Date de fin
+                            </label>
+
+                            <div class="lease-edit-input-wrap">
+                                <i class="fa-solid fa-calendar-xmark lease-edit-input-icon"></i>
+
+                                <input id="idDateFin"
+                                       type="date"
+                                       name="date_fin"
+                                       class="lease-edit-control"
+                                       value="{% if request.method == 'POST' %}{{ request.POST.date_fin }}{% elif location.date_fin %}{{ location.date_fin|date:'Y-m-d' }}{% endif %}">
+                            </div>
+
+                            <p class="lease-edit-help">
+                                Laissez vide pour un bail à durée indéterminée.
+                            </p>
+                        </div>
+
+                        <div class="lease-edit-field col-4">
+                            <label class="lease-edit-label"
+                                   for="idActive">
+                                Statut du bail
+                                <span class="lease-required">*</span>
+                            </label>
+
+                            <div class="lease-edit-input-wrap">
+                                <i class="fa-solid fa-toggle-on lease-edit-input-icon"></i>
+
+                                <select id="idActive"
+                                        name="active"
+                                        class="lease-edit-control"
+                                        required>
+
+                                    <option value="True"
+                                        {% if request.method == "POST" %}
+                                            {% if request.POST.active == "True" %}
+                                                selected
+                                            {% endif %}
+                                        {% elif location.active %}
+                                            selected
+                                        {% endif %}>
+                                        Actif
+                                    </option>
+
+                                    <option value="False"
+                                        {% if request.method == "POST" %}
+                                            {% if request.POST.active == "False" %}
+                                                selected
+                                            {% endif %}
+                                        {% elif not location.active %}
+                                            selected
+                                        {% endif %}>
+                                        Terminé
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="lease-edit-note"
+                         id="statusInformation">
+                        <i class="fa-solid fa-circle-info mt-1"></i>
+
+                        <div id="statusInformationText">
+                            Un bail actif maintient l’unité au statut occupé.
+                        </div>
+                    </div>
+                </section>
+
+                {% if location.contrat_bail_numerique %}
+                    <section class="lease-edit-section">
+                        <div class="lease-contract-panel">
+                            <div class="lease-contract-identity">
+                                <div class="lease-contract-icon">
+                                    <i class="fa-solid fa-file-contract"></i>
+                                </div>
+
+                                <div>
+                                    <p class="lease-contract-title">
+                                        Contrat numérique existant
+                                    </p>
+
+                                    <p class="lease-contract-text">
+                                        Après l’enregistrement, le PDF sera régénéré automatiquement avec les nouvelles informations.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <a href="{{ location.contrat_bail_numerique.url }}"
+                               target="_blank"
+                               rel="noopener"
+                               class="lease-contract-link">
+                                <i class="fa-solid fa-eye"></i>
+                                Voir le contrat actuel
+                            </a>
+                        </div>
+                    </section>
+                {% endif %}
+
+                <div class="lease-edit-actions">
+                    {% if locations_url %}
+                        <a href="{{ locations_url }}"
+                           class="lease-edit-button cancel">
+                            <i class="fa-solid fa-xmark"></i>
+                            Annuler
+                        </a>
+                    {% endif %}
+
+                    <button type="submit"
+                            class="lease-edit-button submit"
+                            id="saveLeaseButton">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Enregistrer les modifications
+                    </button>
+                </div>
+
+            </form>
+        </main>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const page = document.getElementById("leaseEditPage");
+        const form = document.getElementById("leaseEditForm");
+        const saveButton = document.getElementById("saveLeaseButton");
+
+        const unitSelect = document.getElementById("idUnite");
+        const unitPreview = document.getElementById("unitPreview");
+        const previewUnitNumber = document.getElementById("previewUnitNumber");
+        const previewUnitType = document.getElementById("previewUnitType");
+        const previewUnitPrice = document.getElementById("previewUnitPrice");
+
+        const cautionPaid = document.getElementById("idCautionPayee");
+        const cautionDate = document.getElementById("idDateCaution");
+
+        const activeSelect = document.getElementById("idActive");
+        const endDate = document.getElementById("idDateFin");
+        const unitRequiredMark = document.getElementById("unitRequiredMark");
+        const statusInformation = document.getElementById("statusInformation");
+        const statusInformationText = document.getElementById(
+            "statusInformationText"
+        );
+
+        const buildingSelect = document.getElementById("idBatiment");
+
+        function formatFcfa(value) {
+            const numericValue = Number(value || 0);
+
+            if (!Number.isFinite(numericValue)) {
+                return "0 FCFA";
+            }
+
+            return new Intl.NumberFormat("fr-FR", {
+                maximumFractionDigits: 0
+            }).format(numericValue) + " FCFA";
+        }
+
+        function updateUnitPreview() {
+            if (!unitSelect || !unitPreview) {
+                return;
+            }
+
+            const option = unitSelect.options[
+                unitSelect.selectedIndex
+            ];
+
+            if (!option || !option.value) {
+                unitPreview.classList.remove("visible");
+                return;
+            }
+
+            previewUnitNumber.textContent =
+                option.dataset.number || "—";
+
+            previewUnitType.textContent =
+                option.dataset.type || "—";
+
+            previewUnitPrice.textContent =
+                formatFcfa(option.dataset.price);
+
+            unitPreview.classList.add("visible");
+        }
+
+        function updateCautionState() {
+            if (!cautionPaid || !cautionDate) {
+                return;
+            }
+
+            cautionDate.disabled = !cautionPaid.checked;
+
+            if (!cautionPaid.checked) {
+                cautionDate.value = "";
+            }
+        }
+
+        function updateLeaseStatus() {
+            if (!activeSelect) {
+                return;
+            }
+
+            const isActive = activeSelect.value === "True";
+            const hasLegacyRoom = (
+                page
+                && page.dataset.hasLegacyRoom === "1"
+            );
+
+            if (unitSelect) {
+                unitSelect.required = isActive && !hasLegacyRoom;
+            }
+
+            if (unitRequiredMark) {
+                unitRequiredMark.style.display = (
+                    isActive && !hasLegacyRoom
+                    ? "inline"
+                    : "none"
+                );
+            }
+
+            if (isActive) {
+                statusInformation.classList.remove("warning");
+
+                statusInformationText.textContent =
+                    "Un bail actif maintient l’unité au statut occupé. " +
+                    "La date de fin peut rester vide.";
+
+            } else {
+                statusInformation.classList.add("warning");
+
+                statusInformationText.textContent =
+                    "En terminant ce bail, l’unité sera automatiquement " +
+                    "remise dans la liste des unités disponibles.";
+
+                if (endDate && !endDate.value) {
+                    const today = new Date();
+                    const localDate = new Date(
+                        today.getTime()
+                        - today.getTimezoneOffset() * 60000
+                    );
+
+                    endDate.value = localDate
+                        .toISOString()
+                        .slice(0, 10);
+                }
+            }
+        }
+
+        if (unitSelect) {
+            unitSelect.addEventListener(
+                "change",
+                updateUnitPreview
+            );
+
+            updateUnitPreview();
+        }
+
+        if (cautionPaid) {
+            cautionPaid.addEventListener(
+                "change",
+                updateCautionState
+            );
+
+            updateCautionState();
+        }
+
+        if (activeSelect) {
+            activeSelect.addEventListener(
+                "change",
+                updateLeaseStatus
+            );
+
+            updateLeaseStatus();
+        }
+
+        if (buildingSelect) {
+            const originalBuilding = buildingSelect.value;
+
+            buildingSelect.addEventListener("change", function () {
+                if (
+                    buildingSelect.value !== originalBuilding
+                    && unitSelect
+                ) {
+                    unitSelect.value = "";
+                    updateUnitPreview();
+
+                    window.alert(
+                        "Le bâtiment a changé. Les unités affichées peuvent " +
+                        "encore appartenir à l’ancien bâtiment. Rechargez la " +
+                        "page avec les unités du nouveau bâtiment avant " +
+                        "d’enregistrer un bail actif."
+                    );
+                }
+            });
+        }
+
+        if (form && saveButton) {
+            form.addEventListener("submit", function () {
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                saveButton.disabled = true;
+                saveButton.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin"></i>' +
+                    " Enregistrement...";
+            });
+        }
+    });
+</script>
+
+{% endblock %}
